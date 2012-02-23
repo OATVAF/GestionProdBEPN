@@ -2,6 +2,8 @@ package pack;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -192,7 +194,8 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 		
 		//initialisation du stagePane
 		stagePane = new JPanel();
-		stagePane.setLayout(new GridLayout(0,4));
+		//stagePane.setLayout(new GridLayout(0,4));
+		stagePane.setLayout(new GridBagLayout());
 		stagePane.setBackground(Color.WHITE);
 				
 	}//fin constructionStagePane()
@@ -289,22 +292,25 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 		}//fin pour
 		//suppression des stages a enlever de l'affichage
 		StageList.removeAll(removeStage);
-		
+
 		//affichage
 		int i = 0;
+		GridBagConstraints c = new GridBagConstraints();
 		for (Stage unstage : StageList) {
 			if(i == NBAFF){
 				break;
 			}
+			//Border border = LineBorder.createGrayLineBorder();
 			
-			Border border = LineBorder.createGrayLineBorder();
+			c.fill = GridBagConstraints.HORIZONTAL;
 			
 			stageLabels[i][0] = new JLabel();
 			stageLabels[i][0].setText(unstage.getCode());
 			stageLabels[i][0].setFont(new Font("arial", 1, 22));
 			stageLabels[i][0].setForeground(Color.BLACK);
 			stageLabels[i][0].setHorizontalAlignment(SwingConstants.CENTER);
-			stagePane.add(stageLabels[i][0]);
+			c.gridx = 0; c.gridy = i; c.weightx = 1;
+			stagePane.add(stageLabels[i][0], c);
 			
 			stageLabels[i][1] = new JLabel();
 			String libelle = unstage.getLibelle();
@@ -312,15 +318,17 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 			stageLabels[i][1].setFont(new Font("arial", 1, 22));
 			stageLabels[i][1].setForeground(Color.BLACK);
 			stageLabels[i][1].setHorizontalAlignment(SwingConstants.CENTER);
-			stagePane.add(stageLabels[i][1]);
+			c.gridx = 1; c.gridy = i; c.weightx = 2;
+			stagePane.add(stageLabels[i][1],c);
 			
 			stageLabels[i][2] = new JLabel();
 			stageLabels[i][2].setText(unstage.getFirstModule().getSalle());
 			stageLabels[i][2].setFont(new Font("arial", 1, 26));
 			stageLabels[i][2].setForeground(Color.BLACK);
-			stageLabels[i][2].setBorder(border);
+			//stageLabels[i][2].setBorder(border);
 			stageLabels[i][2].setHorizontalAlignment(SwingConstants.CENTER);
-			stagePane.add(stageLabels[i][2]);
+			c.gridx = 2; c.gridy = i; c.weightx = 1;
+			stagePane.add(stageLabels[i][2],c);
 			
 			stageLabels[i][3] = new JLabel();
 			stageLabels[i][3].setText(unstage.getFirstModule().getHeureDebut());
@@ -334,7 +342,8 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 			if((StageList.get(i).getnbMin()-nbmin) < -10){
 				stageLabels[i][3].setForeground(new Color(255, 0, 0));
 			}
-			stagePane.add(stageLabels[i][3]);
+			c.gridx = 3; c.gridy = i; c.weightx = 1;
+			stagePane.add(stageLabels[i][3],c);
 			i++;
 		}
 		//ajout de case vide pour rendre l'affichage plus joli quand il se vide
@@ -342,7 +351,8 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 			for (int k = i; k < 10; k++) {
 				for (int j = 0; j < 4; j++) {
 					stageLabels[i][j] = new JLabel();
-					stagePane.add(stageLabels[i][j]);
+					c.gridx = j; c.gridy = i; c.weightx = 1;
+					stagePane.add(stageLabels[i][j],c);
 				}
 			}
 		}//finsi
