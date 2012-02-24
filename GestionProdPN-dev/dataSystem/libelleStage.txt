@@ -1,18 +1,18 @@
-SMG/Maintien des compétences généralités/19/
-OMG/Maintien des compétences généralités/19/
+SMG/Maintien des Compétences Généralités/19/
+OMG/Maintien des Compétences Généralités/19/
 SE1/Stage Sécurité Sauvetage/24/
 SE2/Stage Sécurité Sauvetage/24/
-SRG/Stage reprise généralités/19/
-ORG/Stage reprise généralités/19/
-OXG/Stage intégration généralités/16/
+SRG/Stage Reprise Généralités/19/
+ORG/Stage Reprise Généralités/19/
+OXG/Stage Intégration Généralités/16/
 S2/Stage 4S PNT/18/
 4S/Stage 4S PNT/18/
 QT/Stage QT PNT/16/
-SMT/Maintien des compétences B777/19/
-SM4/Maintien des compétences B747/19/
-SM8/Maintien des compétences A380/19/
-SM9/Maintien des compétences A340/19/
-OML/Maintien des compétences A320/19/
+SMT/Maintien des Compétences B777/19/
+SM4/Maintien des Compétences B747/19/
+SM8/Maintien des Compétences A380/19/
+SM9/Maintien des Compétences A340/19/
+OML/Maintien des Compétences A320/19/
 SLT/Adaptation B777/18/
 SL4/Adaptation B747/18/
 SL8/Adaptation A380/18/
