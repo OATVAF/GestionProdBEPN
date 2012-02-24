@@ -1,10 +1,16 @@
 package pack;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.Properties;
+import java.util.ResourceBundle;
 
 import javax.swing.JOptionPane;
 
@@ -15,6 +21,7 @@ import javax.swing.JOptionPane;
  */
 public class PasserelleAffichage {
 	
+
 	/**
 	 * procedure qui permet d'afficher le powerpoint
 	 */
@@ -42,7 +49,7 @@ public class PasserelleAffichage {
 	public static String getCheminPptExe(){
 		String chemin = "";
 		
-		try {
+		try {			
 			//lecture du fichier
 			FileReader fichier;
 			fichier = new FileReader("dataSystem\\dataAff.txt");
@@ -77,6 +84,24 @@ public class PasserelleAffichage {
 		return chemin;
 	}//fin getCheminPptExe()
 	
+	public static String getAppConfig(String param) {
+		String val = "";
+		Properties prop = new Properties();
+
+		//ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+		InputStream input = PasserelleAffichage.class.getResourceAsStream("/res/app.config");
+		//InputStream input = classLoader.getResourceAsStream("/res/app.config");
+		//InputStream input2 = PasserelleAffichage.class.getResourceAsStream("/res/app.config");
+		//ResourceBundle.getBundle();
+		try {
+		   	prop.load(input);
+		} catch (IOException e) {
+			System.out.println("ERR");
+		}
+		val = prop.getProperty("aff."+param);
+
+		return val;
+	}
 	/**
 	 * retourne le message de l'entete
 	 * @return
@@ -107,10 +132,10 @@ public class PasserelleAffichage {
 			
 		} catch (FileNotFoundException e) {
 			JOptionPane.showMessageDialog(null, "<html>Fichier non trouvé" +
-					"<br/>dataSystem\\dataAff.txt</html>", "Erreur", JOptionPane.ERROR_MESSAGE);
+					"<br>dataSystem\\dataAff.txt</html>", "Erreur", JOptionPane.ERROR_MESSAGE);
 		} catch (IOException e) {
 			JOptionPane.showMessageDialog(null, "<html>probleme de lecture" +
-					"<br/>dataSystem\\dataAff.txt/html>", "Erreur", JOptionPane.ERROR_MESSAGE);
+					"<br>dataSystem\\dataAff.txt/html>", "Erreur", JOptionPane.ERROR_MESSAGE);
 		}
 		//retour
 		return headerMsg;
