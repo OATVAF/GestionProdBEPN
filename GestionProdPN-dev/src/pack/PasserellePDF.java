@@ -193,33 +193,33 @@ public class PasserellePDF {
 			float[] widths = new float[] { 1f, 8f, 1.5f, 4f, 1.5f };
 			center.setWidths(widths);
 			
-			Font font = new Font(Font.HELVETICA, 10, Font.BOLD);
-			cell = new PdfPCell(new Phrase("",font));
+			Font fontB = new Font(Font.HELVETICA, 10, Font.BOLD);
+			cell = new PdfPCell(new Phrase("",fontB));
 			cell.setBorder(0);
 			center.addCell(cell);
 			//cell = new PdfPCell(new Phrase("Stagiaire",font));
 			//cell.setBorder(0);
 			//cell.setColspan(6);
-			cell.setPhrase(new Phrase("Stagiaire",font));
+			cell.setPhrase(new Phrase("Stagiaire",fontB));
 			center.addCell(cell);
 			//cell = new PdfPCell(new Phrase("Presence",font));
 			//cell.setBorder(0);
 			//cell.setColspan(2);
-			cell.setPhrase(new Phrase("Presence",font));
+			cell.setPhrase(new Phrase("Presence",fontB));
 			center.addCell(cell);
 			//cell = new PdfPCell(new Phrase("Emargement",font));
 			//cell.setBorder(0);
 			//cell.setColspan(4);
-			cell.setPhrase(new Phrase("Emargement",font));
+			cell.setPhrase(new Phrase("Emargement",fontB));
 			center.addCell(cell);
 			//cell = new PdfPCell(new Phrase("IS.VS/MP",font));
 			//cell.setColspan(2);
 			//cell.setBorder(0);
-			cell.setPhrase(new Phrase("IS.VS/MP",font));
+			cell.setPhrase(new Phrase("IS.VS/MP",fontB));
 			center.addCell(cell);
 			
 			int i;
-			font = new Font(Font.HELVETICA, 10);
+			Font font = new Font(Font.HELVETICA, 10);
 			// TODO SG font constante
 			/*
 			if(leStage.getSizeStagiaireList()>=20 && leStage.getSizeStagiaireList() < 25){
@@ -256,7 +256,7 @@ public class PasserellePDF {
 					//str = String.format("%-20s%-20s\n%25s%10s%10s", 
 					cell.setBorder(0);
 					cell.setColspan(5);
-					cell.setPhrase(new Phrase(leStage.getEltStagiaireList(i).getInfo(0), font));
+					cell.setPhrase(new Phrase(leStage.getEltStagiaireList(i).getInfo(0), fontB));
 					stgCell.addCell(cell);
 					cell.setPhrase(new Phrase(leStage.getEltStagiaireList(i).getInfo(1), font));
 					stgCell.addCell(cell);
