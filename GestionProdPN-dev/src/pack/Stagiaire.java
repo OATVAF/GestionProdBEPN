@@ -134,9 +134,9 @@ public class Stagiaire implements Serializable{
 			break;
 		case 4:
 			info = comment;
-			if (info.length()>12) {
-				info = info.substring(0,12);
-			}
+			// SG if (info.length()>12) {
+			// SG	info = info.substring(0,12);
+			// SG }
 			break;
 		default:
 			break;
