@@ -285,10 +285,10 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 		//list qui retient les stages a enlever
 		ArrayList<Stage> removeStage = new ArrayList<Stage>();
 		for (Stage unstage : StageList) {
-			//SG if(unstage.getnbMin() < (nbmin - NBMIN)){
+			if(unstage.getnbMin() < (nbmin - NBMIN)){
 				//enleve les stages qui sont debutés depuis plus de NBMIN minutes
-				//SG removeStage.add(unstage);
-			//SG }
+				removeStage.add(unstage);
+			}
 		}//fin pour
 		//suppression des stages a enlever de l'affichage
 		StageList.removeAll(removeStage);
