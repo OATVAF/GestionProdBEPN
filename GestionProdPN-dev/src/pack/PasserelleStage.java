@@ -181,7 +181,7 @@ public class PasserelleStage {
 				String chaine;
 				
 				Module newmodule = null;
-				
+							    
 				//lecture de la premiere ligne car ligne d'entete
 				reader.readLine();
 				//lecture des chaque ligne jusqu'a la fin du fichier
@@ -196,6 +196,24 @@ public class PasserelleStage {
 							chaine = "";
 						}else{
 							chaine = chaine + ligne.substring(i, i+1);
+						}
+					}
+					//infoLigne.add(chaine);//recup de la derniere information
+					// juste à 31 cellules !
+					if (infoLigne.size() < 29) {
+						//System.out.println("Bug");
+						while (infoLigne.size() < 31) {
+							//chaine = "";
+							ligne = reader.readLine();
+							for (int i = 0; i < ligne.length(); i++) {
+								//la tabulation est le separatuer de Export.txt
+								if(ligne.substring(i, i+1).equals("\t")){
+									infoLigne.add(chaine);
+									chaine = "";
+								}else{
+									chaine = chaine + ligne.substring(i, i+1);
+								}
+							}
 						}
 					}
 					infoLigne.add(chaine);//recup de la derniere information
