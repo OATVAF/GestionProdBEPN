@@ -187,42 +187,57 @@ public class PasserellePDF {
 			header.addCell(cell);
 			
 			//formation du center
-			PdfPTable center = new PdfPTable(15);
-			center.setWidthPercentage(95);
+			PdfPTable center = new PdfPTable(5);
+			//center.setWidthPercentage(95);
+
+			float[] widths = new float[] { 1f, 8f, 1.5f, 4f, 1.5f };
+			center.setWidths(widths);
+			
 			Font font = new Font(Font.HELVETICA, 10, Font.BOLD);
 			cell = new PdfPCell(new Phrase("",font));
 			cell.setBorder(0);
 			center.addCell(cell);
-			cell = new PdfPCell(new Phrase("Stagiaire",font));
-			cell.setBorder(0);
-			cell.setColspan(6);
+			//cell = new PdfPCell(new Phrase("Stagiaire",font));
+			//cell.setBorder(0);
+			//cell.setColspan(6);
+			cell.setPhrase(new Phrase("Stagiaire",font));
 			center.addCell(cell);
-			cell = new PdfPCell(new Phrase("Presence",font));
-			cell.setBorder(0);
-			cell.setColspan(2);
+			//cell = new PdfPCell(new Phrase("Presence",font));
+			//cell.setBorder(0);
+			//cell.setColspan(2);
+			cell.setPhrase(new Phrase("Presence",font));
 			center.addCell(cell);
-			cell = new PdfPCell(new Phrase("Emargement",font));
-			cell.setBorder(0);
-			cell.setColspan(4);
+			//cell = new PdfPCell(new Phrase("Emargement",font));
+			//cell.setBorder(0);
+			//cell.setColspan(4);
+			cell.setPhrase(new Phrase("Emargement",font));
 			center.addCell(cell);
-			cell = new PdfPCell(new Phrase("IS.VS/MP",font));
-			cell.setColspan(2);
-			cell.setBorder(0);
+			//cell = new PdfPCell(new Phrase("IS.VS/MP",font));
+			//cell.setColspan(2);
+			//cell.setBorder(0);
+			cell.setPhrase(new Phrase("IS.VS/MP",font));
 			center.addCell(cell);
 			
 			int i;
-			font = new Font(Font.HELVETICA, 13);
+			font = new Font(Font.HELVETICA, 10);
+			// TODO SG font constante
+			/*
 			if(leStage.getSizeStagiaireList()>=20 && leStage.getSizeStagiaireList() < 25){
 				font.setSize(11);
 			}
 			if(leStage.getSizeStagiaireList()>=25){
 				font.setSize(9);
 			}
+			*/
 			for (i = 0; i < leStage.getSizeStagiaireList(); i++) {
-					cell = new PdfPCell(new Phrase(""+(i+1)));
+					cell.setPhrase(new Phrase(""+(i+1), font));
 					cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+					cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+					cell.setBorder(7);
 					center.addCell(cell);
 					String str = "";
+					// TODO  SG liste statique
+					/*
 					for (int j = 0; j < 5; j++) {
 						str = str + leStage.getEltStagiaireList(i).getInfo(j);
 						if(j == 1){
@@ -233,32 +248,64 @@ public class PasserellePDF {
 							}
 						}
 					}//fin pour
-					Phrase phrs = new Phrase(str, font);
-					cell = new PdfPCell(phrs);
-					cell.setColspan(6);
-					center.addCell(cell);
+					*/
+					cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+					PdfPTable stgCell = new PdfPTable(10);
+					center.setWidthPercentage(100);
+
+					//str = String.format("%-20s%-20s\n%25s%10s%10s", 
+					cell.setBorder(0);
+					cell.setColspan(5);
+					cell.setPhrase(new Phrase(leStage.getEltStagiaireList(i).getInfo(0), font));
+					stgCell.addCell(cell);
+					cell.setPhrase(new Phrase(leStage.getEltStagiaireList(i).getInfo(1), font));
+					stgCell.addCell(cell);
+
+					cell.setColspan(1);
+					cell.setPhrase(new Phrase(" ", font));
+					stgCell.addCell(cell);
+
+					cell.setColspan(2);
+					cell.setPhrase(new Phrase(leStage.getEltStagiaireList(i).getInfo(3), font));
+					stgCell.addCell(cell);
+
+					cell.setColspan(5);
+					cell.setPhrase(new Phrase(leStage.getEltStagiaireList(i).getInfo(4), font));
+					stgCell.addCell(cell);
+
+					cell.setColspan(2);
+					cell.setPhrase(new Phrase(leStage.getEltStagiaireList(i).getInfo(2), font));
+					stgCell.addCell(cell);
+					
+					//Phrase phrs = new Phrase(str, font);
+					//cell = new PdfPCell(phrs);
+					//cell.setColspan(6);
+					cell.setColspan(1);
+					center.addCell(stgCell);
 					//presence
-					cell = new PdfPCell(new Phrase(" "));
-					cell.setColspan(2);
-					center.addCell(cell);
+					//cell = new PdfPCell(new Phrase(" "));
+					//cell.setColspan(2);
+					center.addCell(" ");
 					//emargement
-					cell.setColspan(4);
-					center.addCell(cell);
+					//cell.setColspan(4);
+					center.addCell(" ");
 					//isvsmp
-					cell = new PdfPCell(new Phrase(" "));
-					cell.setColspan(2);
-					center.addCell(cell);
+					//cell = new PdfPCell(new Phrase(" "));
+					//cell.setColspan(2);
+					center.addCell(" ");
 			}
 			if(i<=20){
+				cell.setBorder(0);
+				cell.setPhrase(new Phrase(" ", font));
+				cell.setColspan(5);
 				for (int j = i; j < 20; j++) {
-					for (int k = 0; k < 15; k++) {
-						Phrase phrs = new Phrase(" \n ", new Font(Font.TIMES_ROMAN, 10));
-						cell = new PdfPCell(phrs);
-						cell.setBorder(0);
-						cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-						cell.setPadding(4);
+					//for (int k = 0; k < 5; k++) {
+						//Phrase phrs = new Phrase("- \n ", new Font(Font.TIMES_ROMAN, 10));
+						//cell = new PdfPCell(phrs);
+						//cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+						//cell.setPadding(4);
 						center.addCell(cell);
-					}
+					//}
 				}//fin pour
 			}//fin si
 			
