@@ -9,7 +9,12 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
-
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.JTabbedPane;
+import javax.swing.border.TitledBorder;
+import javax.swing.Box;
+	
 /**
  * c'est la Fenetre Principale de l'application<br>
  * l'utilisateur pourra choisir entre plusieurs boutons<br>
@@ -27,10 +32,7 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 	private JPanel centerPane;//conteneur au center de la fenetre
 	private JPanel bluePane;//conteneur servant de decor
 	private JPanel prodPane;
-	private JPanel dataPane;
-	private JPanel affPane;
 	private JPanel pdfPane;
-	private JPanel smsPane;
 	
 	//attributs JLabel
 	private JLabel logoLabel;
@@ -47,6 +49,11 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 	
 	//police des boutons
 	private Font btnFont;
+	private JLabel versLabel;
+	private JTabbedPane tabbedPane;
+	private JPanel dispPanel;
+	private JPanel dataPanel;
+	private JPanel statPanel;
 	
 	/**
 	 * constructeur
@@ -78,6 +85,14 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 		contentPane = new JPanel();
 		contentPane.setLayout(new BorderLayout());
 		
+		//construction du bluePane
+		bluePane = new JPanel();
+		contentPane.add(bluePane, BorderLayout.WEST);
+		bluePane.setBackground(Color.BLUE);
+		JLabel blueLabel = new JLabel();
+		blueLabel.setPreferredSize(new Dimension(50, 25));
+		bluePane.add(blueLabel);
+		
 		//construction du headerPane
 		headerPane = new JPanel();
 		headerPane.setBackground(Color.WHITE);
@@ -85,7 +100,7 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 		
 		//instanciation du logo
 		logoLabel = new JLabel();
-		logoLabel.setIcon(new ImageIcon("dataSystem\\airfrance.jpg"));
+		logoLabel.setIcon(new ImageIcon(FenetrePrincipale.class.getResource("/res/Airfrance.jpg")));
 		headerPane.add(logoLabel,BorderLayout.WEST);
 		
 		//instanciation du titre
@@ -97,6 +112,17 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 		
 		//ajout de headerPane dans le contentPane
 		contentPane.add(headerPane,BorderLayout.NORTH);
+		
+		versLabel = new JLabel(PasserelleAffichage.getAppConfig("app.version"));
+		versLabel.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+			}
+		});
+		versLabel.setForeground(Color.BLUE);
+		versLabel.setVerticalAlignment(SwingConstants.TOP);
+		versLabel.setFont(new Font("Arial", Font.PLAIN, 10));
+		headerPane.add(versLabel, BorderLayout.EAST);
 		
 		//construction du centerPane
 		constructionCenterPane();
@@ -113,16 +139,6 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 		//instanciation du centerPane
 		centerPane = new JPanel();
 		centerPane.setLayout(new BorderLayout());
-		
-		//construction du bluePane
-		bluePane = new JPanel();
-		bluePane.setBackground(Color.BLUE);
-		JLabel blueLabel = new JLabel();
-		blueLabel.setPreferredSize(new Dimension(50, 25));
-		bluePane.add(blueLabel);
-		
-		//ajout du bluePane
-		centerPane.add(bluePane,BorderLayout.WEST);
 		
 		//construction du prodPane
 		constructionProdPane();
@@ -142,95 +158,89 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 		
 		//initialisation du prodPane
 		prodPane = new JPanel();
-		prodPane.setLayout(new GridLayout(4,0));
+		prodPane.setLayout(new GridLayout(2,0));
 		prodPane.setBackground(Color.WHITE);
 		
-		//initialisation du dataPane
-		dataPane = new JPanel();
-		dataPane.setBackground(Color.WHITE);
+		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		prodPane.add(tabbedPane);
+		
+		dataPanel = new JPanel();
+		tabbedPane.addTab("Prod J-1", null, dataPanel, null);
 		
 		//bouton "importation données DELIA"
 		importBtn = new JButton();
+		dataPanel.add(importBtn);
 		importBtn.setText("<html>Importation des données DELIA et BO<br>et Archivage des données</html>");
-		importBtn.setIcon(new ImageIcon("dataSystem\\import.jpg"));
+		importBtn.setIcon(new ImageIcon(FenetrePrincipale.class.getResource("/res/import.png")));
 		importBtn.setFont(btnFont);
 		importBtn.addActionListener(this);
 		importBtn.setPreferredSize(new Dimension(350, height));
-		dataPane.add(importBtn);
 		
 		//bouton "modifier les données"
 		modifBtn = new JButton();
+		dataPanel.add(modifBtn);
 		modifBtn.setText("modifier les données");
-		modifBtn.setIcon(new ImageIcon("dataSystem\\modif.jpg"));
+		modifBtn.setIcon(new ImageIcon(FenetrePrincipale.class.getResource("/res/modif.png")));
 		modifBtn.setFont(btnFont);
 		modifBtn.setPreferredSize(new Dimension(350, height));
+		
+		//bouton "générer les Documents"
+		pdfBtn = new JButton();
+		dataPanel.add(pdfBtn);
+		pdfBtn.setText("<html>générer les<br>Documents<html>");
+		pdfBtn.setIcon(new ImageIcon(FenetrePrincipale.class.getResource("/res/document.png")));
+		pdfBtn.setFont(btnFont);
+		pdfBtn.setPreferredSize(new Dimension(width, height));
+		
+		//bouton "générer les Documents"
+		majSmsBtn = new JButton();
+		dataPanel.add(majSmsBtn);
+		majSmsBtn.setText("<html>Mettre a jour<br>la liste SMS<html>");
+		majSmsBtn.setIcon(new ImageIcon(FenetrePrincipale.class.getResource("/res/sms.jpg")));
+		majSmsBtn.setFont(btnFont);
+		majSmsBtn.setPreferredSize(new Dimension(width, height));
+		majSmsBtn.addActionListener(this);
+		pdfBtn.addActionListener(this);
 		modifBtn.addActionListener(this);
-		dataPane.add(modifBtn);
 		
-		prodPane.add(dataPane);
-		
-		//initialisation du affPane
-		affPane = new JPanel();
-		affPane.setBackground(Color.WHITE);
+		dispPanel = new JPanel();
+		tabbedPane.addTab("Prod J", null, dispPanel, null);
 		
 		//bouton "afficher le téléaffichage"
 		tvAffichageBtn = new JButton();
+		dispPanel.add(tvAffichageBtn);
 		tvAffichageBtn.setText("<html>Afficher le<br>TéléAffichage<html>");
-		tvAffichageBtn.setIcon(new ImageIcon("dataSystem\\tv.jpg"));
+		tvAffichageBtn.setIcon(new ImageIcon(FenetrePrincipale.class.getResource("/res/tv.png")));
 		tvAffichageBtn.setFont(btnFont);
 		tvAffichageBtn.setPreferredSize(new Dimension(width, height));
-		tvAffichageBtn.addActionListener(this);
-		affPane.add(tvAffichageBtn);
 		
 		//bonton "Afficher le PowerPoint"
 		pptAffichageBtn = new JButton();
+		dispPanel.add(pptAffichageBtn);
 		pptAffichageBtn.setText("Afficher le PowerPoint");
-		pptAffichageBtn.setIcon(new ImageIcon("dataSystem\\ppt.jpg"));
+		pptAffichageBtn.setIcon(new ImageIcon(FenetrePrincipale.class.getResource("/res/ppt.png")));
 		pptAffichageBtn.setFont(btnFont);
 		pptAffichageBtn.setPreferredSize(new Dimension(width, height));
-		pptAffichageBtn.addActionListener(this);
-		affPane.add(pptAffichageBtn);
 		
 		//bonton "Parametres Affichages"
 		modifAffichageBtn = new JButton();
+		dispPanel.add(modifAffichageBtn);
 		modifAffichageBtn.setText("<html>Paramètres<br>Affichages<html>");
 		modifAffichageBtn.setIcon(new ImageIcon("dataSystem\\affichage.jpg"));
 		modifAffichageBtn.setFont(btnFont);
 		modifAffichageBtn.setPreferredSize(new Dimension(width, height));
 		modifAffichageBtn.addActionListener(this);
-		affPane.add(modifAffichageBtn);
+		pptAffichageBtn.addActionListener(this);
+		tvAffichageBtn.addActionListener(this);
 		
-		prodPane.add(affPane);
+		statPanel = new JPanel();
+		tabbedPane.addTab("Prod S", null, statPanel, null);
 		
 		//initialisation du pdfPane
 		pdfPane = new JPanel();
 		pdfPane.setBackground(Color.WHITE);
 		
-		//bouton "générer les Documents"
-		pdfBtn = new JButton();
-		pdfBtn.setText("<html>générer les<br>Documents<html>");
-		pdfBtn.setIcon(new ImageIcon("dataSystem\\document.jpg"));
-		pdfBtn.setFont(btnFont);
-		pdfBtn.setPreferredSize(new Dimension(width, height));
-		pdfBtn.addActionListener(this);
-		pdfPane.add(pdfBtn);
-		
 		prodPane.add(pdfPane);
-		
-		//initialisation du smsPane
-		smsPane = new JPanel();
-		smsPane.setBackground(Color.WHITE);
-		
-		//bouton "générer les Documents"
-		majSmsBtn = new JButton();
-		majSmsBtn.setText("<html>Mettre a jour<br>la liste SMS<html>");
-		majSmsBtn.setIcon(new ImageIcon("dataSystem\\sms.jpg"));
-		majSmsBtn.setFont(btnFont);
-		majSmsBtn.setPreferredSize(new Dimension(width, height));
-		majSmsBtn.addActionListener(this);
-		smsPane.add(majSmsBtn);
-		//ajout
-		prodPane.add(smsPane);
 		
 	}//fin constructionProdPane()
 
@@ -260,7 +270,7 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 		
 		//generer les document
 		if(source.equals(pdfBtn)){
-			new FenetreGénérationPDF();
+			new FenetreGŽnŽrationPDF();
 		}
 		
 		//modifier les données

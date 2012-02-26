@@ -7,11 +7,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.Properties;
-import java.util.ResourceBundle;
-
 import javax.swing.JOptionPane;
 
 /**
@@ -98,7 +95,7 @@ public class PasserelleAffichage {
 		} catch (IOException e) {
 			System.out.println("ERR");
 		}
-		val = prop.getProperty("aff."+param);
+		val = prop.getProperty(param);
 
 		return val;
 	}

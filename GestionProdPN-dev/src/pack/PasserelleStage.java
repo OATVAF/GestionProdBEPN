@@ -199,7 +199,7 @@ public class PasserelleStage {
 						}
 					}
 					//infoLigne.add(chaine);//recup de la derniere information
-					// juste à 31 cellules ! bis ! ter
+					// juste à 32 cellules ! bis ! ter
 					if (infoLigne.size() < 29) {
 						//System.out.println("Bug");
 						while (infoLigne.size() < 31) {

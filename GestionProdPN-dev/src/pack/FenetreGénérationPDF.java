@@ -23,7 +23,7 @@ import javax.swing.SwingConstants;
  * @author BERON Jean-Sébastien
  *
  */
-public class FenetreGénérationPDF extends JFrame implements ActionListener{
+public class FenetreGŽnŽrationPDF extends JFrame implements ActionListener{
 	
 	private static final long serialVersionUID = 7185100043755309312L;
 	
@@ -58,7 +58,7 @@ public class FenetreGénérationPDF extends JFrame implements ActionListener{
 	/**
 	 * contructeur de la ffenetre
 	 */
-	public FenetreGénérationPDF(){
+	public FenetreGŽnŽrationPDF(){
 		
 		//chargement des listes
 		chargerList();
