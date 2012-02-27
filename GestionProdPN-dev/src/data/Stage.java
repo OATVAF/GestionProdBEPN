@@ -14,6 +14,8 @@ import java.util.List;
 
 import javax.persistence.*;
 
+import ui.Config;
+
 import data.Module;
 import data.Stagiaire;
 
@@ -31,14 +33,18 @@ public class Stage implements Serializable {
     public String code;
     public String type;
     public String avion;
+    private String libelle = null;
     @Temporal(TemporalType.DATE)
     public Date date;
     public int maxiPresent;
     public Formateur leader;
+    @OneToMany(mappedBy="stage") @OrderBy("debut")
 	public List<Module> modules;
 	public List<Stagiaire> stagiaires;
  
     public Stage() {
+        this.modules = new ArrayList<Module>();
+        this.stagiaires = new ArrayList<Stagiaire>();
     }
  
     public Stage(String code, String type, String avion, Date date) {
@@ -50,10 +56,23 @@ public class Stage implements Serializable {
         this.stagiaires = new ArrayList<Stagiaire>();
     }
  
-    public Long getId() 	{ return id; }
- 
-    public String getCode() { return code; }
-  
+    public Long   getId() 	 { return id; }
+    public String getCode()  { return code; }
+    public String getType()  { return type; }
+    public String getAvion() { return avion; }
+    public Date   getDate()  { return date; }
+    public String getLibelle() {
+    	if (libelle == null) {
+    		libelle = Config.get("stage.info."+type);
+    	}
+    	return libelle;
+    }
+
+    public void setCode(String c)  { code  = c; }
+    public void setType(String t)  { type  = t; }
+    public void setAvion(String a) { avion = a; }
+    public void setDate(Date d)    { date  = d; }
+
     public List<Module> getModules() { return modules; }
     
 	public Module getModule(String nom) {
@@ -66,6 +85,16 @@ public class Stage implements Serializable {
 		}
 		return null;
 	}
+	
+	public Module getFirstModule() {
+		try {
+			TypedQuery<Module> q = DB.em.createQuery("SELECT m FROM Module m JOIN m.stage s WHERE s.code = :code", Module.class);
+			return q.setParameter("code",code).setMaxResults(1).getSingleResult();
+		} catch (NoResultException e){
+			return null;
+		}
+	}
+	
 	public Module getModule(String nom, Time hd, Time hf) {
 		try {
 			String fq = "";

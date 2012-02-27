@@ -55,6 +55,8 @@ public class Import {
 		colNum = Config.getI("imp.delia.cols");
 		filterStg = Config.get("imp.delia.filter.stage");
 		filterCan = Config.getB("imp.delia.filter.cancel");
+
+		DB.em.getMetamodel();
 		
 		try {
 			file = new FileReader(deliaFile);
@@ -87,7 +89,7 @@ public class Import {
 				try {
 
 					String code = tmp.get(CODE_STG);
-					String type = code.split( "")[0];
+					String type = code.split(" ")[0];
 					code = code.replace(" ", "").trim();
 					Date date = new Date(dateFormat.parse(tmp.get(DATEHEURE_DEB).substring(0,10)).getTime());
 					// Filter 
@@ -99,10 +101,10 @@ public class Import {
 						System.out.println("[INFO] filter out "+code);
 						continue;
 					}
-					Stage s = DB.getStage(code, date);
+					Stage s = DB.modelStages.getStage(code, date);
 					if (s == null) {
-						s = new Stage(code, type, tmp.get(AVION_STG), date);
-						DB.addStage(s);
+						s = DB.modelStages.addStage(code, type, tmp.get(AVION_STG), date);
+						//DB.stages.addStage(s);
 					}			
 
 					if ( tmp.get(ACTIVITE).equals("Activité")) {
@@ -184,7 +186,6 @@ public class Import {
 		
 		pncFile = Config.get("imp.pnc");
 
-		ArrayList<Stagiaire> StagiaireList = new ArrayList<Stagiaire>();
 		try {
 			File fichier = new File(pncFile);
 			Workbook workbook;

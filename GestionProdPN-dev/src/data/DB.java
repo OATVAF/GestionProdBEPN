@@ -14,6 +14,7 @@ public class DB {
 	
 	static public EntityManagerFactory emf;
 	static public EntityManager em;
+	static public ModelStages modelStages;
 	
 	public DB() {
 		
@@ -25,10 +26,10 @@ public class DB {
 		try {
 			emf = Persistence.createEntityManagerFactory("$objectdb/db/points.odb");
 			em = emf.createEntityManager();
+			modelStages = new ModelStages();
 		} catch (PersistenceException e) {
 			System.out.println("[ERR] Database not free ");
 		}
-		
 	}
 	
 	
@@ -81,8 +82,12 @@ public class DB {
   	*/
 	
 	public static void Close() {
-		em.close();
-		emf.close();
+		if (em != null && em.isOpen()) {
+			em.close();
+		}
+		if (emf != null && emf.isOpen()) {
+			emf.close();
+		}
 	}
 	
 	public static void Purge() {
@@ -109,6 +114,8 @@ public class DB {
 	    return (q.setParameter("nom",nom).getSingleResult() > 0);
 	}
 
+	/*
+
 	public static Stage addStage(Stage s) {
 	    DB.em.getTransaction().begin();
 	    DB.em.persist(s);
@@ -125,31 +132,8 @@ public class DB {
 		System.out.println("[DB] new stage: " + s.toString());
 	    return s;
 	}
+	*/
 	
-	public static Stage getStage(String code) {
-		Stage res = null;
-		try {
-			TypedQuery<Stage> q = em.createQuery("SELECT s FROM Stage s WHERE s.code = :code", Stage.class);
-			res = q.setParameter("code",code).getSingleResult();
-		}
-		catch (NoResultException e) {
-			return null;
-		}
-		return res;
-	}
-	public static Stage getStage(String code, Date date) {
-		Stage res = null;
-		try {
-			TypedQuery<Stage> q = em.createQuery("SELECT s FROM Stage s WHERE s.code = :code AND s.date = :date", Stage.class);
-			q.setParameter("code",code);
-			q.setParameter("date",date);
-			res = q.getSingleResult();
-		}
-		catch (NoResultException e) {
-			return null;
-		}
-		return res;
-	}
 	//public static Stage getStage(Stagiaire stg) {
 	public static Stage getStage(String code, Date dateD, Date dateF) {
 		Stage res = null;

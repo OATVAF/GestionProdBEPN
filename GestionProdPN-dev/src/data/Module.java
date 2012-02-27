@@ -35,6 +35,9 @@ public class Module implements Serializable{
 	public Formateur leader;
 	public Formateur aide;	
 
+	public Module() {
+        this.moyens = new ArrayList<String>();
+	}
 	/**
 	 * constructeur
 	 * @param Nom
@@ -59,6 +62,19 @@ public class Module implements Serializable{
 		//this.setNomLeader("");
 		//this.setNomAide("");
 	}
+	
+	public Stage  getStage()	{ return stage; }
+	public String getNom()		{ return nom; }
+	public Time   getDebut()	{ return debut; }
+	public Time	  getFin()		{ return fin; }
+	public String getMoyen()	{ 
+		if (moyens != null && moyens.size() >0) { 
+			return moyens.get(0);
+		} else { 
+			return "NILL";
+		}}
+	public Formateur getLeader(){ return leader; }
+	public Formateur getAide()	{ return aide; }
 	
 	public void setMoyen (String m) {
 	    DB.em.getTransaction().begin();
