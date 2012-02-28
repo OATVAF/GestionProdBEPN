@@ -30,6 +30,8 @@ import javax.swing.Action;
 
 import data.DB;
 import data.Import;
+import data.Module;
+import data.Stage;
 
 import java.awt.event.ActionListener;
 import java.sql.Date;
@@ -203,9 +205,12 @@ public class MainWin extends JFrame
 			putValue(SHORT_DESCRIPTION, Messages.getString("MainWin._Add.short")); //$NON-NLS-1$
 		}
 		public void actionPerformed(ActionEvent e) {
-			DB.modelStages.addStage("CODE", "TYPE", "AVION", new Date(new java.util.Date().getTime())); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			Stage s = DB.modelStages.addStage("CODE", "TYPE", "AVION", 	//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					new Date(new java.util.Date().getTime()));
+			s.addModule(new Module("Module", "08:00", "10:00"));
 		}
 	}
+	
 	private class DeleteAction extends AbstractAction {
 		/**
 		 * 

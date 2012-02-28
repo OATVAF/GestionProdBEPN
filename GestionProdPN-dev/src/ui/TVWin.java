@@ -72,8 +72,9 @@ public class TVWin extends JFrame implements Runnable{
 		this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		
 		this.addWindowListener(new WindowAdapter() {
-			public void windowClosed(WindowEvent e) {
-				System.out.println("Window Closed Event");
+			public void windowClosing(WindowEvent e) {
+				timer.stop();
+				System.out.println("Window Closing Event");
 				run = false;
 			}
 		});
@@ -86,7 +87,7 @@ public class TVWin extends JFrame implements Runnable{
         timer = new Timer(5000, new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				afficherStages();
-    			System.out.println("[INFO] Timer out");
+    			//System.out.println("[INFO] Timer out");
 			}
     	});
 		start();
@@ -275,8 +276,10 @@ public class TVWin extends JFrame implements Runnable{
 			c.gridx = 1; c.gridy = i; c.weightx = 2;
 			stagePane.add(stageLabels[i][1],c);
 			
+			Module fm = unstage.getFirstModule();
+
 			stageLabels[i][2] = new JLabel();
-			stageLabels[i][2].setText(unstage.getFirstModule().getMoyen());
+			stageLabels[i][2].setText(fm.getMoyen());
 			stageLabels[i][2].setFont(new Font("arial", 1, 26));
 			stageLabels[i][2].setForeground(Color.BLACK);
 			//stageLabels[i][2].setBorder(border);
@@ -284,7 +287,6 @@ public class TVWin extends JFrame implements Runnable{
 			c.gridx = 2; c.gridy = i; c.weightx = 1;
 			stagePane.add(stageLabels[i][2],c);
 			
-			Module fm = unstage.getFirstModule();
 			stageLabels[i][3] = new JLabel();
 			stageLabels[i][3].setText(timeFormat.format(fm.getDebut()));
 			stageLabels[i][3].setFont(new Font("arial", 1, 26));

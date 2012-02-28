@@ -11,7 +11,7 @@ import javax.swing.JOptionPane;
 public class Config {
 
 	private static Properties prop = new Properties();
-	private static final String configFile = "dataSystem/app.config";
+	private static final String configFile = "dataSystem/app.properties";
 	
 	public Config() {
 
