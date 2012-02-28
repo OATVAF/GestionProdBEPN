@@ -144,7 +144,7 @@ public class Import {
 						Module m = s.getModule(nomMod, hd, hf);
 						// Set 
 						if (m == null) {
-							m = new Module(s,nomMod, debut, fin );
+							m = new Module(nomMod, debut, fin );
 						    s.addModule(m);							
 						}
 						if (moyen != "") {

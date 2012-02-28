@@ -34,12 +34,13 @@ public class Stage implements Serializable {
     public String type;
     public String avion;
     private String libelle = null;
-    @Temporal(TemporalType.DATE)
+    //@Temporal(TemporalType.DATE)
     public Date date;
     public int maxiPresent;
     public Formateur leader;
     @OneToMany(mappedBy="stage") @OrderBy("debut")
 	public List<Module> modules;
+    @OneToMany(mappedBy="stage") @OrderBy("matricule")
 	public List<Stagiaire> stagiaires;
  
     public Stage() {
@@ -87,10 +88,14 @@ public class Stage implements Serializable {
 	}
 	
 	public Module getFirstModule() {
-		try {
-			TypedQuery<Module> q = DB.em.createQuery("SELECT m FROM Module m JOIN m.stage s WHERE s.code = :code", Module.class);
-			return q.setParameter("code",code).setMaxResults(1).getSingleResult();
-		} catch (NoResultException e){
+		//try {
+			//TypedQuery<Module> q = DB.em.createQuery("SELECT m FROM Module m JOIN m.stage s WHERE s.code = :code", Module.class);
+			//return q.setParameter("code",code).setMaxResults(1).getSingleResult();
+		//}
+		if (modules.size() > 0) {
+			return modules.get(0);
+		}
+		else {
 			return null;
 		}
 	}
@@ -125,6 +130,7 @@ public class Stage implements Serializable {
 	public void addModule(Module m) {
 	    DB.em.getTransaction().begin();
 	    DB.em.persist(m);
+	    m.setStage(this);
 	    modules.add(m);
 	    DB.em.getTransaction().commit();
 		System.out.println("[DB] " + this.toString()+ " addModule  " + m.toString());
@@ -138,6 +144,7 @@ public class Stage implements Serializable {
 	public void addStagiaire(Stagiaire stg) {
 	    DB.em.getTransaction().begin();
 	    DB.em.persist(stg);
+	    stg.setStage(this);
 	    stagiaires.add(stg);
 	    DB.em.getTransaction().commit();
 		System.out.println("[DB] " + this.toString()+ " addStagiaire " + stg.toString());

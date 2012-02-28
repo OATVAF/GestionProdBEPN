@@ -30,7 +30,7 @@ public class Module implements Serializable{
     public Stage stage; 
     public String nom;
 	public Time debut;
-	public Time fin;	
+	public Time fin;
 	public List<String> moyens;
 	public Formateur leader;
 	public Formateur aide;	
@@ -44,9 +44,8 @@ public class Module implements Serializable{
 	 * @param Hdebut
 	 * @param Hfin
 	 */
-	public Module(Stage stg,String nom, String debut, String fin){
-		//this.stage = new Stage();
-		this.stage = stg;
+	public Module(String nom, String debut, String fin){
+		//this.stage = stg;
 		this.nom = nom;
 		try {
 			this.debut = new Time(timeFormat.parse(debut).getTime());
@@ -76,6 +75,10 @@ public class Module implements Serializable{
 	public Formateur getLeader(){ return leader; }
 	public Formateur getAide()	{ return aide; }
 	
+	public void setStage(Stage stage2) {
+		stage = stage2;
+	}
+
 	public void setMoyen (String m) {
 	    DB.em.getTransaction().begin();
 		this.moyens.add(m);

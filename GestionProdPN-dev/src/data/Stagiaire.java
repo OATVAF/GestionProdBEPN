@@ -23,9 +23,10 @@ public class Stagiaire implements Serializable{
  
 	//attirbuts
     public int matricule;
-	public String codeStage;
-	public Date dateDebStage;
-	public Date dateFinStage;
+    public String codeStage;
+    public Stage stage;
+	public Date  dateDebStage;
+	public Date  dateFinStage;
 	public String nom;
 	public String prenom;
 	public String spe;
@@ -179,6 +180,10 @@ public class Stagiaire implements Serializable{
     public String toString() {
         return String.format("[%8d]  %-10s/%-10s : %10s-%10s)", matricule, codeStage, nom, dateDebStage, dateFinStage);
     }
+
+	public void setStage(Stage stage2) {
+		stage = stage2;
+	}
 
 
 }//fin class
