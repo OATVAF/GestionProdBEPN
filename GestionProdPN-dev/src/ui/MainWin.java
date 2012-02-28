@@ -78,7 +78,7 @@ public class MainWin extends JFrame
 			public void windowClosing(WindowEvent e) {
 				System.out.println("Window Closing Event"); //$NON-NLS-1$
 				DB.Close();
-				Config.Write();
+				//Config.Write();
 			}
 		});
 		setBounds(100, 100, 620, 440);
