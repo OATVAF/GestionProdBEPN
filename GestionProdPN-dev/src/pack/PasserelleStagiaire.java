@@ -51,7 +51,7 @@ public class PasserelleStagiaire {
 		ecritureListeTests(StagiaireList);
 		if (good) {
 			JOptionPane.showMessageDialog(null, "<html>Operation terminée !" +
-					"<br>les fichiers sont dans dataExport/Tests/</html>", "Termine", JOptionPane.INFORMATION_MESSAGE);
+					"<br>les fichiers sont dans dataExport/Tests...</html>", "Termine", JOptionPane.INFORMATION_MESSAGE);
 		}//finsi
 	}
 
@@ -272,7 +272,7 @@ public class PasserelleStagiaire {
 
 	private static void ecritureListeTests(ArrayList<Stagiaire> stagiaireList) {
 		Hashtable<String,StringBuffer> stgMap = new Hashtable<String,StringBuffer>();
-		String pathDossier = "dataExport/IS.VS/ "+dateFormat.format(dateDemain)+"/";
+		String pathDossier = "dataExport/Tests du "+dateFormat.format(dateDemain)+"/";
 		String key = "";
 		
 		for (Stagiaire s : stagiaireList) {
@@ -280,11 +280,11 @@ public class PasserelleStagiaire {
 			code = code.substring(0,3)+" "+code.substring(3);
 			String matr = "M"+s.getMatricule().subSequence(0, 6);
 			if (stgMap.containsKey(code)) {
-				System.out.println("[INFO] ajout stage:"+code+" et matr:"+matr);
+				//System.out.println("[INFO] ajout stage:"+code+" et matr:"+matr);
 				stgMap.get(code).append("|"+matr);
 			}
 			else {
-				System.out.println("[INFO]   +++ stage:"+code+" et matr:"+matr);
+				//System.out.println("[INFO]   +++ stage:"+code+" et matr:"+matr);
 				stgMap.put(code,new StringBuffer(matr));
 			}
 		}
