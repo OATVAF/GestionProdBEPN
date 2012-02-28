@@ -44,14 +44,24 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 	private JButton modifBtn;//bouton de modification des données
 	private JButton pdfBtn;//bouton de génération des documents
 	private JButton majSmsBtn;//bouton pour la liste des sms
-	
+	private JButton majTestsBtn;//bouton pour la liste des sms
+
 	//police des boutons
 	private Font btnFont;
+	
+	private boolean TVall = false;
 	
 	/**
 	 * constructeur
 	 */
-	public FenetrePrincipale(){
+	public FenetrePrincipale(String[] args){
+		
+		
+		if (args.length > 0) {
+			if (args[0].equals("TV=all")) {
+				TVall = true;
+			}
+		}
 		
 		//formation de la fenetre
 		this.setTitle("GestionProd");
@@ -229,6 +239,16 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 		majSmsBtn.setPreferredSize(new Dimension(width, height));
 		majSmsBtn.addActionListener(this);
 		smsPane.add(majSmsBtn);
+		
+		//bouton "générer les Lists"
+		majTestsBtn = new JButton();
+		majTestsBtn.setText("<html>Mettre à jour les<br>matricules pour les tests<html>");
+		//majTestsBtn.setIcon(new ImageIcon("dataSystem\\sms.jpg"));
+		majTestsBtn.setFont(btnFont);
+		majTestsBtn.setPreferredSize(new Dimension(width, height));
+		majTestsBtn.addActionListener(this);
+		smsPane.add(majTestsBtn);
+
 		//ajout
 		prodPane.add(smsPane);
 		
@@ -245,7 +265,7 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 
 		//téléaffichage
 		if(source.equals(tvAffichageBtn)){
-			new FenetreTVAffichage();
+			new FenetreTVAffichage(TVall);
 		}
 		
 		//afficher le powerpoint
@@ -285,7 +305,16 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 				PasserelleStagiaire.creerListePourSms();
 			}
 		}
-		
+	
+		//liste matricules
+		if(source.equals(majTestsBtn)){
+			int rep = JOptionPane.showConfirmDialog(null, "Avez-vous importé OATVPNC.xls pour J+1 dans le dossier dataImport ?"
+					,"Verification",JOptionPane.YES_NO_OPTION);
+			if(rep == JOptionPane.YES_OPTION){
+				PasserelleStagiaire.creerListePourTests();
+			}
+		}
+
 	}//fin actionperformed()
 	
 }//fin class

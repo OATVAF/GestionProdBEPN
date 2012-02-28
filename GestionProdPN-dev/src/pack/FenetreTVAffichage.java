@@ -49,10 +49,14 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 	private Thread runner;
 	private boolean run;
 	
+	private boolean TVall = false;
+			
 	/**
 	 * constructeur
 	 */
-	public FenetreTVAffichage(){
+	public FenetreTVAffichage(boolean all){
+		
+		TVall = all;
 		
 		//recuperation de la date d'aujourd'hui
 		dateActuelle = new Date();
@@ -282,17 +286,19 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 		centerPane.add(stagePane,BorderLayout.CENTER);
 		stageLabels = new JLabel[NBAFF][4];
 		
-		//list qui retient les stages a enlever
-		ArrayList<Stage> removeStage = new ArrayList<Stage>();
-		for (Stage unstage : StageList) {
-			//SG if(unstage.getnbMin() < (nbmin - NBMIN)){
-				//enleve les stages qui sont debutés depuis plus de NBMIN minutes
-				//SG removeStage.add(unstage);
-			//SG }
-		}//fin pour
-		//suppression des stages a enlever de l'affichage
-		StageList.removeAll(removeStage);
-
+		if (TVall == false) {
+			//list qui retient les stages a enlever
+			ArrayList<Stage> removeStage = new ArrayList<Stage>();
+			for (Stage unstage : StageList) {
+				if(unstage.getnbMin() < (nbmin - NBMIN)){
+					//enleve les stages qui sont debutés depuis plus de NBMIN minutes
+					removeStage.add(unstage);
+				}
+			}//fin pour
+			//suppression des stages a enlever de l'affichage
+			StageList.removeAll(removeStage);
+		}
+		
 		//affichage
 		int i = 0;
 		GridBagConstraints c = new GridBagConstraints();
