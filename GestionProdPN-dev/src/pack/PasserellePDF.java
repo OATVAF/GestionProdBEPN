@@ -235,7 +235,7 @@ public class PasserellePDF {
 					cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
 					cell.setBorder(7);
 					center.addCell(cell);
-					String str = "";
+					// String str = "";
 					// TODO  SG liste statique
 					/*
 					for (int j = 0; j < 5; j++) {

@@ -12,7 +12,7 @@ public class Main {
 	public static void main(String[] args) {
 		
 		//construction de la fenetre principale
-		new FenetrePrincipale();
+		new FenetrePrincipale(args);
 		
 	}//fin main()
 

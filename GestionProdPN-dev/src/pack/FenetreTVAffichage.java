@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
@@ -49,10 +48,14 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 	private Thread runner;
 	private boolean run;
 	
+	private boolean TVall = false;
+			
 	/**
 	 * constructeur
 	 */
-	public FenetreTVAffichage(){
+	public FenetreTVAffichage(boolean all){
+		
+		TVall = all;
 		
 		//recuperation de la date d'aujourd'hui
 		dateActuelle = new Date();
@@ -282,17 +285,19 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 		centerPane.add(stagePane,BorderLayout.CENTER);
 		stageLabels = new JLabel[NBAFF][4];
 		
-		//list qui retient les stages a enlever
-		ArrayList<Stage> removeStage = new ArrayList<Stage>();
-		for (Stage unstage : StageList) {
-			if(unstage.getnbMin() < (nbmin - NBMIN)){
-				//enleve les stages qui sont debutés depuis plus de NBMIN minutes
-				removeStage.add(unstage);
-			}
-		}//fin pour
-		//suppression des stages a enlever de l'affichage
-		StageList.removeAll(removeStage);
-
+		if (TVall == false) {
+			//list qui retient les stages a enlever
+			ArrayList<Stage> removeStage = new ArrayList<Stage>();
+			for (Stage unstage : StageList) {
+				if(unstage.getnbMin() < (nbmin - NBMIN)){
+					//enleve les stages qui sont debutés depuis plus de NBMIN minutes
+					removeStage.add(unstage);
+				}
+			}//fin pour
+			//suppression des stages a enlever de l'affichage
+			StageList.removeAll(removeStage);
+		}
+		
 		//affichage
 		int i = 0;
 		GridBagConstraints c = new GridBagConstraints();

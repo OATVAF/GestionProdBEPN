@@ -1,10 +1,13 @@
 package pack;
 import java.io.*;
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.GregorianCalendar;
+import java.util.Hashtable;
 
 import javax.swing.*;
 
@@ -25,6 +28,8 @@ public class PasserelleStagiaire {
 	private static final String pathFilePnc= "dataImport\\OATVPNC.xls";
 	private static final String pathFilePnt= "dataImport\\OATVPNT.xls";
 	
+	private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+	private static Date dateDemain;
 	
 	public static void creerListePourSms(){
 		
@@ -39,6 +44,17 @@ public class PasserelleStagiaire {
 		
 	}//fin creerListePourSms()
 	
+	public static void creerListePourTests() {
+		good = true;
+		ArrayList<Stagiaire> StagiaireList = chargerTousStagiairesPNC();
+		StagiaireList = FiltreBOContact(StagiaireList);
+		ecritureListeTests(StagiaireList);
+		if (good) {
+			JOptionPane.showMessageDialog(null, "<html>Operation terminée !" +
+					"<br>les fichiers sont dans dataExport/Tests...</html>", "Termine", JOptionPane.INFORMATION_MESSAGE);
+		}//finsi
+	}
+
 	public static ArrayList<Stagiaire> chargerTousStagiairesPNC(){
 		
 		ArrayList<Stagiaire> StagiaireList = new ArrayList<Stagiaire>();
@@ -196,7 +212,7 @@ public class PasserelleStagiaire {
 				}else{
 					cl.add(Calendar.DATE, 1);
 				}
-				Date dateDemain = new Date((cl.get(Calendar.YEAR)-1900), cl.get(Calendar.MONTH), cl.get(Calendar.DATE));
+				dateDemain = new Date((cl.get(Calendar.YEAR)-1900), cl.get(Calendar.MONTH), cl.get(Calendar.DATE));
 				
 				for (Stagiaire stagiaire : newStagiaireList) {
 					if(dateDemain.before(stagiaire.getDateDeb()) == false && dateDemain.after(stagiaire.getDateFin()) == false){
@@ -253,5 +269,44 @@ public class PasserelleStagiaire {
 			}
 
 	}//fin ecritureListeSMSxls
+
+	private static void ecritureListeTests(ArrayList<Stagiaire> stagiaireList) {
+		Hashtable<String,StringBuffer> stgMap = new Hashtable<String,StringBuffer>();
+		String pathDossier = "dataExport/Tests du "+dateFormat.format(dateDemain)+"/";
+		String key = "";
+		
+		for (Stagiaire s : stagiaireList) {
+			String code = s.getCodeStage().replace(" ", "").trim();
+			code = code.substring(0,3)+" "+code.substring(3);
+			String matr = "M"+s.getMatricule().subSequence(0, 6);
+			if (stgMap.containsKey(code)) {
+				//System.out.println("[INFO] ajout stage:"+code+" et matr:"+matr);
+				stgMap.get(code).append("|"+matr);
+			}
+			else {
+				//System.out.println("[INFO]   +++ stage:"+code+" et matr:"+matr);
+				stgMap.put(code,new StringBuffer(matr));
+			}
+		}
+
+		try {
+			new File(pathDossier).mkdir();
+	
+			Enumeration<String> e = stgMap.keys();
+			 while (e.hasMoreElements()) {
+				  key = e.nextElement();
+				  StringBuffer value = stgMap.get(key);
+				  
+				  FileWriter fichier = new FileWriter(pathDossier+key+".txt");
+				  PrintWriter printer = new PrintWriter(fichier);
+				  printer.println(value);
+				  printer.close();
+			 }
+		} catch (IOException e) {
+			JOptionPane.showMessageDialog(null, "<html>probleme d'ecriture de" +
+					"<br>"+pathDossier+key+".txt", "Erreur", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
 
 }//fin class
