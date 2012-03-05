@@ -120,22 +120,30 @@ public class PasserelleStagiaire {
 		for (Stage stage : newStageList) {
 			index = -1;
 			for (int i = 0 ; i < stagePNTList.size(); i++) {
-				if(stage.getCode().startsWith(stagePNTList.get(i))){
+				if(stage.getCodeI().startsWith(stagePNTList.get(i))){
 					index = i;
 					break;
 				}
 			}
 			switch (index) {
 			case 0:
+				int n = 0;
+				long modulo = 0;
 				for (Stagiaire stagiaire : pntList) {
 					if (stagiaire.getCodeStage().trim().endsWith("S2CC")) {
-						stage.ajoutStagiaire(stagiaire);
+						// modulo pour les S2
+						modulo = (n % stage.getIdxMax()) +1 ;
+						if (modulo == stage.getIdx()) {
+							System.out.println("Ajout PNT "+n+ " " + stagiaire.getNom() + " au stage " +stage.getCode());
+							stage.ajoutStagiaire(stagiaire);
+						}
+						n++;
 					}
 				}
 				break;
 			case 1:
 				ArrayList<String> qtinfo = new ArrayList<String>();
-				String codeStage = stage.getCode();
+				String codeStage = stage.getCodeI();
 				String chaine = "";
 				for (int i = 0; i < codeStage.length(); i++) {
 					if(codeStage.substring(i, i+1).equalsIgnoreCase(" ")){
@@ -166,7 +174,7 @@ public class PasserelleStagiaire {
 		ArrayList<Stage> newStageList = stageList;
 		
 		for (Stage stage : newStageList) {
-			String strCodeStage = stage.getCode().replace(" ", "");
+			String strCodeStage = stage.getCodeI().replace(" ", "");
 			for (Stagiaire stagiaire : stagiairePNCList) {
 				String strCodeStagiaire = stagiaire.getCodeStage().replace(" ", "").trim();
 				if(strCodeStagiaire.startsWith(strCodeStage)

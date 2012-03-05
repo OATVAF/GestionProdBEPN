@@ -11,6 +11,8 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.JOptionPane;
 
@@ -171,7 +173,8 @@ public class PasserelleStage {
 		ArrayList<Stage> stageExportList = new ArrayList<Stage>();
 		ArrayList<Module> moduleList = new ArrayList<Module>();
 		FileReader fichier;
-		
+		Map<String, Integer> hsCode = new HashMap<String, Integer>();
+		Map<Long, Integer> hsId = new HashMap<Long, Integer>();
 		
 			try {
 				fichier = new FileReader(pathExport);
@@ -219,8 +222,27 @@ public class PasserelleStage {
 					infoLigne.add(chaine);//recup de la derniere information
 
 					//ajout des modules
-					if(infoLigne.get(3).equalsIgnoreCase("activité")){
-						newmodule = new Module(infoLigne.get(4), infoLigne.get(22), infoLigne.get(29).substring(0, 10)
+					if(infoLigne.get(3).equalsIgnoreCase("activité") && ! infoLigne.get(4).endsWith("annulé")) {
+						Long id  = Long.parseLong(infoLigne.get(0));
+						String code = infoLigne.get(4);
+						System.out.println(" ? "+id +"/"+code+" => " + hsCode.get(code));
+						if (hsCode.containsKey(code)) {
+							if (hsId.containsKey(id)) {
+								System.out.println(" - "+id +"/"+code+" => " + hsCode.get(code));
+							}
+							else {
+								Integer c = hsCode.get(code); c++; hsCode.put(code, c);
+								hsId.put(id, hsCode.get(code));
+								System.out.println(" + "+id +"/"+code+" => " + hsCode.get(code));
+							}
+						}
+						else {
+							hsCode.put(code, new Integer(1));
+							hsId.put(id, new Integer(1));
+							System.out.println(" N "+id +"/"+code+" => " + hsCode.get(code));
+						}
+						
+						newmodule = new Module(id, code, infoLigne.get(22), infoLigne.get(29).substring(0, 10)
 								, infoLigne.get(29).substring(11,16), infoLigne.get(30).substring(11,16));
 						
 						if(infoLigne.get(2).equalsIgnoreCase("salle")){
@@ -239,8 +261,8 @@ public class PasserelleStage {
 						if(infoLigne.get(2).equalsIgnoreCase("intervenant")){
 							newmodule.setNomAide(infoLigne.get(1));
 						}
+						moduleList.add(newmodule);
 					}
-					moduleList.add(newmodule);
 					
 					infoLigne.clear();
 					
@@ -260,7 +282,7 @@ public class PasserelleStage {
 		for (Module module : moduleList) {
 			good = false;
 			for (Stage stage : stageExportList) {
-				if(module.getCodeStage().equals(stage.getCode())){
+				if(module.getId() == stage.getId()){
 					good = true;
 					int indexmod = stage.exist(module);
 					if(indexmod != -1){
@@ -274,18 +296,26 @@ public class PasserelleStage {
 							stage.getEltModuleList(indexmod).setNomAide(module.getNomAide());
 						}
 					}else{
+						module.setCodeStage(stage.getCode());
 						stage.ajoutModule(module);
 					}
 				}
 			}
+			// nouveau stage 
 			if(! good){
+				// filter
 				if(module.getCodeStage().equalsIgnoreCase("dry")
 				|| module.getCodeStage().equalsIgnoreCase("réserve")
 				|| module.getCodeStage().equalsIgnoreCase("non instruction")
 				|| module.getCodeStage().equalsIgnoreCase("mts")){
 					//nothing
 				}else{
-					stageExportList.add(new Stage(module));
+					Stage s = new Stage(module);
+					s.setIdx(hsId.get(s.getId()), hsCode.get(s.getCodeI()));
+					stageExportList.add(s);
+					module.setCodeStage(s.getCode());
+					//System.out.println("Add stage1 "+s.getCode()+":"+hsId.get(module.getId())+"/"+hsCode.get(module.getCodeStage()));
+					//System.out.println("Add stage2 "+s.getCode()+":"+s.getIdx()+"/"+s.getIdxMax());
 				}
 			}
 		}

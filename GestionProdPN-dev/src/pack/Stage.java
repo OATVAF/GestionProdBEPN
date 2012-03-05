@@ -11,12 +11,15 @@ import java.util.Date;
  * @author BERON Jean-Sébastien
  *
  */
-public class Stage implements Serializable{
+public class Stage implements Serializable /*,Cloneable*/ {
 
 	private static final long serialVersionUID = -3775254007031121727L;
+
+	private Long id;
 	
 	//attributs
 	private String code;
+	private Integer idx, idxMax;
 	private String date;
 	private String libelle;
 	private int maxiPresent;
@@ -36,7 +39,7 @@ public class Stage implements Serializable{
 	 * @param unModule
 	 */
 	public Stage(Module unModule){
-		
+		id = unModule.getId();
 		moduleList = new ArrayList<Module>();
 		stagiaireList = new ArrayList<Stagiaire>();
 		this.code = unModule.getCodeStage();
@@ -44,9 +47,46 @@ public class Stage implements Serializable{
 		this.leader = unModule.getNomLeader();
 		unModule.setStage(this);
 		moduleList.add(unModule);
+		this.idx = 0;
+		this.idxMax = 0;
 		affectationInfoStage();
 		
 	}//fin Stage(Module unModule)
+	
+	/*
+	public Stage clone() {
+		Stage o = null;
+		try {
+			// On récupère l'instance à renvoyer par l'appel de la 
+			// méthode super.clone()
+			o = (Stage) super.clone();
+		} catch(CloneNotSupportedException cnse) {
+			// Ne devrait jamais arriver car nous implémentons 
+			// l'interface Cloneable
+			cnse.printStackTrace(System.err);
+		}
+		o.moduleList = (ArrayList<Module>)moduleList.clone();
+		o.stagiaireList = (ArrayList<Stagiaire>)stagiaireList.clone();
+		
+		// on renvoie le clone
+		return o;
+	}
+	*/
+	
+	public long getId() {
+		return id;
+	}
+	
+	public long getIdx() {
+		return idx;
+	}
+	public long getIdxMax() {
+		return idxMax;
+	}
+	public void setIdx(Integer idx, Integer idxM) {
+		this.idx = idx;
+		this.idxMax = idxM;
+	}
 	
 	/**
 	 * setter de code
@@ -54,14 +94,23 @@ public class Stage implements Serializable{
 	 */
 	public void setCode(String code) {
 		this.code = code;
+		for (Module m: moduleList) {
+			m.setCodeStage(getCode());
+		}
 	}
-	
 	/**
 	 * getter de code
 	 * @return
 	 */
-	public String getCode() {
+	public String getCodeI() {
 		return code;
+	}
+	public String getCode() {
+		String c = code;
+		if (idxMax != null && idxMax > 1) {
+			c += "-"+idx;
+		}
+		return c;
 	}
 
 	/**

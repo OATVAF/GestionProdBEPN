@@ -9,7 +9,9 @@ import java.io.Serializable;
 public class Module implements Serializable{
 	
 	private static final long serialVersionUID = -1234129121873518254L;
-	
+
+	private Long id;
+
 	//attributs
 	private Stage stage;
 	private String codeStage;
@@ -29,7 +31,8 @@ public class Module implements Serializable{
 	 * @param Hdebut
 	 * @param Hfin
 	 */
-	public Module(String codStg, String libelle, String ladate, String Hdebut, String Hfin){
+	public Module(Long sId,String codStg, String libelle, String ladate, String Hdebut, String Hfin){
+		this.id = sId;
 		this.stage = new Stage();
 		this.codeStage = codStg;
 		this.date = ladate;
@@ -41,6 +44,13 @@ public class Module implements Serializable{
 		this.setNomAide("");
 	}
 	
+	public long getId() {
+		return id;
+	}
+	public void setCodeStage(String codeStage) {
+		this.codeStage = codeStage;
+	}
+
 	/**
 	 * setter de stage
 	 * @param stage
@@ -56,11 +66,12 @@ public class Module implements Serializable{
 	public Stage getStage() {
 		return stage;
 	}
-
+	
 	/**
 	 * getter de codeStage
 	 * @return codeStage
 	 */
+
 	public String getCodeStage() {
 		return codeStage;
 	}
