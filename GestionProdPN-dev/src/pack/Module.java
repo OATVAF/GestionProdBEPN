@@ -33,7 +33,7 @@ public class Module implements Serializable{
 	 */
 	public Module(Long sId,String codStg, String libelle, String ladate, String Hdebut, String Hfin){
 		this.id = sId;
-		this.stage = new Stage();
+		this.stage = null;
 		this.codeStage = codStg;
 		this.date = ladate;
 		this.libelle = libelle;
@@ -130,9 +130,11 @@ public class Module implements Serializable{
 	 */
 	public void setNomLeader(String nomLeader) {
 		this.nomLeader = nomLeader;
-		this.stage.setLeader(nomLeader);
+		if (this.stage != null) {
+			this.stage.setLeader(nomLeader);
+		}
 	}
-
+	
 	/**
 	 * getter de nomLeader
 	 * @return nomLeader

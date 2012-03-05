@@ -225,21 +225,21 @@ public class PasserelleStage {
 					if(infoLigne.get(3).equalsIgnoreCase("activité") && ! infoLigne.get(4).endsWith("annulé")) {
 						Long id  = Long.parseLong(infoLigne.get(0));
 						String code = infoLigne.get(4);
-						System.out.println(" ? "+id +"/"+code+" => " + hsCode.get(code));
+						//System.out.println(" ? "+id +"/"+code+" => " + hsCode.get(code));
 						if (hsCode.containsKey(code)) {
 							if (hsId.containsKey(id)) {
-								System.out.println(" - "+id +"/"+code+" => " + hsCode.get(code));
+								//System.out.println(" - "+id +"/"+code+" => " + hsCode.get(code));
 							}
 							else {
 								Integer c = hsCode.get(code); c++; hsCode.put(code, c);
 								hsId.put(id, hsCode.get(code));
-								System.out.println(" + "+id +"/"+code+" => " + hsCode.get(code));
+								//System.out.println(" + "+id +"/"+code+" => " + hsCode.get(code));
 							}
 						}
 						else {
 							hsCode.put(code, new Integer(1));
 							hsId.put(id, new Integer(1));
-							System.out.println(" N "+id +"/"+code+" => " + hsCode.get(code));
+							//System.out.println(" N "+id +"/"+code+" => " + hsCode.get(code));
 						}
 						
 						newmodule = new Module(id, code, infoLigne.get(22), infoLigne.get(29).substring(0, 10)
@@ -285,19 +285,30 @@ public class PasserelleStage {
 				if(module.getId() == stage.getId()){
 					good = true;
 					int indexmod = stage.exist(module);
+					Module mm;
 					if(indexmod != -1){
-						if(! module.getSalle().equalsIgnoreCase("")){
-							stage.getEltModuleList(indexmod).setSalle(module.getSalle());
-						}
-						if(! module.getNomLeader().equalsIgnoreCase("")){
-							stage.getEltModuleList(indexmod).setNomLeader(module.getNomLeader());
-						}
-						if(! module.getNomAide().equalsIgnoreCase("")){
-							stage.getEltModuleList(indexmod).setNomAide(module.getNomAide());
-						}
-					}else{
-						module.setCodeStage(stage.getCode());
+						mm = stage.getEltModuleList(indexmod);
+					} else {
+						mm = module;
+					}
+					mm.setStage(stage);
+					mm.setCodeStage(stage.getCode());
+					if(! module.getSalle().equalsIgnoreCase("")){
+						mm.setSalle(module.getSalle());
+					}
+					if(! module.getNomLeader().equalsIgnoreCase("")){
+						mm.setNomLeader(module.getNomLeader());
+						//System.out.println("  "+ stage.getCode()+" Mod Module:" + mm.getLibelle()+" L:" + mm.getNomLeader()+"/"+stage.getLeader() + " s:"+mm.getStage());
+					}
+					if(! module.getNomAide().equalsIgnoreCase("")){
+						mm.setNomAide(module.getNomAide());
+						//System.out.println("  "+stage.getCode()+" Mod Module:" + mm.getLibelle()+"  A:" + mm.getNomAide() + " s:"+mm.getStage());
+					}
+					//}else{
+					if(indexmod == -1){
+						//module.setCodeStage(stage.getCode());
 						stage.ajoutModule(module);
+						System.out.println(" +"+stage.getCode()+" Add Module:" + module.getLibelle() + " L:" + module.getNomLeader()+"/"+stage.getLeader() + " s:"+module.getStage());
 					}
 				}
 			}
@@ -314,8 +325,8 @@ public class PasserelleStage {
 					s.setIdx(hsId.get(s.getId()), hsCode.get(s.getCodeI()));
 					stageExportList.add(s);
 					module.setCodeStage(s.getCode());
-					//System.out.println("Add stage1 "+s.getCode()+":"+hsId.get(module.getId())+"/"+hsCode.get(module.getCodeStage()));
-					//System.out.println("Add stage2 "+s.getCode()+":"+s.getIdx()+"/"+s.getIdxMax());
+					//System.out.println("Add stage "+s.getCode()+":"+hsId.get(module.getId())+"/"+hsCode.get(module.getCodeStage()));
+					System.out.println("+ "+s.getCode()+":"+s.getIdx()+"/"+s.getIdxMax()+ "M:" + module.getLibelle()+" L:"+s.getLeader() + " s:"+module.getStage());
 				}
 			}
 		}
