@@ -24,6 +24,7 @@ public class Stage implements Serializable /*,Cloneable*/ {
 	private String libelle;
 	private int maxiPresent;
 	private String leader;
+	private String compagnie;
 	private ArrayList<Module> moduleList;
 	private ArrayList<Stagiaire> stagiaireList;
 	
@@ -45,6 +46,7 @@ public class Stage implements Serializable /*,Cloneable*/ {
 		this.code = unModule.getCodeStage();
 		this.date = unModule.getDate();
 		this.leader = unModule.getNomLeader();
+		this.compagnie = unModule.getCompagnie();
 		unModule.setStage(this);
 		moduleList.add(unModule);
 		this.idx = 0;
@@ -383,5 +385,13 @@ public class Stage implements Serializable /*,Cloneable*/ {
 		//retour
 		return nbmin;
 	}//fin getnbmin()
+
+	public String getCompagnie() {
+		return compagnie;
+	}
+
+	public void setCompagnie(String compagnie) {
+		this.compagnie = compagnie;
+	}
 	
 }//fin class

@@ -22,6 +22,7 @@ public class Module implements Serializable{
 	private String salle;
 	private String nomLeader;
 	private String nomAide;
+	private String compagnie;
 
 	/**
 	 * constructeur
@@ -171,5 +172,13 @@ public class Module implements Serializable{
 		//retour
 		return nbmin;
 	}//fin getnbMin()
+
+	public String getCompagnie() {
+		return compagnie;
+	}
+
+	public void setCompagnie(String compagnie) {
+		this.compagnie = compagnie;
+	}
 
 }//fin class

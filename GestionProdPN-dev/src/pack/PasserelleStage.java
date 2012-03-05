@@ -245,6 +245,7 @@ public class PasserelleStage {
 						newmodule = new Module(id, code, infoLigne.get(22), infoLigne.get(29).substring(0, 10)
 								, infoLigne.get(29).substring(11,16), infoLigne.get(30).substring(11,16));
 						
+						newmodule.setCompagnie(infoLigne.get(7));
 						if(infoLigne.get(2).equalsIgnoreCase("salle")){
 							newmodule.setSalle("Salle "+infoLigne.get(1));
 						}
@@ -412,11 +413,14 @@ public class PasserelleStage {
 	 * chargement de la liste des stages pour le teleAffichage
 	 * @return
 	 */
-	public static ArrayList<Stage> chargerStageList(){
+	public static ArrayList<Stage> chargerStageList(Boolean...params){
+	    boolean all = params.length > 0 ? params[0].booleanValue() : false;
 		//declaration de la liste
 		ArrayList<Stage> stageList;
 		stageList = lectureStageObj();
-		stageList = suppresionStage(stageList,false);
+		if (!all) {
+			stageList = suppresionStage(stageList,false);
+		}
 		stageList = triHoraire(stageList);
 		//retour
 		return stageList;

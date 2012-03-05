@@ -8,6 +8,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
 import javax.swing.*;
 import javax.swing.border.*;
@@ -23,7 +24,7 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 	private static final long serialVersionUID = 6442873953231455888L;
 	
 	//constante
-	private final int NBAFF = 20;//nombre d'affichage max
+	private final int NBAFF = 19;//nombre d'affichage max
 	private final int NBMIN = 30;//nombre de minutes 
 	
 	//attributs IHM
@@ -39,6 +40,7 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 	private Marquee marquee;
 	private JLabel timeLabel;
 	private JLabel[][] stageLabels;
+	private HashMap<String,ImageIcon> logoIcons = new HashMap<String,ImageIcon>(); 
 	
 	//attributs temporaires
 	private Date dateActuelle;
@@ -61,7 +63,7 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 		dateActuelle = new Date();
 		
 		//chargement des stages
-		StageList = PasserelleStage.chargerStageList();
+		StageList = PasserelleStage.chargerStageList(all);
 		if(StageList.isEmpty()){
 			//boite de dialogue
 			JOptionPane.showMessageDialog(null, "ERREUR ! pas de stages à afficher !","Erreur",JOptionPane.OK_OPTION);
@@ -283,7 +285,7 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 		centerPane.remove(stagePane);
 		constructionStagePane();
 		centerPane.add(stagePane,BorderLayout.CENTER);
-		stageLabels = new JLabel[NBAFF][4];
+		stageLabels = new JLabel[NBAFF][5];
 		
 		if (TVall == false) {
 			//list qui retient les stages a enlever
@@ -305,50 +307,70 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 			if(i == NBAFF){
 				break;
 			}
-			//Border border = LineBorder.createGrayLineBorder();
+			int j = 0;
 			
+			//Border border = LineBorder.createGrayLineBorder();
 			c.fill = GridBagConstraints.HORIZONTAL;
 			
-			stageLabels[i][0] = new JLabel();
-			stageLabels[i][0].setText(unstage.getCode());
-			stageLabels[i][0].setFont(new Font("arial", 1, 22));
-			stageLabels[i][0].setForeground(Color.BLACK);
-			stageLabels[i][0].setHorizontalAlignment(SwingConstants.CENTER);
-			c.gridx = 0; c.gridy = i; c.weightx = 1;
-			stagePane.add(stageLabels[i][0], c);
+			stageLabels[i][j] = new JLabel();
+			//stageLabels[i][j].setText(unstage.getCompagnie());
+			stageLabels[i][j].setFont(new Font("arial", 1, 26));
+			stageLabels[i][j].setBackground(Color.BLUE);
+			stageLabels[i][j].setForeground(Color.BLACK);
+			if (! logoIcons.containsKey(unstage.getCompagnie())) {
+				logoIcons.put(unstage.getCompagnie(), 
+						new ImageIcon("dataSystem/logos/"+unstage.getCompagnie()+".jpg"));
+			}
+			stageLabels[i][j].setIcon(logoIcons.get(unstage.getCompagnie()));
+			stageLabels[i][j].setSize(10,5);
+			c.gridx = j; c.gridy = i; c.weightx = 1;
+			stagePane.add(stageLabels[i][j],c);
+			j++;
+
+			stageLabels[i][j] = new JLabel();
+			stageLabels[i][j].setText(unstage.getCode());
+			stageLabels[i][j].setFont(new Font("arial", 1, 22));
+			stageLabels[i][j].setForeground(Color.BLACK);
+			stageLabels[i][j].setHorizontalAlignment(SwingConstants.CENTER);
+			c.gridx = j; c.gridy = i; c.weightx = 1;
+			stagePane.add(stageLabels[i][j], c);
+			j++;
 			
-			stageLabels[i][1] = new JLabel();
-			String libelle = unstage.getLibelle();
-			stageLabels[i][1].setText(libelle);
-			stageLabels[i][1].setFont(new Font("arial", 1, 22));
-			stageLabels[i][1].setForeground(Color.BLACK);
-			stageLabels[i][1].setHorizontalAlignment(SwingConstants.CENTER);
-			c.gridx = 1; c.gridy = i; c.weightx = 2;
-			stagePane.add(stageLabels[i][1],c);
+			stageLabels[i][j] = new JLabel();
+			stageLabels[i][j].setText(unstage.getLibelle());
+			stageLabels[i][j].setFont(new Font("arial", 1, 22));
+			stageLabels[i][j].setForeground(Color.BLACK);
+			stageLabels[i][j].setHorizontalAlignment(SwingConstants.CENTER);
+			c.gridx = j; c.gridy = i; c.weightx = 2;
+			stagePane.add(stageLabels[i][j],c);
+			j++;
 			
-			stageLabels[i][2] = new JLabel();
-			stageLabels[i][2].setText(unstage.getFirstModule().getSalle());
-			stageLabels[i][2].setFont(new Font("arial", 1, 26));
-			stageLabels[i][2].setForeground(Color.BLACK);
-			//stageLabels[i][2].setBorder(border);
-			stageLabels[i][2].setHorizontalAlignment(SwingConstants.CENTER);
-			c.gridx = 2; c.gridy = i; c.weightx = 1;
-			stagePane.add(stageLabels[i][2],c);
+			stageLabels[i][j] = new JLabel();
+			stageLabels[i][j].setText(unstage.getFirstModule().getSalle());
+			stageLabels[i][j].setFont(new Font("arial", 1, 26));
+			stageLabels[i][j].setForeground(Color.BLACK);
+			//stageLabels[i][j].setBorder(border);
+			stageLabels[i][j].setHorizontalAlignment(SwingConstants.CENTER);
+			c.gridx = j; c.gridy = i; c.weightx = 1;
+			stagePane.add(stageLabels[i][j],c);
+			j++;
 			
-			stageLabels[i][3] = new JLabel();
-			stageLabels[i][3].setText(unstage.getFirstModule().getHeureDebut());
-			stageLabels[i][3].setFont(new Font("arial", 1, 26));
-			stageLabels[i][3].setForeground(Color.BLACK);
-			stageLabels[i][3].setHorizontalAlignment(SwingConstants.CENTER);
+			stageLabels[i][j] = new JLabel();
+			stageLabels[i][j].setText(unstage.getFirstModule().getHeureDebut());
+			stageLabels[i][j].setFont(new Font("arial", 1, 26));
+			stageLabels[i][j].setForeground(Color.BLACK);
+			stageLabels[i][j].setHorizontalAlignment(SwingConstants.CENTER);
 			//changement de couleur de l'heure
 			if((StageList.get(i).getnbMin()-nbmin) <= 0 && (unstage.getnbMin()-nbmin) >= -10){
-				stageLabels[i][3].setForeground(new Color(255, 102, 0));
+				stageLabels[i][j].setForeground(new Color(255, 102, 0));
 			}
 			if((StageList.get(i).getnbMin()-nbmin) < -10){
-				stageLabels[i][3].setForeground(new Color(255, 0, 0));
+				stageLabels[i][j].setForeground(new Color(255, 0, 0));
 			}
-			c.gridx = 3; c.gridy = i; c.weightx = 1;
-			stagePane.add(stageLabels[i][3],c);
+			c.gridx = j; c.gridy = i; c.weightx = 1;
+			stagePane.add(stageLabels[i][j],c);
+			j++;
+						
 			i++;
 		}
 		//ajout de case vide pour rendre l'affichage plus joli quand il se vide
