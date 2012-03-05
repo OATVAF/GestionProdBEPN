@@ -622,6 +622,13 @@ public class PasserellePDF {
 		String pathDossier = "Feuilles de routes du "+ladate;
 		new File("dataExport\\"+pathDossier).mkdir();
 		
+		
+		// Suppression des feuilles inutiles :
+		if (Nom.startsWith("IFH PNC") || Nom.startsWith("IPNC") || Nom.startsWith("CADRE PNT")
+				|| Nom.startsWith("Infirmière EXT") || Nom.startsWith("SFI")) {
+			return;
+		}
+		
 		//tri
 		Module modTemps ;
 		boolean good = false;
@@ -666,6 +673,9 @@ public class PasserellePDF {
 			
 			PdfPTable center = new PdfPTable(5);
 			center.setWidthPercentage(100);
+			float[] widths = new float[] { 1f, 1f, 1f, 1.2f, 1.2f };
+			center.setWidths(widths);
+
 			phrs = new Phrase("Code Stage",new Font(Font.HELVETICA, 12, Font.BOLD));
 			cell = new PdfPCell(phrs);
 			cell.setBorder(0);
@@ -697,11 +707,18 @@ public class PasserellePDF {
 				cell.setBorder(0);
 				cell.setPadding(10);
 				center.addCell(cell);
-				String lead = "en tant que Leader";
+				String lead = "Leader";
+				String aide = module.getNomAide();
 				if(! module.getNomLeader().equalsIgnoreCase(Nom)){
-					lead = "en tant que Aide";
+					lead = "Aide";
+					aide = module.getNomLeader();
 				}
 				phrs = new Phrase(lead,new Font(Font.HELVETICA, 12));
+				if (!aide.equals("")) {
+					phrs.add(new Phrase("\n"+aide,new Font(Font.HELVETICA, 9, Font.ITALIC)));
+
+				}
+				//phrs = new Phrase(lead,new Font(Font.HELVETICA, 10));
 				cell = new PdfPCell(phrs);
 				cell.setBorder(0);
 				cell.setPadding(10);
