@@ -265,7 +265,7 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 				afficherStages(nbmin);
 			}//finsi
 			try {
-				System.out.println("Sleep");
+				//System.out.println("Sleep");
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
@@ -310,20 +310,22 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 			int j = 0;
 			
 			//Border border = LineBorder.createGrayLineBorder();
-			c.fill = GridBagConstraints.HORIZONTAL;
+			c.fill = GridBagConstraints.BOTH; // HORIZONTAL;
+			c.weighty = 1;
 			
 			stageLabels[i][j] = new JLabel();
 			//stageLabels[i][j].setText(unstage.getCompagnie());
 			stageLabels[i][j].setFont(new Font("arial", 1, 26));
 			stageLabels[i][j].setBackground(Color.BLUE);
 			stageLabels[i][j].setForeground(Color.BLACK);
+			stageLabels[i][j].setHorizontalAlignment(SwingConstants.CENTER);
 			if (! logoIcons.containsKey(unstage.getCompagnie())) {
 				logoIcons.put(unstage.getCompagnie(), 
 						new ImageIcon("dataSystem/logos/"+unstage.getCompagnie()+".jpg"));
 			}
 			stageLabels[i][j].setIcon(logoIcons.get(unstage.getCompagnie()));
 			stageLabels[i][j].setSize(10,5);
-			c.gridx = j; c.gridy = i; c.weightx = 1;
+			c.gridx = j; c.gridy = i; c.weightx = 0.3;
 			stagePane.add(stageLabels[i][j],c);
 			j++;
 
@@ -373,6 +375,7 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 						
 			i++;
 		}
+		/*
 		//ajout de case vide pour rendre l'affichage plus joli quand il se vide
 		if(i < 10){
 			for (int k = i; k < 10; k++) {
@@ -383,6 +386,7 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 				}
 			}
 		}//finsi
+		*/
 		
 	}//fin afficherStages()
 
