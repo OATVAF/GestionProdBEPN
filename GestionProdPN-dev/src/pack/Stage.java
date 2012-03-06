@@ -27,6 +27,7 @@ public class Stage implements Serializable /*,Cloneable*/ {
 	private String compagnie;
 	private ArrayList<Module> moduleList;
 	private ArrayList<Stagiaire> stagiaireList;
+	private Stage coStage;
 	
 	/**
 	 * constructeur par defaut
@@ -51,6 +52,7 @@ public class Stage implements Serializable /*,Cloneable*/ {
 		moduleList.add(unModule);
 		this.idx = 0;
 		this.idxMax = 0;
+		this.setCoStage(null);
 		affectationInfoStage();
 		
 	}//fin Stage(Module unModule)
@@ -192,7 +194,12 @@ public class Stage implements Serializable /*,Cloneable*/ {
 	 * @return module
 	 */
 	public Module getFirstModule(){
-		return moduleList.get(0);
+		if (coStage != null) {
+			return coStage.getFirstModule();
+		}
+		else {
+			return moduleList.get(0);
+		}
 	}
 
 
@@ -392,6 +399,14 @@ public class Stage implements Serializable /*,Cloneable*/ {
 
 	public void setCompagnie(String compagnie) {
 		this.compagnie = compagnie;
+	}
+
+	public Stage getCoStage() {
+		return coStage;
+	}
+
+	public void setCoStage(Stage coStage) {
+		this.coStage = coStage;
 	}
 	
 }//fin class

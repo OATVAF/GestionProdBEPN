@@ -46,10 +46,12 @@ public class PasserelleStage {
 		stageExportList = importExportDelia();
 		
 		Date dateactuelle = new Date();
+		/*
 		if(stageExportList.get(0).getDateDt().equals(dateactuelle) || stageExportList.get(0).getDateDt().before(dateactuelle)){
 			JOptionPane.showMessageDialog(null, "<html>ERREUR ! la date des stages que vous essayez d'importer n'est pas celle de demain !<br> veuillez refaire l'exportation DELIA</html>"
 					,"Erreur",JOptionPane.YES_NO_OPTION);
 		}else{
+		*/ if (true) {
 			//importation des stagiaires PNC de J+1
 			ArrayList<Stagiaire> stagiairePNCList = PasserelleStagiaire.chargerTousStagiairesPNC();
 			//importation des stagiaires PNT de J+1
@@ -175,6 +177,7 @@ public class PasserelleStage {
 		FileReader fichier;
 		Map<String, Integer> hsCode = new HashMap<String, Integer>();
 		Map<Long, Integer> hsId = new HashMap<Long, Integer>();
+		Map<String, Stage> hsStages = new HashMap<String,Stage>();
 		
 			try {
 				fichier = new FileReader(pathExport);
@@ -326,6 +329,11 @@ public class PasserelleStage {
 					s.setIdx(hsId.get(s.getId()), hsCode.get(s.getCodeI()));
 					stageExportList.add(s);
 					module.setCodeStage(s.getCode());
+					if (s.getIdx() > 1 && hsStages.containsKey(s.getCodeI()+"-1")) {
+						s.setCoStage(hsStages.get(s.getCodeI()+"-1"));
+						System.out.println("* "+s.getCode()+" has coStage:"+s.getCoStage().getCode());
+					}
+					hsStages.put(s.getCode(), s);
 					//System.out.println("Add stage "+s.getCode()+":"+hsId.get(module.getId())+"/"+hsCode.get(module.getCodeStage()));
 					System.out.println("+ "+s.getCode()+":"+s.getIdx()+"/"+s.getIdxMax()+ "M:" + module.getLibelle()+" L:"+s.getLeader() + " s:"+module.getStage());
 				}
