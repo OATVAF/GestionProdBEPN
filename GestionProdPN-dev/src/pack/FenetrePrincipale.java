@@ -35,7 +35,8 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 	//attributs JLabel
 	private JLabel logoLabel;
 	private JLabel titleLabel;
-	
+	private JLabel versLabel;
+
 	//attributs JButton
 	private JButton tvAffichageBtn;//bouton du téléAffichage
 	private JButton pptAffichageBtn;//bouton du lancement duu powerpoint
@@ -105,6 +106,13 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 		titleLabel.setFont(new Font("arial", 1, 30));
 		headerPane.add(titleLabel,BorderLayout.CENTER);
 		
+		versLabel = new JLabel("v093");
+		versLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+		versLabel.setVerticalAlignment(SwingConstants.TOP);
+		versLabel.setForeground(Color.BLUE);
+		versLabel.setFont(new Font("arial", 1, 9));
+		headerPane.add(versLabel,BorderLayout.EAST);
+
 		//ajout de headerPane dans le contentPane
 		contentPane.add(headerPane,BorderLayout.NORTH);
 		
