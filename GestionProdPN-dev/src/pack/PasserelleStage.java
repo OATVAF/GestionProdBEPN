@@ -46,12 +46,10 @@ public class PasserelleStage {
 		stageExportList = importExportDelia();
 		
 		Date dateactuelle = new Date();
-		/*
 		if(stageExportList.get(0).getDateDt().equals(dateactuelle) || stageExportList.get(0).getDateDt().before(dateactuelle)){
 			JOptionPane.showMessageDialog(null, "<html>ERREUR ! la date des stages que vous essayez d'importer n'est pas celle de demain !<br> veuillez refaire l'exportation DELIA</html>"
 					,"Erreur",JOptionPane.YES_NO_OPTION);
 		}else{
-		*/ if (true) {
 			//importation des stagiaires PNC de J+1
 			ArrayList<Stagiaire> stagiairePNCList = PasserelleStagiaire.chargerTousStagiairesPNC();
 			//importation des stagiaires PNT de J+1
