@@ -270,6 +270,10 @@ public class Stage implements Serializable /*,Cloneable*/ {
 		stagiaireList.remove(index);
 	}
 	
+	public void supprimerStagiaire(Stagiaire st){
+		stagiaireList.remove(st);
+	}
+	
 	/**
 	 * procedure triant les stagiaire par ordre alphabetique
 	 */

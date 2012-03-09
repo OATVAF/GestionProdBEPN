@@ -179,4 +179,24 @@ public class Stagiaire implements Serializable{
 		
 	}//fin getDateFin()
 
+	public void setNom(String aValue) {
+		nom = aValue;
+	}
+
+	public void setPrenom(String aValue) {
+		prenom = aValue;
+	}
+
+	public void setMatricule(String aValue) {
+		matricule = aValue;
+	}
+	
+	public void setSpe(String aValue) {
+		spe = aValue;
+	}
+
+	public void setSecteur(String aValue) {
+		comment = aValue;
+	}
+
 }//fin class
