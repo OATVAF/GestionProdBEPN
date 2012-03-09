@@ -158,7 +158,7 @@ public class FenetreDonneeNew extends JFrame implements ActionListener{
 		scrollPane = new JScrollPane(table);
 		ms.selDate("1/1/1");
 		dateBox.setModel(ms.dateModel);
-
+		dateBox.setSelectedIndex(ms.dateModel.getSize()-1);
 		
 		//conteneur affichant les boutons de modifications
 		JPanel btnPane = new JPanel();
@@ -359,7 +359,7 @@ public class FenetreDonneeNew extends JFrame implements ActionListener{
 		//si le bouton est le bouton de l'affichage des stagiaires
 		if(source.equals(stagiaireBtn)){
 			Stage s = ms.getSelectedStage(table.getSelectedRow());
-			afficherInfoStage(s);
+			//afficherInfoStage(s);
 			new FenetreStagiaire(s); //affichage de la fenetre
 		}//finsi
 		/*
