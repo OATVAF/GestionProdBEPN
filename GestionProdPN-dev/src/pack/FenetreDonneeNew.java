@@ -21,12 +21,10 @@ import javax.swing.JTable;
 import javax.swing.event.ChangeListener;
 
 import java.awt.FlowLayout;
-import java.util.ArrayList;
 
 import javax.swing.ListSelectionModel;
 import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
-import javax.swing.table.TableColumnModel;
 
 /**
  * Fenetre qui permet a l'utilisateur de modifier les données importées<br>
