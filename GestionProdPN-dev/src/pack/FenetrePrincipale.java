@@ -9,6 +9,8 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 /**
  * c'est la Fenetre Principale de l'application<br>
@@ -64,6 +66,23 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 			}
 		}
 		
+        try {
+			UIManager.setLookAndFeel(
+			        UIManager.getSystemLookAndFeelClassName());
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedLookAndFeelException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
 		//formation de la fenetre
 		this.setTitle("GestionProd");
 		this.setSize(900, 700);
@@ -293,7 +312,7 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 		
 		//modifier les données
 		if(source.equals(modifBtn)){
-			new FenetreDonnee();
+			new FenetreDonneeNew();
 		}
 		
 		//importation
