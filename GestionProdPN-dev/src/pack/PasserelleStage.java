@@ -196,7 +196,7 @@ public class PasserelleStage {
 					for (int i = 0; i < ligne.length(); i++) {
 						//la tabulation est le separatuer de Export.txt
 						if(ligne.substring(i, i+1).equals("\t")){
-							infoLigne.add(chaine);
+							infoLigne.add(chaine.trim());
 							chaine = "";
 						}else{
 							chaine = chaine + ligne.substring(i, i+1);
@@ -212,7 +212,7 @@ public class PasserelleStage {
 							for (int i = 0; i < ligne.length(); i++) {
 								//la tabulation est le separatuer de Export.txt
 								if(ligne.substring(i, i+1).equals("\t")){
-									infoLigne.add(chaine);
+									infoLigne.add(chaine.trim());
 									chaine = "";
 								}else{
 									chaine = chaine + ligne.substring(i, i+1);
@@ -220,7 +220,7 @@ public class PasserelleStage {
 							}
 						}
 					}
-					infoLigne.add(chaine);//recup de la derniere information
+					infoLigne.add(chaine.trim());//recup de la derniere information
 
 					//ajout des modules
 					if(infoLigne.get(3).equalsIgnoreCase("activité") && ! infoLigne.get(4).endsWith("annulé")) {
