@@ -48,6 +48,7 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 	private JButton pdfBtn;//bouton de génération des documents
 	private JButton majSmsBtn;//bouton pour la liste des sms
 	private JButton majTestsBtn;//bouton pour la liste des sms
+	private JButton InterviewBtn;//bouton pour les listes interview
 
 	//police des boutons
 	private Font btnFont;
@@ -276,6 +277,15 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 		majTestsBtn.addActionListener(this);
 		smsPane.add(majTestsBtn);
 
+		//bouton "générer les Lists Interview"
+		InterviewBtn = new JButton();
+		InterviewBtn.setText("<html>Mettre à jour les listes<br>pour interview<html>");
+		//majTestsBtn.setIcon(new ImageIcon("dataSystem\\sms.jpg"));
+		InterviewBtn.setFont(btnFont);
+		InterviewBtn.setPreferredSize(new Dimension(width, height));
+		InterviewBtn.addActionListener(this);
+		smsPane.add(InterviewBtn);
+
 		//ajout
 		prodPane.add(smsPane);
 		
@@ -339,6 +349,15 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 					,"Verification",JOptionPane.YES_NO_OPTION);
 			if(rep == JOptionPane.YES_OPTION){
 				PasserelleStagiaire.creerListePourTests();
+			}
+		}
+		
+		//listes interview
+		if(source.equals(InterviewBtn)){
+			int rep = JOptionPane.showConfirmDialog(null, "Avez-vous importé les fichiers XLS pour S-1 dans le dossier dataImport ?"
+					,"Verification",JOptionPane.YES_NO_OPTION);
+			if(rep == JOptionPane.YES_OPTION){
+				PasserelleStagiaire.creerListePourInterview();
 			}
 		}
 

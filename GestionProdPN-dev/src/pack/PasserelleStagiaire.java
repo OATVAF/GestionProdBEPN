@@ -3,6 +3,7 @@ import java.io.*;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
@@ -53,6 +54,88 @@ public class PasserelleStagiaire {
 			JOptionPane.showMessageDialog(null, "<html>Operation terminée !" +
 					"<br>les fichiers sont dans dataExport/Tests...</html>", "Termine", JOptionPane.INFORMATION_MESSAGE);
 		}//finsi
+	}
+
+	public static void creerListePourInterview() {
+		good = true;
+		String pPNCS_1 = "dataImport/PNC_S-1.xls";
+		String pPNTS_1 = "dataImport/PNT_S-1.xls";
+		
+		// PNC
+		try {
+			ArrayList<StgMail> StgList = new ArrayList<StgMail>();
+			File f = new File(pPNCS_1);
+			Workbook wb = Workbook.getWorkbook(f);
+			Sheet sh = wb.getSheet(0);
+			StgMail h = new StgMail(sh.getRow(0),0);
+			String[] qListes = { "CRM", "EAO", "EPU", "SEC", "SS", "SUR", "VOL" };
+			PrintWriter[] P = { null, null, null, null, null, null, null };
+
+			for (int i=1; i< sh.getRows(); i++) {
+				Cell[] c = sh.getRow(i);
+				StgList.add(new StgMail(c,i-1));
+			}
+			wb.close();
+
+			for (int i=0; i< qListes.length; i++) {
+				P[i] = new PrintWriter(new FileWriter("dataExport/Liste PNC-"+qListes[i]+".txt"));
+				P[i].println(h.toString());
+			}
+			for (StgMail s : StgList) {
+				P[s.n % qListes.length].println(s.toString());
+			}
+			for (int i=0; i< qListes.length; i++) {
+				P[i].close();
+			}
+			
+		} catch (BiffException e) {
+			good = false;
+			JOptionPane.showMessageDialog(null, "<html>probleme de lecture de" +
+					"<br>"+pPNCS_1+"</html>", "Erreur", JOptionPane.ERROR_MESSAGE);
+		} catch (IOException e) {
+			good = false;
+			JOptionPane.showMessageDialog(null, "<html>probleme de lecture de" +
+					"<br>"+pPNCS_1+"</html>", "Erreur", JOptionPane.ERROR_MESSAGE);
+		}
+		
+		
+		// PNT
+		try {
+			ArrayList<StgMail> StgList = new ArrayList<StgMail>();
+			File f = new File(pPNTS_1);
+			Workbook wb = Workbook.getWorkbook(f);
+			Sheet sh = wb.getSheet(0);
+			StgMail h = new StgMail(sh.getRow(0),0);
+			PrintWriter P;
+
+			for (int i=1; i< sh.getRows(); i++) {
+				Cell[] c = sh.getRow(i);
+				StgList.add(new StgMail(c,i-1));
+			}
+			wb.close();
+
+			P = new PrintWriter(new FileWriter("dataExport/Liste PNT-VOL.txt"));
+			P.println(h.toString());
+
+			for (StgMail s : StgList) {
+				P.println(s.toString());
+			}
+			P.close();
+			
+		} catch (BiffException e) {
+			good = false;
+			JOptionPane.showMessageDialog(null, "<html>probleme de lecture de" +
+					"<br>"+pPNTS_1+"</html>", "Erreur", JOptionPane.ERROR_MESSAGE);
+		} catch (IOException e) {
+			good = false;
+			JOptionPane.showMessageDialog(null, "<html>probleme de lecture de" +
+					"<br>"+pPNTS_1+"</html>", "Erreur", JOptionPane.ERROR_MESSAGE);
+		}
+
+		if (good) {
+			JOptionPane.showMessageDialog(null, "<html>Operation terminée !" +
+					"<br>les fichiers sont dans dataExport/Interview/...</html>", "Termine", JOptionPane.INFORMATION_MESSAGE);
+		}
 	}
 
 	public static ArrayList<Stagiaire> chargerTousStagiairesPNC(){
@@ -315,6 +398,7 @@ public class PasserelleStagiaire {
 					"<br>"+pathDossier+key+".txt", "Erreur", JOptionPane.ERROR_MESSAGE);
 		}
 	}
+
 
 
 }//fin class
