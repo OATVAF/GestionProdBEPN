@@ -390,7 +390,7 @@ public class Stage implements Serializable /*,Cloneable*/ {
 	 */
 	public int getnbMin(){
 		//recuperation de l'heure de debut
-		String heureDeb = moduleList.get(0).getHeureDebut();
+		String heureDeb = getFirstModule().getHeureDebut();
 		int nbmin;
 		nbmin = Integer.parseInt(heureDeb.substring(0, 2))*60 + Integer.parseInt(heureDeb.substring(3, 5));
 		//retour
