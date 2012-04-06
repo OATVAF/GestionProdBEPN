@@ -2,6 +2,8 @@ package ui;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -13,7 +15,6 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import pack.Config;
-import pack.PasserelleAffichage;
 import pack.PasserelleStage;
 import pack.PasserelleStagiaire;
 
@@ -312,7 +313,20 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 		
 		//afficher le powerpoint
 		if(source.equals(pptAffichageBtn)){
-			PasserelleAffichage.affichagePPT();
+			//recherche de l'executable de powerpoint
+			Runtime x = Runtime.getRuntime();
+			String[] args = { Config.get("aff.cheminpptexe"),
+							  "/s",
+							  Config.get("aff.ppt")
+							  };
+			//execution du diaporama
+			try {
+				x.exec(args);
+			} catch (IOException e1) {
+				//boite de dialogue d'erreur
+				JOptionPane.showMessageDialog(null, "soit le chemin vers powerpnt.exe est incorrect ! soit le ppt n'est pas nommé TVAFFPPT.ppt !", "Erreur", JOptionPane.ERROR_MESSAGE);
+			}
+
 		}
 		
 		//parametres affichage

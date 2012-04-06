@@ -14,7 +14,6 @@ import javax.swing.*;
 import javax.swing.border.*;
 
 import pack.Config;
-import pack.PasserelleAffichage;
 import pack.PasserelleStage;
 import pack.Stage;
 
@@ -147,7 +146,7 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 		//formation et ajout des composants
 		logoLabel = new JLabel(new ImageIcon(Config.getRes("airfrance.jpg")));
 		headerPane.add(logoLabel,BorderLayout.LINE_START);
-		welcomeLabel = new JLabel(PasserelleAffichage.getHeaderMsg());
+		welcomeLabel = new JLabel(Config.get("aff.header"));
 		welcomeLabel.setFont(new Font("Arial", 1, 30));
 		welcomeLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		welcomeLabel.setForeground(Color.BLUE);
@@ -221,7 +220,7 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 		footerPane.setLayout(new BorderLayout());
 		
 		//initialisation du message déroulant
-		marquee = new Marquee(PasserelleAffichage.getFooterMsg(), 120);
+		marquee = new Marquee(Config.get("aff.footer"), 120);
 		marquee.start();
 		footerPane.add(marquee,BorderLayout.CENTER);
 		

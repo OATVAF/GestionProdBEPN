@@ -28,8 +28,10 @@ import jxl.write.biff.RowsExceededException;
 public class PasserelleStagiaire {
 	
 	private static boolean good;
-	private static final String pathFilePnc= "dataImport\\OATVPNC.xls";
-	private static final String pathFilePnt= "dataImport\\OATVPNT.xls";
+	private static final String pathFilePnc= Config.get("imp.pnc"); //"dataImport\\OATVPNC.xls";
+	private static final String pathFilePnt= Config.get("imp.pnt"); //"dataImport\\OATVPNT.xls";
+	private static final String pathFileSMS= Config.get("exp.sms"); // "dataExport\\ListSMS.xls"
+	private static final String pathDirTests= Config.get("exp.tests"); // "dataExport\\Tests du"
 	
 	private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	private static Date dateDemain;
@@ -42,7 +44,7 @@ public class PasserelleStagiaire {
 		ecritureListeSMSxls(StagiaireList);
 		if (good) {
 			JOptionPane.showMessageDialog(null, "<html>Operation terminée !" +
-					"<br>le fichier est dans dataExport\\ListeSMS.xls</html>", "Termine", JOptionPane.INFORMATION_MESSAGE);
+					"<br>le fichier est dans "+pathFileSMS+"</html>", "Termine", JOptionPane.INFORMATION_MESSAGE);
 		}// finsi
 		
 	}//fin creerListePourSms()
@@ -60,8 +62,8 @@ public class PasserelleStagiaire {
 
 	public static void creerListePourInterview() {
 		good = true;
-		String pPNCS_1 = "dataImport/PNC_S-1.xls";
-		String pPNTS_1 = "dataImport/PNT_S-1.xls";
+		String pPNCS_1 = Config.get("imp.pnc-1"); //"dataImport/PNC_S-1.xls";
+		String pPNTS_1 = Config.get("imp.pnt-1"); //"dataImport/PNT_S-1.xls";
 		
 		// PNC
 		try {
@@ -286,18 +288,19 @@ public class PasserelleStagiaire {
 		
 		ArrayList<Stagiaire> newStagiaireList = StagiaireList;
 		
-		ArrayList<String> stageList = new ArrayList<String>();
+		//ArrayList<String> stageList = new ArrayList<String>();
 		ArrayList<Stagiaire> stagiaireGood = new ArrayList<Stagiaire>();
 		String selDate = "";
-		FileReader fichier;
+		//FileReader fichier;
 			try {
+				/*
 				String ligne;
 				fichier = new FileReader("dataSystem\\StageSMSPNC.txt");
 				BufferedReader reader = new BufferedReader(fichier);
 				while ((ligne = reader.readLine()) != null){
 					stageList.add(ligne);
 				}
-
+				*/
 				
 				//recuperation de la date de demain
 				Calendar cl=new GregorianCalendar();
@@ -314,15 +317,20 @@ public class PasserelleStagiaire {
 
 				for (Stagiaire stagiaire : newStagiaireList) {
 					if(dateDemain.before(stagiaire.getDateDeb()) == false && dateDemain.after(stagiaire.getDateFin()) == false){
+						/*
 						for (String string : stageList) {
 							if(stagiaire.getCodeStage().startsWith(string)){
 								stagiaireGood.add(stagiaire);
 								break;
 							}
 						}
+						*/
+						if (stagiaire.getCodeStage().matches(Config.get("exp.sms.pattern"))) {
+							stagiaireGood.add(stagiaire);
+						}
 					}
 				}
-				
+			/*	
 			} catch (FileNotFoundException e) {
 				good = false;
 				JOptionPane.showMessageDialog(null, "<html>fichier non trouvé" +
@@ -331,6 +339,7 @@ public class PasserelleStagiaire {
 				good = false;
 				JOptionPane.showMessageDialog(null, "<html>probleme de lecture de" +
 						"<br/>dataSystem\\StageSMSPNC.txt</html>", "Erreur", JOptionPane.ERROR_MESSAGE);;
+			*/
 			} catch (ParseException e) {
 				good = false;
 				JOptionPane.showMessageDialog(null, "<html>probleme de format" +
@@ -347,34 +356,36 @@ public class PasserelleStagiaire {
 	private static void ecritureListeSMSxls(ArrayList<Stagiaire> StagiaireList){
 		
 			try {
-				File file = new File("dataExport\\listeSMS.xls");
+				File file = new File(pathFileSMS);
 				WritableWorkbook workbook;
 				workbook = Workbook.createWorkbook(file);
 				WritableSheet sheet = workbook.createSheet("ListeMAT", 0);
 				for (int i = 0; i < StagiaireList.size(); i++) {
 					sheet.addCell(new Label(0, i, StagiaireList.get(i).getMatricule()));
+					sheet.addCell(new Label(1, i, StagiaireList.get(i).getCodeStage()));
+					sheet.addCell(new Label(2, i, StagiaireList.get(i).getDateDebStage()));
 				}
-				workbook.write(); 
+				workbook.write();
 				workbook.close();
 			} catch (IOException e) {
 				good = false;
-				JOptionPane.showMessageDialog(null, "<html>probleme d'ecriture de" +
-						"<br/>dataExport\\listeSMS.xls", "Erreur", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null, "<html>probleme d'ecriture de<br>"+pathFileSMS,
+						"Erreur", JOptionPane.ERROR_MESSAGE);
 			} catch (RowsExceededException e) {
 				good = false;
-				JOptionPane.showMessageDialog(null, "<html>probleme d'ecriture de" +
-						"<br/>dataExport\\listeSMS.xls</html>", "Erreur", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null, "<html>probleme d'ecriture de<br>"+pathFileSMS,
+						"Erreur", JOptionPane.ERROR_MESSAGE);
 			} catch (WriteException e) {
 				good = false;
-				JOptionPane.showMessageDialog(null, "<html>probleme d'ecriture de" +
-						"<br/>dataExport\\listeSMS.xls</html>", "Erreur", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null, "<html>probleme d'ecriture de<br>"+pathFileSMS,
+						"Erreur", JOptionPane.ERROR_MESSAGE);
 			}
 
 	}//fin ecritureListeSMSxls
 
 	private static void ecritureListeTests(ArrayList<Stagiaire> stagiaireList) {
 		Hashtable<String,StringBuffer> stgMap = new Hashtable<String,StringBuffer>();
-		String pathDossier = "dataExport/Tests du "+dateFormat.format(dateDemain)+"/";
+		String pathDossier = pathDirTests+dateFormat.format(dateDemain)+"/";
 		String key = "";
 		
 		for (Stagiaire s : stagiaireList) {

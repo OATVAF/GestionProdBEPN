@@ -63,9 +63,11 @@ public enum Config {
 	
 	public static String get(String param) {
 		if (INSTANCE.cfgProp.containsKey(param)) {
+			//System.out.println(INSTANCE.cfgProp.getProperty(param).toString());
 			return INSTANCE.cfgProp.getProperty(param);
 		}
 		else {
+			//System.out.println(INSTANCE.appProp.getProperty(param).toString());
 			return INSTANCE.appProp.getProperty(param); 
 		}
 	}

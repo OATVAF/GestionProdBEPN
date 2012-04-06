@@ -24,8 +24,8 @@ import javax.swing.JOptionPane;
 public class PasserelleStage {
 	
 	private static boolean good;
-	private static final String pathObj = "dataSystem\\stages.obj";
-	private static final String pathExport = "dataImport\\Export.txt";
+	private static final String pathObj = Config.get("data.obj");
+	private static final String pathExport = Config.get("imp.delia");
 	
 	/**
 	 * procedure de mise a jour des stages
