@@ -1,6 +1,7 @@
 package pack;
 import java.io.*;
 import java.io.File;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -40,7 +41,7 @@ public class PasserelleStagiaire {
 		if (good) {
 			JOptionPane.showMessageDialog(null, "<html>Operation terminée !" +
 					"<br>le fichier est dans dataExport\\ListeSMS.xls</html>", "Termine", JOptionPane.INFORMATION_MESSAGE);
-		}//finsi
+		}// finsi
 		
 	}//fin creerListePourSms()
 	
@@ -285,6 +286,7 @@ public class PasserelleStagiaire {
 		
 		ArrayList<String> stageList = new ArrayList<String>();
 		ArrayList<Stagiaire> stagiaireGood = new ArrayList<Stagiaire>();
+		String selDate = "";
 		FileReader fichier;
 			try {
 				String ligne;
@@ -293,6 +295,7 @@ public class PasserelleStagiaire {
 				while ((ligne = reader.readLine()) != null){
 					stageList.add(ligne);
 				}
+
 				
 				//recuperation de la date de demain
 				Calendar cl=new GregorianCalendar();
@@ -302,8 +305,11 @@ public class PasserelleStagiaire {
 				}else{
 					cl.add(Calendar.DATE, 1);
 				}
-				dateDemain = new Date((cl.get(Calendar.YEAR)-1900), cl.get(Calendar.MONTH), cl.get(Calendar.DATE));
-				
+
+				dateDemain = new Date((cl.get(Calendar.YEAR)-1900), cl.get(Calendar.MONTH), cl.get(Calendar.DATE));		
+				selDate = JOptionPane.showInputDialog("Séléction de la date: ", dateFormat.format(dateDemain));
+				dateDemain = dateFormat.parse(selDate);				
+
 				for (Stagiaire stagiaire : newStagiaireList) {
 					if(dateDemain.before(stagiaire.getDateDeb()) == false && dateDemain.after(stagiaire.getDateFin()) == false){
 						for (String string : stageList) {
@@ -323,6 +329,10 @@ public class PasserelleStagiaire {
 				good = false;
 				JOptionPane.showMessageDialog(null, "<html>probleme de lecture de" +
 						"<br/>dataSystem\\StageSMSPNC.txt</html>", "Erreur", JOptionPane.ERROR_MESSAGE);;
+			} catch (ParseException e) {
+				good = false;
+				JOptionPane.showMessageDialog(null, "<html>probleme de format" +
+						"<br/>de la date " + selDate + "</html>", "Erreur", JOptionPane.ERROR_MESSAGE);;
 			}
 			
 		newStagiaireList.retainAll(stagiaireGood);

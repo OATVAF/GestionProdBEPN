@@ -126,7 +126,7 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 		titleLabel.setFont(new Font("arial", 1, 30));
 		headerPane.add(titleLabel,BorderLayout.CENTER);
 		
-		versLabel = new JLabel("v095");
+		versLabel = new JLabel("v095b");
 		versLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		versLabel.setVerticalAlignment(SwingConstants.TOP);
 		versLabel.setForeground(Color.BLUE);
