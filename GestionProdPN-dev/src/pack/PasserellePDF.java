@@ -159,6 +159,12 @@ public class PasserellePDF {
 	 */
 	public static void creationListeEmargement(Stage leStage){
 		
+		if (Config.getB("pdf.dif")) {
+			if (leStage.getCode().matches(Config.get("pdf.dif.pattern"))) {
+				creationListeEmargementDIF(leStage);
+				return;
+			}
+		}
 		String date = leStage.getDateStr();
 		date = date.replace("/", ".");
 		String pathDossier = "Emargement du "+date;
@@ -390,6 +396,238 @@ public class PasserellePDF {
 		
 	}//fin
 	
+	public static void creationListeEmargementDIF(Stage leStage){
+		
+		String date = leStage.getDateStr();
+		date = date.replace("/", ".");
+		String pathDossier = "Emargement du "+date;
+		new File("dataExport\\"+pathDossier).mkdir();
+		
+		try {
+			
+			//creation du document
+			Document doc = new Document(PageSize.A4,10,10,10,0);
+			FileOutputStream fichier = new FileOutputStream("dataExport\\"+pathDossier+"\\listeEmargement - "+leStage.getCode()+".pdf");
+			PdfWriter.getInstance(doc, fichier);
+			doc.open();
+			
+			PdfPTable header = new PdfPTable(1);
+			header.setWidthPercentage(100);
+			
+			PdfPCell cell = new PdfPCell(new Phrase(leStage.getDateStr(),new Font(Font.HELVETICA, 12, Font.BOLD)));
+			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+			cell.setBorder(0);
+			header.addCell(cell);
+
+			Phrase par = new Phrase(leStage.getCode(),new Font(Font.HELVETICA, 22, Font.BOLD));
+			cell = new PdfPCell(par);
+			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+			cell.setPadding(5);
+			cell.setBorder(0);
+			header.addCell(cell);
+	
+			Font font   = new Font(Font.HELVETICA, 10);
+			Font fontB  = new Font(Font.HELVETICA, 10, Font.BOLD);
+			Font fontB2 = new Font(Font.HELVETICA, 12, Font.BOLD);
+
+			cell = new PdfPCell(new Phrase(" DIF: Formation éligible au titre du DIF", fontB));
+			cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+			cell.setPadding(0);
+			cell.setPaddingTop(5);
+			cell.setBorder(0);
+			header.addCell(cell);
+			cell = new PdfPCell(new Phrase(" Si vous ne souhaitez pas activer votre compteur DIF pour cette formation, cochez la case DIF ci-dessous", font));
+			cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+			cell.setPaddingBottom(5);
+			cell.setBorder(0);
+			header.addCell(cell);
+			
+			//formation du center
+			PdfPTable center = new PdfPTable(7);
+			center.setWidthPercentage(98);
+
+			float[] widths = new float[] { 0.8f, 8f, 1.5f, 4f, 4f, 1f, 1.5f };
+			center.setWidths(widths);
+			
+			cell.setPadding(0);
+			cell.setPaddingTop(0);
+			cell.setPaddingBottom(0);
+
+			cell = new PdfPCell(new Phrase("N",fontB)); cell.setBorder(0);
+			cell.setColspan(3);
+			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+			cell.setPhrase(new Phrase("",fontB));				center.addCell(cell);		
+			cell.setColspan(1);
+			cell.setPhrase(new Phrase("Emargement",fontB));		center.addCell(cell);
+			cell.setColspan(3);
+			cell.setPhrase(new Phrase("",fontB));				center.addCell(cell);		
+			cell.setColspan(1);
+
+			cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+			cell.setPhrase(new Phrase("",fontB));				center.addCell(cell);		
+			cell.setPhrase(new Phrase("Stagiaire",fontB));		center.addCell(cell);
+			cell.setPhrase(new Phrase("Pres.",fontB));			center.addCell(cell);
+			cell.setPhrase(new Phrase("Martin",fontB));		center.addCell(cell);
+			cell.setPhrase(new Phrase("Après-Midi",fontB));		center.addCell(cell);
+			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+			cell.setPhrase(new Phrase("DIF",fontB));			center.addCell(cell);
+			cell.setPhrase(new Phrase("IS.VS",fontB));			center.addCell(cell);
+
+			int i;
+			// TODO SG font constante
+			/*
+			if(leStage.getSizeStagiaireList()>=20 && leStage.getSizeStagiaireList() < 25){
+				font.setSize(11);
+			}
+			if(leStage.getSizeStagiaireList()>=25){
+				font.setSize(9);
+			}
+			*/
+			for (i = 0; i < leStage.getSizeStagiaireList(); i++) {
+					cell.setPhrase(new Phrase(""+(i+1), font));
+					cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+					cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+					cell.setBorder(7);
+					center.addCell(cell);
+					cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+					PdfPTable stgCell = new PdfPTable(10);
+					stgCell.setWidthPercentage(100);
+					float[] widths2 = new float[] { 1f, 2f, 2f, 2.5f, 2f, 2f, 2f, 2f, 2f, 0.5f};
+					stgCell.setWidths(widths2);
+
+					//str = String.format("%-20s%-20s\n%25s%10s%10s", 
+					cell.setBorder(0);
+					cell.setColspan(5);
+					cell.setPhrase(new Phrase(leStage.getEltStagiaireList(i).getInfo(0), fontB));
+					stgCell.addCell(cell);
+					cell.setPhrase(new Phrase(leStage.getEltStagiaireList(i).getInfo(1), font));
+					stgCell.addCell(cell);
+
+					cell.setColspan(1);
+					cell.setPhrase(new Phrase(" ", font));
+					stgCell.addCell(cell);
+
+					cell.setColspan(2);
+					cell.setPhrase(new Phrase(leStage.getEltStagiaireList(i).getInfo(3), font));
+					stgCell.addCell(cell);
+
+					cell.setColspan(4);
+					cell.setPhrase(new Phrase(leStage.getEltStagiaireList(i).getInfo(4), font));
+					stgCell.addCell(cell);
+
+					cell.setColspan(3);
+					cell.setPhrase(new Phrase(leStage.getEltStagiaireList(i).getInfo(2), font));
+					stgCell.addCell(cell);
+					
+					cell.setColspan(1);
+					center.addCell(stgCell);
+					
+					//presence
+					center.addCell(" ");
+					//emargement M
+					center.addCell(" ");
+					//emargement A-M
+					center.addCell(" ");
+					//DIF
+					center.addCell(" ");
+					//isvsmp
+					center.addCell(" ");
+			}
+			if(i<=20){
+				cell.setBorder(0);
+				cell.setPhrase(new Phrase(" ", font));
+				cell.setColspan(5);
+				for (int j = i; j < 20; j++) {
+					//for (int k = 0; k < 5; k++) {
+						//Phrase phrs = new Phrase("- \n ", new Font(Font.TIMES_ROMAN, 10));
+						//cell = new PdfPCell(phrs);
+						//cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+						//cell.setPadding(4);
+						center.addCell(cell);
+					//}
+				}//fin pour
+			}//fin si
+			
+			PdfPTable footer = new PdfPTable(3);
+			footer.setWidthPercentage(75);
+			cell = new PdfPCell(new Phrase("Nombre de stagiaires :", fontB2));
+			cell.setColspan(3);
+			cell.setBorder(0);
+			footer.addCell(cell);
+			
+			cell = new PdfPCell(new Phrase("Prévus", fontB2));
+			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+			cell.setBorderWidthTop(0);
+			cell.setBorderWidthLeft(0);
+			cell.setBorderWidthBottom(1);
+			cell.setBorderWidthRight(1);
+			footer.addCell(cell);
+			
+			cell = new PdfPCell(new Phrase("Présents", fontB2));
+			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+			cell.setBorderWidthTop(0);
+			cell.setBorderWidthLeft(1);
+			cell.setBorderWidthBottom(1);
+			cell.setBorderWidthRight(1);
+			footer.addCell(cell);
+			
+			cell = new PdfPCell(new Phrase("Maxi Présents", fontB2));
+			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+			cell.setBorderWidthTop(0);
+			cell.setBorderWidthLeft(1);
+			cell.setBorderWidthRight(0);
+			cell.setBorderWidthBottom(1);
+			footer.addCell(cell);
+			
+			cell = new PdfPCell(new Phrase(""+leStage.getSizeStagiaireList(), fontB2));
+			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+			cell.setBorderWidthTop(1);
+			cell.setBorderWidthLeft(0);
+			cell.setBorderWidthRight(1);
+			cell.setBorderWidthBottom(0);
+			footer.addCell(cell);
+			
+			cell = new PdfPCell(new Phrase(" ", fontB2));
+			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+			cell.setBorderWidthTop(1);
+			cell.setBorderWidthLeft(1);
+			cell.setBorderWidthRight(1);
+			cell.setBorderWidthBottom(0);;
+			footer.addCell(cell);
+			
+			cell = new PdfPCell(new Phrase(""+leStage.getMaxiPresent(),new Font(Font.HELVETICA, 14, Font.BOLD)));
+			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+			cell.setBorderWidthTop(1);
+			cell.setBorderWidthLeft(1);
+			cell.setBorderWidthRight(0);
+			cell.setBorderWidthBottom(0);
+			footer.addCell(cell);
+			
+			//formateur
+			PdfPTable footer2 = new PdfPTable(1);
+			footer2.setWidthPercentage(80);
+			par = new Phrase("Formateurs : _ _ _ _ _ _ _ _ _ _ _ _ _ _ _/ "+leStage.getLeader(), fontB2);
+			cell = new PdfPCell(par);
+			cell.setBorder(0);
+			footer2.addCell(cell);
+			
+			//ajout des composants
+			doc.add(header);
+			//doc.add(new Paragraph("        "));
+			doc.add(center);
+			doc.add(new Paragraph("        "));
+			doc.add(footer);
+			doc.add(footer2);
+			
+			doc.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (DocumentException e) {
+			e.printStackTrace();
+		}
+		
+	}//fin
+
 	/**
 	 * creer le pdf pour la liste d'emargement pour le stage passé en parametre
 	 * @param leStage
