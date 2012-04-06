@@ -1,6 +1,7 @@
 package pack;
 import java.io.Serializable;
 
+
 /**
  * classe contenatn toutes les informations sur un module
  * @author BERON Jean-Sebastien

@@ -1,4 +1,4 @@
-package pack;
+package ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -19,6 +19,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+
+import pack.PasserelleStage;
+import pack.Stage;
+
 
 /**
  * Fenetre qui permet a l'utilisateur de modifier les données importées<br>

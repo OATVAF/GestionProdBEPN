@@ -1,4 +1,4 @@
-package pack;
+package ui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
@@ -12,6 +12,12 @@ import java.util.HashMap;
 
 import javax.swing.*;
 import javax.swing.border.*;
+
+import pack.Config;
+import pack.PasserelleAffichage;
+import pack.PasserelleStage;
+import pack.Stage;
+
 
 /**
  * fenetre qui sert pour le téléffichage<br>
@@ -139,7 +145,7 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 		headerPane.setBackground(Color.WHITE);
 		
 		//formation et ajout des composants
-		logoLabel = new JLabel(new ImageIcon("dataSystem\\airfrance.jpg"));
+		logoLabel = new JLabel(new ImageIcon(Config.getRes("airfrance.jpg")));
 		headerPane.add(logoLabel,BorderLayout.LINE_START);
 		welcomeLabel = new JLabel(PasserelleAffichage.getHeaderMsg());
 		welcomeLabel.setFont(new Font("Arial", 1, 30));

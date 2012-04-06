@@ -1,4 +1,4 @@
-package pack;
+package ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -12,6 +12,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
+
+import pack.Stage;
+
 
 /**
  * Fenetre pour avoir une vue générale des stages

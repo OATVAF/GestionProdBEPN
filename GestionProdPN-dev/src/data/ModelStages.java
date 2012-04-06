@@ -1,16 +1,18 @@
-package pack;
+package data;
 
 import java.awt.Font;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.plaf.FontUIResource;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
-import javax.swing.AbstractListModel;
-import javax.swing.ComboBoxModel;
 import javax.swing.JTable;
 import javax.swing.UIManager;
+
+import pack.PasserelleStage;
+import pack.Stage;
+import ui.TableModelSorter;
+
 
 public class ModelStages extends AbstractTableModel
 {
@@ -21,8 +23,8 @@ public class ModelStages extends AbstractTableModel
 	
 	private ArrayList<Stage> stagesAll = new ArrayList<Stage>();
 	private ArrayList<Stage> stages = new ArrayList<Stage>();
-	public ComboModel dateModel = new ComboModel();	
-	public ComboModel cieModel = new ComboModel();
+	public ModelCombo dateModel = new ModelCombo();	
+	public ModelCombo cieModel = new ModelCombo();
 	private TableModelSorter sorter;
 	private JTable table;
 	public String filterDate;
@@ -218,40 +220,6 @@ public class ModelStages extends AbstractTableModel
     	stages.remove(getSelectedStage());
 		fireTableDataChanged();
     }
-}
-
-class ComboModel extends AbstractListModel implements ComboBoxModel
-{
-	private static final long serialVersionUID = 4011116690928828937L;
-
-	List<String> list = new ArrayList<String>();
-	String sel = null;
-	
-	public void setList(List<String> l) {
-		list = l;
-	}
-	
-	public void add(String s) {
-		if (! list.contains(s)) {
-			list.add(s);
-		}
-	}
-
-	public Object getElementAt(int index) {
-		return list.get(index);
-	}
-
-	public int getSize() {
-		return list.size();
-	}
-
-	public Object getSelectedItem() {
-		return sel;
-	}
-
-	public void setSelectedItem(Object anItem) {
-		sel = (String)anItem;
-	}
 }
 
 /*

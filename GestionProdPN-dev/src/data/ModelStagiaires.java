@@ -1,4 +1,4 @@
-package pack;
+package data;
 
 import java.awt.Font;
 import java.util.ArrayList;
@@ -9,7 +9,13 @@ import javax.swing.plaf.FontUIResource;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 
-class ModelStagiaires extends AbstractTableModel {
+import pack.Stage;
+import pack.Stagiaire;
+
+import ui.TableModelSorter;
+
+
+public class ModelStagiaires extends AbstractTableModel {
 	
 	private static final long serialVersionUID = -4189189270303777510L;
 	

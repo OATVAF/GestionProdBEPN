@@ -12,6 +12,8 @@ import java.util.Hashtable;
 
 import javax.swing.*;
 
+import data.StgMail;
+
 import jxl.*;
 import jxl.read.biff.*;
 

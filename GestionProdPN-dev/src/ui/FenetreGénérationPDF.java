@@ -1,4 +1,4 @@
-package pack;
+package ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -17,6 +17,11 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+
+import pack.PasserellePDF;
+import pack.PasserelleStage;
+import pack.Stage;
+
 
 /**
  * fenetre qui permet a l'utilisateur de générer les document pour les stages de J et J+1

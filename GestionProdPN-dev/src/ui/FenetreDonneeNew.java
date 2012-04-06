@@ -1,4 +1,4 @@
-package pack;
+package ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -25,6 +25,11 @@ import java.awt.FlowLayout;
 import javax.swing.ListSelectionModel;
 import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
+
+import pack.Stage;
+
+import data.ModelStages;
+import data.ModelStagiaires;
 
 /**
  * Fenetre qui permet a l'utilisateur de modifier les données importées<br>

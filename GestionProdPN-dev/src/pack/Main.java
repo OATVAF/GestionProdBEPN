@@ -1,5 +1,7 @@
 package pack;
 
+import ui.FenetrePrincipale;
+
 /**
  * classe Main (debut du programme)
  * @author BERON Jean-Sébastien

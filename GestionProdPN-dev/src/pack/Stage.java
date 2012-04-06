@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 
+
 /**
  * classe qui contient toutes les informations sur un stage<br>
  * s'indentifie par son code et sa date

@@ -1,4 +1,4 @@
-package pack;
+package ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -18,6 +18,10 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
+
+import pack.Stage;
+import pack.Stagiaire;
+
 
 /**
  * fenetre affichant la liste des stagiaires pour un stage<br>
