@@ -331,6 +331,7 @@ public class FenetreGénérationPDF extends JFrame implements ActionListener{
 			for (Stage leStage : stageList) {
 				if(leStage.getDateStr().equals(date) && leStage.getCode().equals(stageBox1.getSelectedItem())){
 					PasserellePDF.creationListeStagiaire(leStage);
+					PasserellePDF.creationAffichageSalle(leStage);
 					//fenetre de dialogue
 					JOptionPane.showMessageDialog(null, "<html>Opération terminée !</html>", "Creation", JOptionPane.INFORMATION_MESSAGE);
 					break;
@@ -359,6 +360,7 @@ public class FenetreGénérationPDF extends JFrame implements ActionListener{
 			for (Stage leStage : stageList) {
 				if(leStage.getDateStr().equals(date)){
 					PasserellePDF.creationListeStagiaire(leStage);
+					PasserellePDF.creationAffichageSalle(leStage);
 				}
 			}//finpour
 			//fenetre de dialogue

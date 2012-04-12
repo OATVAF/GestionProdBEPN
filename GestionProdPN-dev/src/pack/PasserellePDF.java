@@ -5,9 +5,14 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
+
+import jxl.format.PageOrientation;
+
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
@@ -1245,7 +1250,7 @@ public class PasserellePDF {
 			cell.setBorder(0);
 			cell.setColspan(2);
 			header.addCell(cell);
-			Image img = Image.getInstance("dataSystem\\AirfranceKLM.jpg");
+			Image img = Image.getInstance(Config.getRes("airfrance.jpg"));
 			cell = new PdfPCell(img);
 			cell.setBorder(0);
 			header.addCell(cell);
@@ -1545,4 +1550,96 @@ public class PasserellePDF {
 		
 	}//fin creationCheckListAdm()
 	
+
+	/**
+	 * creer le pdf pour le surbook du stage passé en parametre
+	 * @param leStage
+	 */
+	public static void creationAffichageSalle(Stage leStage){
+		
+		SimpleDateFormat fmt = new SimpleDateFormat("EEEE d MMMM yyyy");
+		String date = leStage.getDateStr();
+		date = date.replace("/", ".");
+		String pathDossier = "dataExport/Salles "+date;
+		new File(pathDossier).mkdir();
+		
+		try {
+			FileOutputStream fichier;
+			fichier = new FileOutputStream(pathDossier+"/Salle - "+leStage.getCode()+".pdf");
+			Document doc = new Document(PageSize.A4.rotate(),40,40,20,20); 	
+			PdfWriter.getInstance(doc, fichier);
+			doc.open();
+			
+			PdfPTable header = new PdfPTable(3);
+			header.setWidthPercentage(95);
+			Font font  = new Font(Font.HELVETICA,  18, Font.BOLD);
+			Font fontB = new Font(Font.HELVETICA, 120, Font.BOLD);
+
+			Image img = Image.getInstance(Config.getRes("airfrance.jpg"));
+			//PdfPCell cell = new PdfPCell(img);
+			PdfPCell cell = new PdfPCell(new Phrase(""));
+			cell.setBorder(0);
+			header.addCell(cell);
+			
+			cell = new PdfPCell(new Phrase(fmt.format(leStage.getDateDt()), font));
+			cell.setBorder(0);
+			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+			header.addCell(cell);
+
+			cell = new PdfPCell(new Phrase(""));
+			cell.setBorder(0);
+			header.addCell(cell);
+
+			doc.add(header);
+
+			PdfPTable title = new PdfPTable(1);
+			title.setWidthPercentage(95);
+			
+			Phrase phrs = new Phrase("",fontB);
+			cell = new PdfPCell(phrs);
+			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+			cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+			cell.setBorder(0);
+			cell.setMinimumHeight(100);
+			title.addCell(cell);
+
+			phrs = new Phrase(leStage.getCode(),fontB);
+			cell = new PdfPCell(phrs);
+			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+			cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+			cell.setBorder(0);
+			cell.setMinimumHeight(200);
+			title.addCell(cell);
+			
+			phrs = new Phrase(leStage.getLibelle(), font);
+			cell = new PdfPCell(phrs);
+			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+			cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+			cell.setBorder(0);
+			cell.setMinimumHeight(150);
+			title.addCell(cell);			
+			doc.add(title);
+									
+			PdfPTable footer = new PdfPTable(1);
+			footer.setWidthPercentage(95);
+			cell = new PdfPCell(new Phrase(leStage.getFirstModule().getSalle(), font));
+			cell.setBorder(0);
+			cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+			footer.addCell(cell);
+			doc.add(footer);
+			
+			doc.close();
+			
+		} catch (DocumentException e) {
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+			
+	}//fin
+
 }//fin class
