@@ -122,7 +122,7 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 		
 		//instanciation du logo
 		logoLabel = new JLabel();
-		logoLabel.setIcon(new ImageIcon(Config.getRes("airfrance.jpg"))); //$NON-NLS-1$
+		logoLabel.setIcon(new ImageIcon(Config.getRes("Airfrance.jpg"))); //$NON-NLS-1$
 		headerPane.add(logoLabel,BorderLayout.WEST);
 		
 		//instanciation du titre

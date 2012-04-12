@@ -144,7 +144,7 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 		headerPane.setBackground(Color.WHITE);
 		
 		//formation et ajout des composants
-		logoLabel = new JLabel(new ImageIcon(Config.getRes("airfrance.jpg")));
+		logoLabel = new JLabel(new ImageIcon(Config.getRes("Airfrance.jpg")));
 		headerPane.add(logoLabel,BorderLayout.LINE_START);
 		welcomeLabel = new JLabel(Config.get("aff.header"));
 		welcomeLabel.setFont(new Font("Arial", 1, 30));

@@ -1250,7 +1250,7 @@ public class PasserellePDF {
 			cell.setBorder(0);
 			cell.setColspan(2);
 			header.addCell(cell);
-			Image img = Image.getInstance(Config.getRes("airfrance.jpg"));
+			Image img = Image.getInstance(Config.getRes("Airfrance.jpg"));
 			cell = new PdfPCell(img);
 			cell.setBorder(0);
 			header.addCell(cell);
@@ -1575,7 +1575,7 @@ public class PasserellePDF {
 			Font font  = new Font(Font.HELVETICA,  18, Font.BOLD);
 			Font fontB = new Font(Font.HELVETICA, 120, Font.BOLD);
 
-			Image img = Image.getInstance(Config.getRes("airfrance.jpg"));
+			Image img = Image.getInstance(Config.getRes("Airfrance.jpg"));
 			//PdfPCell cell = new PdfPCell(img);
 			PdfPCell cell = new PdfPCell(new Phrase(""));
 			cell.setBorder(0);
