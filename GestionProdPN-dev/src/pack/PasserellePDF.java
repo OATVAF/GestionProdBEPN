@@ -1,5 +1,8 @@
 package pack;
 
+import java.awt.Graphics;
+import java.awt.image.ImageObserver;
+import java.awt.image.ImageProducer;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -12,8 +15,10 @@ import java.util.ArrayList;
 import javax.swing.JOptionPane;
 
 import jxl.format.PageOrientation;
+import jxl.read.biff.FooterRecord;
 
 import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
@@ -1563,6 +1568,8 @@ public class PasserellePDF {
 		String pathDossier = "dataExport/Salles "+date;
 		new File(pathDossier).mkdir();
 		
+		String code = leStage.getCode();
+		
 		try {
 			FileOutputStream fichier;
 			fichier = new FileOutputStream(pathDossier+"/Salle - "+leStage.getCode()+".pdf");
@@ -1572,12 +1579,21 @@ public class PasserellePDF {
 			
 			PdfPTable header = new PdfPTable(3);
 			header.setWidthPercentage(95);
-			Font font  = new Font(Font.HELVETICA,  18, Font.BOLD);
-			Font fontB = new Font(Font.HELVETICA, 120, Font.BOLD);
+			Font font  = new Font(Font.HELVETICA,  20, Font.BOLD);
+			Font font2 = new Font(Font.HELVETICA, 140, Font.BOLD);
+			Font font3 = new Font(Font.HELVETICA,  95, Font.BOLD);
 
-			Image img = Image.getInstance(Config.getRes("Airfrance.jpg"));
-			//PdfPCell cell = new PdfPCell(img);
-			PdfPCell cell = new PdfPCell(new Phrase(""));
+			PdfPCell cell;
+			try {
+				Image img = Image.getInstance(Config.get("data.logos")+"Orig/"+leStage.getCompagnie()+".jpg");
+				img.scaleAbsoluteWidth(30*img.getWidth()/img.getHeight());
+				img.scaleAbsoluteHeight(30);
+				cell = new PdfPCell(img); 
+			} catch (FileNotFoundException e) {
+				cell = new PdfPCell(new Phrase("")); 
+			}
+			//Chunk c = new Chunk(img,0,0);
+			//PdfPCell cell = new PdfPCell(new Phrase(""));
 			cell.setBorder(0);
 			header.addCell(cell);
 			
@@ -1591,34 +1607,43 @@ public class PasserellePDF {
 			header.addCell(cell);
 
 			doc.add(header);
-
-			PdfPTable title = new PdfPTable(1);
-			title.setWidthPercentage(95);
 			
-			Phrase phrs = new Phrase("",fontB);
-			cell = new PdfPCell(phrs);
-			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-			cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-			cell.setBorder(0);
-			cell.setMinimumHeight(100);
-			title.addCell(cell);
-
-			phrs = new Phrase(leStage.getCode(),fontB);
-			cell = new PdfPCell(phrs);
-			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-			cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-			cell.setBorder(0);
-			cell.setMinimumHeight(200);
-			title.addCell(cell);
+			PdfPTable center = new PdfPTable(1);
+			center.setWidthPercentage(95);
 			
-			phrs = new Phrase(leStage.getLibelle(), font);
-			cell = new PdfPCell(phrs);
-			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-			cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-			cell.setBorder(0);
-			cell.setMinimumHeight(150);
-			title.addCell(cell);			
-			doc.add(title);
+			Phrase phrs1 = new Phrase("",font);
+			PdfPCell cell1 = new PdfPCell(phrs1);
+			cell1.setHorizontalAlignment(Element.ALIGN_CENTER);
+			cell1.setVerticalAlignment(Element.ALIGN_MIDDLE);
+			cell1.setBorder(0);
+			cell1.setMinimumHeight(120);
+
+			Phrase phrs2 = new Phrase(leStage.getCode(),font2);
+			PdfPCell cell2 = new PdfPCell(phrs2);
+			cell2.setHorizontalAlignment(Element.ALIGN_CENTER);
+			cell2.setVerticalAlignment(Element.ALIGN_MIDDLE);
+			cell2.setBorder(0);
+			cell2.setMinimumHeight(200);
+			
+			Phrase phrs3 = new Phrase(leStage.getLibelle(), font);
+			PdfPCell cell3 = new PdfPCell(phrs3);
+			cell3.setHorizontalAlignment(Element.ALIGN_CENTER);
+			cell3.setVerticalAlignment(Element.ALIGN_MIDDLE);
+			cell3.setBorder(0);
+			cell3.setMinimumHeight(100);
+		
+			if (code.length() > 10) {
+				cell1.setMinimumHeight(50);
+				phrs2 = new Phrase(leStage.getCode(),font3); cell2.setPhrase(phrs2);
+				cell2.setMinimumHeight(300);
+				cell3.setMinimumHeight(50);
+			}
+
+			center.addCell(cell1);
+			center.addCell(cell2);
+			center.addCell(cell3);
+
+			doc.add(center);
 									
 			PdfPTable footer = new PdfPTable(1);
 			footer.setWidthPercentage(95);
@@ -1631,8 +1656,6 @@ public class PasserellePDF {
 			doc.close();
 			
 		} catch (DocumentException e) {
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (MalformedURLException e) {
 			e.printStackTrace();

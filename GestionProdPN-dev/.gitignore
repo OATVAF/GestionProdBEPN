@@ -3,5 +3,6 @@ dataImport
 dataExport
 api/db
 api/log
-dataSystem/logos/Orig
-dataSystem/logos/Thumbs.db
+dataSystem/Archive*
+*Thumbs.db
+/GestionProdBEPN.jar
