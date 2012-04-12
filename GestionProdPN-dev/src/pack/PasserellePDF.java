@@ -1,24 +1,16 @@
 package pack;
 
-import java.awt.Graphics;
-import java.awt.image.ImageObserver;
-import java.awt.image.ImageProducer;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 
-import jxl.format.PageOrientation;
-import jxl.read.biff.FooterRecord;
-
 import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;

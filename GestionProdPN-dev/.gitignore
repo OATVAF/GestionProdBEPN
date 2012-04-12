@@ -4,5 +4,6 @@ dataExport
 api/db
 api/log
 dataSystem/Archive*
+dataSystem/logos/Orig/*.png
 *Thumbs.db
 /GestionProdBEPN.jar
