@@ -203,6 +203,8 @@ public class PasserelleStagiaire {
 		ArrayList<String> stagePNTList = new ArrayList<String>();
 		stagePNTList.add("S2");
 		stagePNTList.add("QT");
+		String site = Config.get("app.site");
+		String s2pat = Config.get("imp.pnt.s2."+site);
 		int index;
 		for (Stage stage : newStageList) {
 			index = -1;
@@ -217,7 +219,7 @@ public class PasserelleStagiaire {
 				int n = 0;
 				long modulo = 0;
 				for (Stagiaire stagiaire : pntList) {
-					if (stagiaire.getCodeStage().trim().endsWith("S2CC")) {
+					if (stagiaire.getCodeStage().trim().endsWith(s2pat)) {
 						// modulo pour les S2
 						modulo = (n % stage.getIdxMax()) +1 ;
 						if (modulo == stage.getIdx()) {
