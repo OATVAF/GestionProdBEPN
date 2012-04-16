@@ -432,15 +432,10 @@ public class PasserellePDF {
 			Font fontB  = new Font(Font.HELVETICA, 10, Font.BOLD);
 			Font fontB2 = new Font(Font.HELVETICA, 12, Font.BOLD);
 
-			cell = new PdfPCell(new Phrase(" DIF: Formation éligible au titre du DIF", fontB));
+			cell = new PdfPCell(new Phrase(" DIF : Formation éligible au titre du DIF (*)", fontB));
 			cell.setHorizontalAlignment(Element.ALIGN_LEFT);
 			cell.setPadding(0);
 			cell.setPaddingTop(5);
-			cell.setBorder(0);
-			header.addCell(cell);
-			cell = new PdfPCell(new Phrase(" Si vous ne souhaitez pas activer votre compteur DIF pour cette formation, cochez la case DIF ci-dessous", font));
-			cell.setHorizontalAlignment(Element.ALIGN_LEFT);
-			cell.setPaddingBottom(5);
 			cell.setBorder(0);
 			header.addCell(cell);
 			
@@ -469,7 +464,7 @@ public class PasserellePDF {
 			cell.setPhrase(new Phrase("",fontB));				center.addCell(cell);		
 			cell.setPhrase(new Phrase("Stagiaire",fontB));		center.addCell(cell);
 			cell.setPhrase(new Phrase("Pres.",fontB));			center.addCell(cell);
-			cell.setPhrase(new Phrase("Martin",fontB));		center.addCell(cell);
+			cell.setPhrase(new Phrase("Matin",fontB));		center.addCell(cell);
 			cell.setPhrase(new Phrase("Après-Midi",fontB));		center.addCell(cell);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setPhrase(new Phrase("DIF",fontB));			center.addCell(cell);
@@ -552,6 +547,7 @@ public class PasserellePDF {
 			
 			PdfPTable footer = new PdfPTable(3);
 			footer.setWidthPercentage(75);
+						
 			cell = new PdfPCell(new Phrase("Nombre de stagiaires :", fontB2));
 			cell.setColspan(3);
 			cell.setBorder(0);
@@ -612,7 +608,16 @@ public class PasserellePDF {
 			cell = new PdfPCell(par);
 			cell.setBorder(0);
 			footer2.addCell(cell);
-			
+						
+			// DIF
+			PdfPTable footer3 = new PdfPTable(1);
+			footer3.setWidthPercentage(95);
+			cell = new PdfPCell(new Phrase("\n* Si vous ne souhaitez pas activer votre compteur DIF pour cette formation, cochez la case DIF ci-dessus", font));
+			cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+			cell.setPaddingBottom(5);
+			cell.setBorder(0);
+			footer3.addCell(cell);
+
 			//ajout des composants
 			doc.add(header);
 			//doc.add(new Paragraph("        "));
@@ -620,6 +625,7 @@ public class PasserellePDF {
 			doc.add(new Paragraph("        "));
 			doc.add(footer);
 			doc.add(footer2);
+			doc.add(footer3);
 			
 			doc.close();
 		} catch (FileNotFoundException e) {
