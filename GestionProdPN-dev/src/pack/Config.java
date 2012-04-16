@@ -88,7 +88,12 @@ public enum Config {
 		}
 	}
 	public static void set(String param, String val) {
-		INSTANCE.cfgProp.setProperty(param,val);
+		if (INSTANCE.cfgProp.containsKey(param)) {
+			INSTANCE.cfgProp.setProperty(param,val);
+		}
+		else {
+			INSTANCE.appProp.setProperty(param,val);
+		}
 	}
 	public static URL getRes(String param) {
 		return Config.class.getResource("/res/"+param);

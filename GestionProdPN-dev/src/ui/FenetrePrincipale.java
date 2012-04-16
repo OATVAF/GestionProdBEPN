@@ -59,17 +59,26 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 	//police des boutons
 	private Font btnFont;
 	
-	private boolean TVall = false;
+	//private boolean TVall = false;
 	
 	/**
 	 * constructeur
 	 */
 	public FenetrePrincipale(String[] args){
 		
-		
+		System.out.println("Site:"+Config.get("app.site"));
 		if (args.length > 0) {
-			if (args[0].equals("TV=all")) { //$NON-NLS-1$
-				TVall = true;
+			for (String s: args) {
+				//if (s.equals("TV=all")) { //$NON-NLS-1$
+				//	TVall = true;
+				//}
+				if (s.indexOf("=") > 0) {
+					String[] p = s.split("=");
+					if (p.length > 1) {
+						System.out.println("Config param:"+p[0]+" val:"+p[1]);
+						Config.set(p[0], p[1]);
+					}
+				}
 			}
 		}
 		
@@ -132,7 +141,7 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 		titleLabel.setFont(new Font(Messages.getString("FenetrePrincipale.FontA"), 1, 30)); //$NON-NLS-1$
 		headerPane.add(titleLabel,BorderLayout.CENTER);
 		
-		versLabel = new JLabel(Config.get("app.version")); //$NON-NLS-1$
+		versLabel = new JLabel(Config.get("app.site")+"/"+Config.get("app.version")); //$NON-NLS-1$
 		versLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		versLabel.setVerticalAlignment(SwingConstants.TOP);
 		versLabel.setForeground(Color.BLUE);
@@ -308,7 +317,7 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 
 		//téléaffichage
 		if(source.equals(tvAffichageBtn)){
-			new FenetreTVAffichage(TVall);
+			new FenetreTVAffichage();
 		}
 		
 		//afficher le powerpoint

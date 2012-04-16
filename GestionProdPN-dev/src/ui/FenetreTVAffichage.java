@@ -60,15 +60,15 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 	/**
 	 * constructeur
 	 */
-	public FenetreTVAffichage(boolean all){
+	public FenetreTVAffichage(){
 		
-		TVall = all;
+		TVall = Config.get("aff.TV").equals("all");
 		
 		//recuperation de la date d'aujourd'hui
 		dateActuelle = new Date();
 		
 		//chargement des stages
-		StageList = PasserelleStage.chargerStageList(all);
+		StageList = PasserelleStage.chargerStageList(TVall);
 		if(StageList.isEmpty()){
 			//boite de dialogue
 			JOptionPane.showMessageDialog(null, "ERREUR ! pas de stages à afficher !","Erreur",JOptionPane.OK_OPTION);
