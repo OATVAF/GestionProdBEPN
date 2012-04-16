@@ -35,9 +35,9 @@ public class ModelStages extends AbstractTableModel
 			{ 40, 50, 50},
 			{ 60,250,100},
 			{ 80,500,150},
-			{ 60,120, 90},
-			{ 60,120, 90},
-			{ 60, 70, 60}
+			{ 60,180, 90},
+			{ 60,180, 90},
+			{ 60, 80, 60}
 			};
 
     public ModelStages(JTable table) {
@@ -217,9 +217,32 @@ public class ModelStages extends AbstractTableModel
     }
 
     public void removeSelectedStage() {
-    	stages.remove(getSelectedStage());
+    	removeStage(getSelectedStage());
+		//fireTableDataChanged();
+    }
+    
+    public ArrayList<Stage> getSelectedStages() {
+    	ArrayList<Stage> sl = new ArrayList<Stage>();
+    	int[] idx = table.getSelectedRows();
+    	for (int i : idx) {
+    		if (i >= 0) {
+    			sl.add(stages.get(sorter.modelIndex(i)));
+    		}
+    	}
+    	return sl;
+    }
+
+    public void removeStages(ArrayList<Stage> sl) {
+    	stagesAll.removeAll(sl);
+    	stages.removeAll(sl);
 		fireTableDataChanged();
     }
+
+    public void removeSelectedStages() {
+    	removeStages(getSelectedStages());
+		//fireTableDataChanged();
+    }
+
 }
 
 /*

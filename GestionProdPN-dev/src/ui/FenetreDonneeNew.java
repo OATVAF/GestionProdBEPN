@@ -21,6 +21,7 @@ import javax.swing.JTable;
 import javax.swing.event.ChangeListener;
 
 import java.awt.FlowLayout;
+import java.util.ArrayList;
 
 import javax.swing.ListSelectionModel;
 import javax.swing.JTabbedPane;
@@ -183,7 +184,8 @@ public class FenetreDonneeNew extends JFrame implements ActionListener {
 		
 		tableStages = new JTable();
 		ms = new ModelStages(tableStages);
-		tableStages.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		//tableStages.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		tableStages.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		scrollPane = new JScrollPane(tableStages);
 		ms.selDate("1/1/1");
 		dateBox.setModel(ms.dateModel);
@@ -307,14 +309,23 @@ public class FenetreDonneeNew extends JFrame implements ActionListener {
 
 		//si le bouton est le bouton de la suppression de stage
 		if(source.equals(removeBtn)){
+			int rep = JOptionPane.NO_OPTION;
 			//fenetre de dialogue
 			Stage s = ms.getSelectedStage();
-			int rep = JOptionPane.showConfirmDialog(null, "<html>Supprimer le stage "+s.getCode()+" du "+ms.filterDate+" ?<br>" +
+			ArrayList<Stage> sl = ms.getSelectedStages();
+			if (sl.size() == 1) {
+				rep = JOptionPane.showConfirmDialog(null, "<html>Supprimer le stage "+s.getCode()+" du "+ms.filterDate+" ?<br>" +
 					"les modifications seront definitives !</html>"
 					,Messages.getString("FenetreDonneeNew.Mod"),JOptionPane.YES_NO_OPTION); //$NON-NLS-1$
+			}
+			else {
+				rep = JOptionPane.showConfirmDialog(null, "<html>Supprimer les stages séléctionnés du "+ms.filterDate+" ?<br>" +
+						"les modifications seront definitives !</html>"
+						,Messages.getString("FenetreDonneeNew.Mod"),JOptionPane.YES_NO_OPTION); //$NON-NLS-1$
+			}
 			//si la reponse est "oui"
 			if(rep == JOptionPane.YES_OPTION) {
-				ms.removeStage(s);
+				ms.removeStages(sl);
 				//ms.saveStages();
 				//JOptionPane.showMessageDialog(null, "<html>Suppresion réussi !</html>", "Suppression", JOptionPane.INFORMATION_MESSAGE);
 			}
