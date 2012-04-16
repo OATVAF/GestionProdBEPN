@@ -200,14 +200,15 @@ public class PasserelleStagiaire {
 	
 	public static ArrayList<Stage> ajoutPnt(ArrayList<Stage> stageList,ArrayList<Stagiaire> pntList){
 		ArrayList<Stage> newStageList = stageList;
-		ArrayList<String> stagePNTList = new ArrayList<String>();
-		stagePNTList.add("S2");
-		stagePNTList.add("QT");
+		//ArrayList<String> stagePNTList = new ArrayList<String>();
+		//stagePNTList.add("S2");
+		//stagePNTList.add("QT");
 		String site = Config.get("app.site");
 		String s2pat = Config.get("imp.pnt.s2."+site);
-		int index;
+		//int index;
+		
 		for (Stage stage : newStageList) {
-			index = -1;
+			/*index = -1;
 			for (int i = 0 ; i < stagePNTList.size(); i++) {
 				if(stage.getCodeI().startsWith(stagePNTList.get(i))){
 					index = i;
@@ -215,7 +216,9 @@ public class PasserelleStagiaire {
 				}
 			}
 			switch (index) {
-			case 0:
+			case 0:		// 4S / S2
+			*/
+			if (stage.getCodeI().startsWith("S2")) {
 				int n = 0;
 				long modulo = 0;
 				for (Stagiaire stagiaire : pntList) {
@@ -229,11 +232,15 @@ public class PasserelleStagiaire {
 						n++;
 					}
 				}
-				break;
-			case 1:
-				ArrayList<String> qtinfo = new ArrayList<String>();
+				//break;
+			}
+			//case 1:		// QT
+			if (stage.getCodeI().startsWith("QT")) {
+				String qtPat = null;
+				//ArrayList<String> qtinfo = new ArrayList<String>();
 				String codeStage = stage.getCodeI();
-				String chaine = "";
+				//String chaine = "";
+				/*
 				for (int i = 0; i < codeStage.length(); i++) {
 					if(codeStage.substring(i, i+1).equalsIgnoreCase(" ")){
 						qtinfo.add(chaine);
@@ -243,16 +250,33 @@ public class PasserelleStagiaire {
 					}
 				}
 				qtinfo.add(chaine);
-				for (Stagiaire stagiaire : pntList) {
-					for (String string : qtinfo) {
-						if (stagiaire.getCodeStage().startsWith(string)) {
-							stage.ajoutStagiaire(stagiaire);
-						}
+				*/
+				for (String s : codeStage.split(" ")) {
+					if (s.length() < 6) {
+						continue;
+					}
+					if (qtPat == null) {
+						qtPat = "^("+s.substring(0,2) + "." + s.substring(3,6)+".";
+					}
+					else {
+						qtPat += "|"+s.substring(0,2) + "." + s.substring(3,6)+".";
 					}
 				}
-				break;
-			default:
-				break;
+				qtPat += ") *";
+				
+				for (Stagiaire stagiaire : pntList) {
+					//for (String string : qtinfo) {
+					//	if (stagiaire.getCodeStage().startsWith(string)) {
+					if (stagiaire.getCodeStage().matches(qtPat)) {
+						System.out.println("Ajout PNT :" + stagiaire.getNom() + ":"+stagiaire.getCodeStage()
+								+ " au stage :" + ":" +stage.getCode());
+						stage.ajoutStagiaire(stagiaire);
+					}
+					//}
+				}
+			//	break;
+			//default:
+			//	break;
 			}
 		}
 		
