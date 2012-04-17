@@ -200,29 +200,15 @@ public class PasserelleStagiaire {
 	
 	public static ArrayList<Stage> ajoutPnt(ArrayList<Stage> stageList,ArrayList<Stagiaire> pntList){
 		ArrayList<Stage> newStageList = stageList;
-		//ArrayList<String> stagePNTList = new ArrayList<String>();
-		//stagePNTList.add("S2");
-		//stagePNTList.add("QT");
 		String site = Config.get("app.site");
 		String s2pat = Config.get("imp.pnt.s2."+site);
-		//int index;
 		
 		for (Stage stage : newStageList) {
-			/*index = -1;
-			for (int i = 0 ; i < stagePNTList.size(); i++) {
-				if(stage.getCodeI().startsWith(stagePNTList.get(i))){
-					index = i;
-					break;
-				}
-			}
-			switch (index) {
-			case 0:		// 4S / S2
-			*/
 			if (stage.getCodeI().startsWith("S2")) {
 				int n = 0;
 				long modulo = 0;
 				for (Stagiaire stagiaire : pntList) {
-					if (stagiaire.getCodeStage().trim().endsWith(s2pat)) {
+					if (stagiaire.getCodeStage().trim().matches(s2pat)) {
 						// modulo pour les S2
 						modulo = (n % stage.getIdxMax()) +1 ;
 						if (modulo == stage.getIdx()) {
@@ -232,25 +218,10 @@ public class PasserelleStagiaire {
 						n++;
 					}
 				}
-				//break;
 			}
-			//case 1:		// QT
 			if (stage.getCodeI().startsWith("QT")) {
 				String qtPat = null;
-				//ArrayList<String> qtinfo = new ArrayList<String>();
 				String codeStage = stage.getCodeI();
-				//String chaine = "";
-				/*
-				for (int i = 0; i < codeStage.length(); i++) {
-					if(codeStage.substring(i, i+1).equalsIgnoreCase(" ")){
-						qtinfo.add(chaine);
-						chaine = "";
-					}else{
-						chaine = chaine + codeStage.substring(i, i+1);
-					}
-				}
-				qtinfo.add(chaine);
-				*/
 				for (String s : codeStage.split(" ")) {
 					if (s.length() < 6) {
 						continue;
@@ -265,18 +236,12 @@ public class PasserelleStagiaire {
 				qtPat += ") *";
 				
 				for (Stagiaire stagiaire : pntList) {
-					//for (String string : qtinfo) {
-					//	if (stagiaire.getCodeStage().startsWith(string)) {
 					if (stagiaire.getCodeStage().matches(qtPat)) {
 						System.out.println("Ajout PNT :" + stagiaire.getNom() + ":"+stagiaire.getCodeStage()
 								+ " au stage :" + ":" +stage.getCode());
 						stage.ajoutStagiaire(stagiaire);
 					}
-					//}
 				}
-			//	break;
-			//default:
-			//	break;
 			}
 		}
 		
