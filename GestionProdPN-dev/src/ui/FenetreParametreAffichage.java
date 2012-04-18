@@ -1,4 +1,4 @@
-package pack;
+package ui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -8,6 +8,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.*;
+
+import pack.Config;
 
 /**
  * 
@@ -102,7 +104,7 @@ public class FenetreParametreAffichage extends JFrame implements ActionListener{
 		infoHdpane = new JPanel();
 		infoHdpane.setBackground(Color.WHITE);
 		infoHdpane.add(new JLabel("message en entete (- de 50 caracteres recommandé): "));
-		msgHdTextField = new JTextField(PasserelleAffichage.getHeaderMsg());
+		msgHdTextField = new JTextField(Config.get("aff.header"));
 		msgHdTextField.setPreferredSize(new Dimension(400, 25));
 		infoHdpane.add(msgHdTextField);
 		
@@ -110,7 +112,7 @@ public class FenetreParametreAffichage extends JFrame implements ActionListener{
 		infoFtpane = new JPanel();
 		infoFtpane.setBackground(Color.WHITE);
 		infoFtpane.add(new JLabel("message en bas de page (- de 100 caracteres recommandé): "));
-		msgFtTextField = new JTextField(PasserelleAffichage.getFooterMsg());
+		msgFtTextField = new JTextField(Config.get("aff.footer"));
 		msgFtTextField.setPreferredSize(new Dimension(400, 25));
 		infoFtpane.add(msgFtTextField);
 
@@ -118,7 +120,7 @@ public class FenetreParametreAffichage extends JFrame implements ActionListener{
 		infoPptpane = new JPanel();
 		infoPptpane.setBackground(Color.WHITE);
 		infoPptpane.add(new JLabel("chemin absolu vers : powerpnt.exe"));
-		pathPptTextField = new JTextField(PasserelleAffichage.getCheminPptExe());
+		pathPptTextField = new JTextField(Config.get("aff.cheminpptexe"));
 		pathPptTextField.setPreferredSize(new Dimension(400, 25));
 		infoPptpane.add(pathPptTextField);
 		
@@ -139,7 +141,11 @@ public class FenetreParametreAffichage extends JFrame implements ActionListener{
 		
 		//application si la source est applyBtn
 		if(source.equals(applyBtn)){
-			PasserelleAffichage.ecritureTextAff(msgHdTextField.getText(), msgFtTextField.getText(),pathPptTextField.getText());
+			//PasserelleAffichage.ecritureTextAff(msgHdTextField.getText(), msgFtTextField.getText(),pathPptTextField.getText());
+			Config.set("aff.header",       msgHdTextField.getText());
+			Config.set("aff.footer",       msgFtTextField.getText());
+			Config.set("aff.cheminpptexe", pathPptTextField.getText());
+			Config.Write();
 			this.dispose();
 		}//finsi
 		

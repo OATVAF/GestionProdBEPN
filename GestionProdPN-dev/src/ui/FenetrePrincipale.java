@@ -1,7 +1,9 @@
-package pack;
+package ui;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -9,6 +11,12 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+
+import pack.Config;
+import pack.PasserelleStage;
+import pack.PasserelleStagiaire;
 
 /**
  * c'est la Fenetre Principale de l'application<br>
@@ -35,7 +43,8 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 	//attributs JLabel
 	private JLabel logoLabel;
 	private JLabel titleLabel;
-	
+	private JLabel versLabel;
+
 	//attributs JButton
 	private JButton tvAffichageBtn;//bouton du téléAffichage
 	private JButton pptAffichageBtn;//bouton du lancement duu powerpoint
@@ -45,26 +54,53 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 	private JButton pdfBtn;//bouton de génération des documents
 	private JButton majSmsBtn;//bouton pour la liste des sms
 	private JButton majTestsBtn;//bouton pour la liste des sms
+	private JButton InterviewBtn;//bouton pour les listes interview
 
 	//police des boutons
 	private Font btnFont;
 	
-	private boolean TVall = false;
+	//private boolean TVall = false;
 	
 	/**
 	 * constructeur
 	 */
 	public FenetrePrincipale(String[] args){
 		
-		
+		System.out.println("Site:"+Config.get("app.site"));
 		if (args.length > 0) {
-			if (args[0].equals("TV=all")) {
-				TVall = true;
+			for (String s: args) {
+				//if (s.equals("TV=all")) { //$NON-NLS-1$
+				//	TVall = true;
+				//}
+				if (s.indexOf("=") > 0) {
+					String[] p = s.split("=");
+					if (p.length > 1) {
+						System.out.println("Config param:"+p[0]+" val:"+p[1]);
+						Config.set(p[0], p[1]);
+					}
+				}
 			}
 		}
 		
+        try {
+			UIManager.setLookAndFeel(
+			        UIManager.getSystemLookAndFeelClassName());
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedLookAndFeelException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
 		//formation de la fenetre
-		this.setTitle("GestionProd");
+		this.setTitle(Messages.getString("FenetrePrincipale.TitreFenetre")); //$NON-NLS-1$
 		this.setSize(900, 700);
 		this.setResizable(false);
 		this.setLocationRelativeTo(null);
@@ -95,16 +131,23 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 		
 		//instanciation du logo
 		logoLabel = new JLabel();
-		logoLabel.setIcon(new ImageIcon("dataSystem\\airfrance.jpg"));
+		logoLabel.setIcon(new ImageIcon(Config.getRes("Airfrance.jpg"))); //$NON-NLS-1$
 		headerPane.add(logoLabel,BorderLayout.WEST);
 		
 		//instanciation du titre
-		titleLabel = new JLabel("Application Gestion Production");
+		titleLabel = new JLabel(Messages.getString("FenetrePrincipale.Titre")); //$NON-NLS-1$
 		titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		titleLabel.setForeground(Color.BLUE);
-		titleLabel.setFont(new Font("arial", 1, 30));
+		titleLabel.setFont(new Font(Messages.getString("FenetrePrincipale.FontA"), 1, 30)); //$NON-NLS-1$
 		headerPane.add(titleLabel,BorderLayout.CENTER);
 		
+		versLabel = new JLabel(Config.get("app.site")+"/"+Config.get("app.version")); //$NON-NLS-1$
+		versLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+		versLabel.setVerticalAlignment(SwingConstants.TOP);
+		versLabel.setForeground(Color.BLUE);
+		versLabel.setFont(new Font(Messages.getString("FenetrePrincipale.FontA"), 1, 9)); //$NON-NLS-1$
+		headerPane.add(versLabel,BorderLayout.EAST);
+
 		//ajout de headerPane dans le contentPane
 		contentPane.add(headerPane,BorderLayout.NORTH);
 		
@@ -146,7 +189,7 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 	private void constructionProdPane(){
 		
 		//police des boutons
-		btnFont = new Font("arial", 1, 14);
+		btnFont = new Font(Messages.getString("FenetrePrincipale.FontA"), 1, 14); //$NON-NLS-1$
 		int width = 225;
 		int height = 50;
 		
@@ -161,8 +204,8 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 		
 		//bouton "importation données DELIA"
 		importBtn = new JButton();
-		importBtn.setText("<html>Importation des données DELIA et BO<br>et Archivage des données</html>");
-		importBtn.setIcon(new ImageIcon("dataSystem\\import.jpg"));
+		importBtn.setText(Messages.getString("FenetrePrincipale.importBtn")); //$NON-NLS-1$
+		importBtn.setIcon(new ImageIcon(Config.getRes("import.png"))); //$NON-NLS-1$
 		importBtn.setFont(btnFont);
 		importBtn.addActionListener(this);
 		importBtn.setPreferredSize(new Dimension(350, height));
@@ -170,8 +213,8 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 		
 		//bouton "modifier les données"
 		modifBtn = new JButton();
-		modifBtn.setText("modifier les données");
-		modifBtn.setIcon(new ImageIcon("dataSystem\\modif.jpg"));
+		modifBtn.setText(Messages.getString("FenetrePrincipale.modifBtn")); //$NON-NLS-1$
+		modifBtn.setIcon(new ImageIcon(Config.getRes("modif.png"))); //$NON-NLS-1$
 		modifBtn.setFont(btnFont);
 		modifBtn.setPreferredSize(new Dimension(350, height));
 		modifBtn.addActionListener(this);
@@ -185,8 +228,8 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 		
 		//bouton "afficher le téléaffichage"
 		tvAffichageBtn = new JButton();
-		tvAffichageBtn.setText("<html>Afficher le<br>TéléAffichage<html>");
-		tvAffichageBtn.setIcon(new ImageIcon("dataSystem\\tv.jpg"));
+		tvAffichageBtn.setText(Messages.getString("FenetrePrincipale.tvBtn")); //$NON-NLS-1$
+		tvAffichageBtn.setIcon(new ImageIcon(Config.getRes("tv.png"))); //$NON-NLS-1$
 		tvAffichageBtn.setFont(btnFont);
 		tvAffichageBtn.setPreferredSize(new Dimension(width, height));
 		tvAffichageBtn.addActionListener(this);
@@ -194,8 +237,8 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 		
 		//bonton "Afficher le PowerPoint"
 		pptAffichageBtn = new JButton();
-		pptAffichageBtn.setText("Afficher le PowerPoint");
-		pptAffichageBtn.setIcon(new ImageIcon("dataSystem\\ppt.jpg"));
+		pptAffichageBtn.setText(Messages.getString("FenetrePrincipale.pptBtn")); //$NON-NLS-1$
+		pptAffichageBtn.setIcon(new ImageIcon(Config.getRes("ppt.png"))); //$NON-NLS-1$
 		pptAffichageBtn.setFont(btnFont);
 		pptAffichageBtn.setPreferredSize(new Dimension(width, height));
 		pptAffichageBtn.addActionListener(this);
@@ -203,8 +246,8 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 		
 		//bonton "Parametres Affichages"
 		modifAffichageBtn = new JButton();
-		modifAffichageBtn.setText("<html>Paramètres<br>Affichages<html>");
-		modifAffichageBtn.setIcon(new ImageIcon("dataSystem\\affichage.jpg"));
+		modifAffichageBtn.setText(Messages.getString("FenetrePrincipale.affModBtn")); //$NON-NLS-1$
+		modifAffichageBtn.setIcon(new ImageIcon(Config.getRes("affichage.png"))); //$NON-NLS-1$
 		modifAffichageBtn.setFont(btnFont);
 		modifAffichageBtn.setPreferredSize(new Dimension(width, height));
 		modifAffichageBtn.addActionListener(this);
@@ -218,8 +261,8 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 		
 		//bouton "générer les Documents"
 		pdfBtn = new JButton();
-		pdfBtn.setText("<html>générer les<br>Documents<html>");
-		pdfBtn.setIcon(new ImageIcon("dataSystem\\document.jpg"));
+		pdfBtn.setText(Messages.getString("FenetrePrincipale.pdfBtn")); //$NON-NLS-1$
+		pdfBtn.setIcon(new ImageIcon(Config.getRes("document.png"))); //$NON-NLS-1$
 		pdfBtn.setFont(btnFont);
 		pdfBtn.setPreferredSize(new Dimension(width, height));
 		pdfBtn.addActionListener(this);
@@ -233,8 +276,8 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 		
 		//bouton "générer les Documents"
 		majSmsBtn = new JButton();
-		majSmsBtn.setText("<html>Mettre a jour<br>la liste SMS<html>");
-		majSmsBtn.setIcon(new ImageIcon("dataSystem\\sms.jpg"));
+		majSmsBtn.setText(Messages.getString("FenetrePrincipale.smsBtn")); //$NON-NLS-1$
+		majSmsBtn.setIcon(new ImageIcon(Config.getRes("sms.png"))); //$NON-NLS-1$
 		majSmsBtn.setFont(btnFont);
 		majSmsBtn.setPreferredSize(new Dimension(width, height));
 		majSmsBtn.addActionListener(this);
@@ -242,12 +285,21 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 		
 		//bouton "générer les Lists"
 		majTestsBtn = new JButton();
-		majTestsBtn.setText("<html>Mettre à jour les<br>matricules pour les tests<html>");
+		majTestsBtn.setText(Messages.getString("FenetrePrincipale.testBtn")); //$NON-NLS-1$
 		//majTestsBtn.setIcon(new ImageIcon("dataSystem\\sms.jpg"));
 		majTestsBtn.setFont(btnFont);
 		majTestsBtn.setPreferredSize(new Dimension(width, height));
 		majTestsBtn.addActionListener(this);
 		smsPane.add(majTestsBtn);
+
+		//bouton "générer les Lists Interview"
+		InterviewBtn = new JButton();
+		InterviewBtn.setText(Messages.getString("FenetrePrincipale.intervBtn")); //$NON-NLS-1$
+		//majTestsBtn.setIcon(new ImageIcon("dataSystem\\sms.jpg"));
+		InterviewBtn.setFont(btnFont);
+		InterviewBtn.setPreferredSize(new Dimension(width, height));
+		InterviewBtn.addActionListener(this);
+		smsPane.add(InterviewBtn);
 
 		//ajout
 		prodPane.add(smsPane);
@@ -265,12 +317,25 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 
 		//téléaffichage
 		if(source.equals(tvAffichageBtn)){
-			new FenetreTVAffichage(TVall);
+			new FenetreTVAffichage();
 		}
 		
 		//afficher le powerpoint
 		if(source.equals(pptAffichageBtn)){
-			PasserelleAffichage.affichagePPT();
+			//recherche de l'executable de powerpoint
+			Runtime x = Runtime.getRuntime();
+			String[] args = { Config.get("aff.cheminpptexe"),
+							  "/s",
+							  Config.get("aff.ppt")
+							  };
+			//execution du diaporama
+			try {
+				x.exec(args);
+			} catch (IOException e1) {
+				//boite de dialogue d'erreur
+				JOptionPane.showMessageDialog(null, "soit le chemin vers powerpnt.exe est incorrect ! soit le ppt n'est pas nommé TVAFFPPT.ppt !", "Erreur", JOptionPane.ERROR_MESSAGE);
+			}
+
 		}
 		
 		//parametres affichage
@@ -285,13 +350,13 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 		
 		//modifier les données
 		if(source.equals(modifBtn)){
-			new FenetreDonnee();
+			new FenetreDonneeNew();
 		}
 		
 		//importation
 		if(source.equals(importBtn)){
-			int rep = JOptionPane.showConfirmDialog(null, "<html>Avez-vous importé Export.txt, OATVPNC.xls et OATVPNT.xls pour J+1 dans le dossier dataImport ?</html>"
-					,"Verification",JOptionPane.YES_NO_OPTION);
+			int rep = JOptionPane.showConfirmDialog(null, Messages.getString("FenetrePrincipale.exportMsg") //$NON-NLS-1$
+					,Messages.getString("FenetrePrincipale.verif"),JOptionPane.YES_NO_OPTION); //$NON-NLS-1$
 			if(rep == JOptionPane.YES_OPTION){
 				PasserelleStage.importationDonnées();
 			}
@@ -299,8 +364,8 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 		
 		//liste SMS
 		if(source.equals(majSmsBtn)){
-			int rep = JOptionPane.showConfirmDialog(null, "Avez-vous importé OATVPNC.xls pour J+1 dans le dossier dataImport ?"
-					,"Verification",JOptionPane.YES_NO_OPTION);
+			int rep = JOptionPane.showConfirmDialog(null, Messages.getString("FenetrePrincipale.importMsg") //$NON-NLS-1$
+					,Messages.getString("FenetrePrincipale.verif"),JOptionPane.YES_NO_OPTION); //$NON-NLS-1$
 			if(rep == JOptionPane.YES_OPTION){
 				PasserelleStagiaire.creerListePourSms();
 			}
@@ -308,10 +373,19 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 	
 		//liste matricules
 		if(source.equals(majTestsBtn)){
-			int rep = JOptionPane.showConfirmDialog(null, "Avez-vous importé OATVPNC.xls pour J+1 dans le dossier dataImport ?"
-					,"Verification",JOptionPane.YES_NO_OPTION);
+			int rep = JOptionPane.showConfirmDialog(null, Messages.getString("FenetrePrincipale.importMsg") //$NON-NLS-1$
+					,Messages.getString("FenetrePrincipale.verif"),JOptionPane.YES_NO_OPTION); //$NON-NLS-1$
 			if(rep == JOptionPane.YES_OPTION){
 				PasserelleStagiaire.creerListePourTests();
+			}
+		}
+		
+		//listes interview
+		if(source.equals(InterviewBtn)){
+			int rep = JOptionPane.showConfirmDialog(null, Messages.getString("FenetrePrincipale.importIntervMsg") //$NON-NLS-1$
+					,Messages.getString("FenetrePrincipale.verif"),JOptionPane.YES_NO_OPTION); //$NON-NLS-1$
+			if(rep == JOptionPane.YES_OPTION){
+				PasserelleStagiaire.creerListePourInterview();
 			}
 		}
 

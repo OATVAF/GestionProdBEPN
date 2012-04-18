@@ -1,4 +1,4 @@
-package pack;
+package ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -19,6 +19,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+
+import pack.PasserelleStage;
+import pack.Stage;
+
 
 /**
  * Fenetre qui permet a l'utilisateur de modifier les données importées<br>
@@ -42,6 +46,7 @@ public class FenetreDonnee extends JFrame implements ActionListener{
 	private JButton vueBtn;
 	
 	private JPanel stagePane;//conteneur  contenant le formulaire de modification
+	private JTextField nomField;
 	private JTextField libField;
 	private JTextField salleField;
 	private JTextField leaderField;
@@ -205,11 +210,23 @@ public class FenetreDonnee extends JFrame implements ActionListener{
 		codeStgLabel.setFont(font);
 		codestagePane.add(codeStgLabel);
 		stagePane.add(codestagePane);
-		
+
+		//partie du formulaire pour le nom du stage
+		JPanel nomPane = new JPanel();
+		nomPane.setBackground(Color.WHITE);
+		JLabel nomLabel = new JLabel("Nom du Stage :");
+		nomLabel.setFont(font);
+		nomLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		nomPane.add(nomLabel);
+		nomField = new JTextField(leStage.getCodeI());
+		nomField.setPreferredSize(new Dimension(250, 25));
+		nomPane.add(nomField);
+		stagePane.add(nomPane);
+
 		//partie du formulaire pour le libelle du stage
 		JPanel libPane = new JPanel();
 		libPane.setBackground(Color.WHITE);
-		JLabel libLabel = new JLabel("libelle du Stage :");
+		JLabel libLabel = new JLabel("Libellé du Stage :");
 		libLabel.setFont(font);
 		libLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		libPane.add(libLabel);
@@ -342,6 +359,7 @@ public class FenetreDonnee extends JFrame implements ActionListener{
 			if(rep == JOptionPane.YES_OPTION){
 				for (Stage leStage : stageList) {
 					if(leStage.getDateStr().equals(date) && leStage.getCode().equals(code)){
+						leStage.setCode(nomField.getText());
 						leStage.setLibelle(libField.getText());
 						leStage.getFirstModule().setSalle(salleField.getText());
 						leStage.setLeader(leaderField.getText());

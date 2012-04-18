@@ -1,6 +1,7 @@
 package pack;
 import java.io.Serializable;
 
+
 /**
  * classe contenatn toutes les informations sur un module
  * @author BERON Jean-Sebastien
@@ -9,7 +10,9 @@ import java.io.Serializable;
 public class Module implements Serializable{
 	
 	private static final long serialVersionUID = -1234129121873518254L;
-	
+
+	private Long id;
+
 	//attributs
 	private Stage stage;
 	private String codeStage;
@@ -20,6 +23,7 @@ public class Module implements Serializable{
 	private String salle;
 	private String nomLeader;
 	private String nomAide;
+	private String compagnie;
 
 	/**
 	 * constructeur
@@ -29,8 +33,9 @@ public class Module implements Serializable{
 	 * @param Hdebut
 	 * @param Hfin
 	 */
-	public Module(String codStg, String libelle, String ladate, String Hdebut, String Hfin){
-		this.stage = new Stage();
+	public Module(Long sId,String codStg, String libelle, String ladate, String Hdebut, String Hfin){
+		this.id = sId;
+		this.stage = null;
 		this.codeStage = codStg;
 		this.date = ladate;
 		this.libelle = libelle;
@@ -41,6 +46,13 @@ public class Module implements Serializable{
 		this.setNomAide("");
 	}
 	
+	public long getId() {
+		return id;
+	}
+	public void setCodeStage(String codeStage) {
+		this.codeStage = codeStage;
+	}
+
 	/**
 	 * setter de stage
 	 * @param stage
@@ -56,11 +68,12 @@ public class Module implements Serializable{
 	public Stage getStage() {
 		return stage;
 	}
-
+	
 	/**
 	 * getter de codeStage
 	 * @return codeStage
 	 */
+
 	public String getCodeStage() {
 		return codeStage;
 	}
@@ -89,12 +102,20 @@ public class Module implements Serializable{
 		return heureDebut;
 	}
 	
+	public void setHeureDebut(String heureDebut) {
+		this.heureDebut=heureDebut;
+	}
+
 	/**
 	 * getter de  heureFin
 	 * @return heurefin
 	 */
 	public String getHeureFin() {
 		return heureFin;
+	}
+	
+	public void setHeureFin(String heureFin) {
+		this.heureFin=heureFin;
 	}
 
 	/**
@@ -119,9 +140,11 @@ public class Module implements Serializable{
 	 */
 	public void setNomLeader(String nomLeader) {
 		this.nomLeader = nomLeader;
-		this.stage.setLeader(nomLeader);
+		if (this.stage != null) {
+			this.stage.setLeader(nomLeader);
+		}
 	}
-
+	
 	/**
 	 * getter de nomLeader
 	 * @return nomLeader
@@ -158,5 +181,13 @@ public class Module implements Serializable{
 		//retour
 		return nbmin;
 	}//fin getnbMin()
+
+	public String getCompagnie() {
+		return compagnie;
+	}
+
+	public void setCompagnie(String compagnie) {
+		this.compagnie = compagnie;
+	}
 
 }//fin class

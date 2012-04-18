@@ -2,8 +2,11 @@ package pack;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+
 
 /**
  * classe qui contient toutes les informations sur un stage<br>
@@ -11,24 +14,36 @@ import java.util.Date;
  * @author BERON Jean-Sébastien
  *
  */
-public class Stage implements Serializable{
+public class Stage implements Serializable /*,Cloneable*/ {
 
 	private static final long serialVersionUID = -3775254007031121727L;
+
+	private Long id;
 	
 	//attributs
 	private String code;
+	private Integer idx, idxMax;
 	private String date;
+	private Date dateD;
 	private String libelle;
 	private int maxiPresent;
 	private String leader;
+	private String compagnie;
 	private ArrayList<Module> moduleList;
 	private ArrayList<Stagiaire> stagiaireList;
+	private Stage coStage;
+	
+	private SimpleDateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
 	
 	/**
 	 * constructeur par defaut
 	 */
 	public Stage(){
-		//nothing
+		moduleList = new ArrayList<Module>();
+		stagiaireList = new ArrayList<Stagiaire>();
+		this.idx = 0;
+		this.idxMax = 0;
+		this.setCoStage(null);
 	}
 	
 	/**
@@ -36,17 +51,61 @@ public class Stage implements Serializable{
 	 * @param unModule
 	 */
 	public Stage(Module unModule){
-		
+		id = unModule.getId();
 		moduleList = new ArrayList<Module>();
 		stagiaireList = new ArrayList<Stagiaire>();
 		this.code = unModule.getCodeStage();
 		this.date = unModule.getDate();
+		try {
+			this.dateD = fmt.parse(date);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		this.leader = unModule.getNomLeader();
+		this.compagnie = unModule.getCompagnie();
 		unModule.setStage(this);
 		moduleList.add(unModule);
+		this.idx = 0;
+		this.idxMax = 0;
+		this.setCoStage(null);
 		affectationInfoStage();
-		
 	}//fin Stage(Module unModule)
+	
+	/*
+	public Stage clone() {
+		Stage o = null;
+		try {
+			// On récupère l'instance à renvoyer par l'appel de la 
+			// méthode super.clone()
+			o = (Stage) super.clone();
+		} catch(CloneNotSupportedException cnse) {
+			// Ne devrait jamais arriver car nous implémentons 
+			// l'interface Cloneable
+			cnse.printStackTrace(System.err);
+		}
+		o.moduleList = (ArrayList<Module>)moduleList.clone();
+		o.stagiaireList = (ArrayList<Stagiaire>)stagiaireList.clone();
+		
+		// on renvoie le clone
+		return o;
+	}
+	*/
+	
+	public long getId() {
+		return id;
+	}
+	
+	public long getIdx() {
+		return idx;
+	}
+	public long getIdxMax() {
+		return idxMax;
+	}
+	public void setIdx(Integer idx, Integer idxM) {
+		this.idx = idx;
+		this.idxMax = idxM;
+	}
 	
 	/**
 	 * setter de code
@@ -54,14 +113,24 @@ public class Stage implements Serializable{
 	 */
 	public void setCode(String code) {
 		this.code = code;
+		for (Module m: moduleList) {
+			m.setCodeStage(getCode());
+		}
+		affectationInfoStage();
 	}
-	
 	/**
 	 * getter de code
 	 * @return
 	 */
-	public String getCode() {
+	public String getCodeI() {
 		return code;
+	}
+	public String getCode() {
+		String c = code;
+		if (idxMax != null && idxMax > 1) {
+			c += "-"+idx;
+		}
+		return c;
 	}
 
 	/**
@@ -70,6 +139,12 @@ public class Stage implements Serializable{
 	 */
 	public void setDate(String date) {
 		this.date = date;
+		try {
+			this.dateD = fmt.parse(date);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -84,16 +159,8 @@ public class Stage implements Serializable{
 	 * retourne la date sous le format date
 	 * @return
 	 */
-	@SuppressWarnings("deprecation")
 	public Date getDateDt() {
-		//recuperation de chaque élément de la date
-		int year = Integer.parseInt(date.substring(6, 10))-1900;
-		int mois = Integer.parseInt(date.substring(3, 5))-1;
-		int day = Integer.parseInt(date.substring(0, 2));
-		//formation de la date
-		Date newdate = new Date(year,mois,day);
-		//retour
-		return newdate;
+		return dateD;
 	}//fin getDateDt()
 	
 	/**
@@ -141,7 +208,12 @@ public class Stage implements Serializable{
 	 * @return module
 	 */
 	public Module getFirstModule(){
-		return moduleList.get(0);
+		if (coStage != null) {
+			return coStage.getFirstModule();
+		}
+		else {
+			return moduleList.get(0);
+		}
 	}
 
 
@@ -212,6 +284,14 @@ public class Stage implements Serializable{
 		stagiaireList.remove(index);
 	}
 	
+	public void supprimerStagiaire(Stagiaire st){
+		stagiaireList.remove(st);
+	}
+	
+	public void supprimerStagiaire(ArrayList<Stagiaire> sl){
+		stagiaireList.removeAll(sl);
+	}
+
 	/**
 	 * procedure triant les stagiaire par ordre alphabetique
 	 */
@@ -328,11 +408,27 @@ public class Stage implements Serializable{
 	 */
 	public int getnbMin(){
 		//recuperation de l'heure de debut
-		String heureDeb = moduleList.get(0).getHeureDebut();
+		String heureDeb = getFirstModule().getHeureDebut();
 		int nbmin;
 		nbmin = Integer.parseInt(heureDeb.substring(0, 2))*60 + Integer.parseInt(heureDeb.substring(3, 5));
 		//retour
 		return nbmin;
 	}//fin getnbmin()
+
+	public String getCompagnie() {
+		return compagnie;
+	}
+
+	public void setCompagnie(String compagnie) {
+		this.compagnie = compagnie;
+	}
+
+	public Stage getCoStage() {
+		return coStage;
+	}
+
+	public void setCoStage(Stage coStage) {
+		this.coStage = coStage;
+	}
 	
 }//fin class

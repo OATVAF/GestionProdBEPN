@@ -1,6 +1,7 @@
 package pack;
 import java.io.*;
 import java.io.File;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -10,6 +11,8 @@ import java.util.GregorianCalendar;
 import java.util.Hashtable;
 
 import javax.swing.*;
+
+import data.StgMail;
 
 import jxl.*;
 import jxl.read.biff.*;
@@ -25,8 +28,10 @@ import jxl.write.biff.RowsExceededException;
 public class PasserelleStagiaire {
 	
 	private static boolean good;
-	private static final String pathFilePnc= "dataImport\\OATVPNC.xls";
-	private static final String pathFilePnt= "dataImport\\OATVPNT.xls";
+	private static final String pathFilePnc= Config.get("imp.pnc"); //"dataImport\\OATVPNC.xls";
+	private static final String pathFilePnt= Config.get("imp.pnt"); //"dataImport\\OATVPNT.xls";
+	private static final String pathFileSMS= Config.get("exp.sms"); // "dataExport\\ListSMS.xls"
+	private static final String pathDirTests= Config.get("exp.tests"); // "dataExport\\Tests du"
 	
 	private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	private static Date dateDemain;
@@ -39,8 +44,8 @@ public class PasserelleStagiaire {
 		ecritureListeSMSxls(StagiaireList);
 		if (good) {
 			JOptionPane.showMessageDialog(null, "<html>Operation terminée !" +
-					"<br>le fichier est dans dataExport\\ListeSMS.xls</html>", "Termine", JOptionPane.INFORMATION_MESSAGE);
-		}//finsi
+					"<br>le fichier est dans "+pathFileSMS+"</html>", "Termine", JOptionPane.INFORMATION_MESSAGE);
+		}// finsi
 		
 	}//fin creerListePourSms()
 	
@@ -55,6 +60,88 @@ public class PasserelleStagiaire {
 		}//finsi
 	}
 
+	public static void creerListePourInterview() {
+		good = true;
+		String pPNCS_1 = Config.get("imp.pnc-1"); //"dataImport/PNC_S-1.xls";
+		String pPNTS_1 = Config.get("imp.pnt-1"); //"dataImport/PNT_S-1.xls";
+		
+		// PNC
+		try {
+			ArrayList<StgMail> StgList = new ArrayList<StgMail>();
+			File f = new File(pPNCS_1);
+			Workbook wb = Workbook.getWorkbook(f);
+			Sheet sh = wb.getSheet(0);
+			StgMail h = new StgMail(sh.getRow(0),0);
+			String[] qListes = { "CRM", "EAO", "EPU", "SEC", "SS", "SUR", "VOL" };
+			PrintWriter[] P = { null, null, null, null, null, null, null };
+
+			for (int i=1; i< sh.getRows(); i++) {
+				Cell[] c = sh.getRow(i);
+				StgList.add(new StgMail(c,i-1));
+			}
+			wb.close();
+
+			for (int i=0; i< qListes.length; i++) {
+				P[i] = new PrintWriter(new FileWriter("dataExport/Liste PNC-"+qListes[i]+".txt"));
+				P[i].println(h.toString());
+			}
+			for (StgMail s : StgList) {
+				P[s.n % qListes.length].println(s.toString());
+			}
+			for (int i=0; i< qListes.length; i++) {
+				P[i].close();
+			}
+			
+		} catch (BiffException e) {
+			good = false;
+			JOptionPane.showMessageDialog(null, "<html>probleme de lecture de" +
+					"<br>"+pPNCS_1+"</html>", "Erreur", JOptionPane.ERROR_MESSAGE);
+		} catch (IOException e) {
+			good = false;
+			JOptionPane.showMessageDialog(null, "<html>probleme de lecture de" +
+					"<br>"+pPNCS_1+"</html>", "Erreur", JOptionPane.ERROR_MESSAGE);
+		}
+		
+		
+		// PNT
+		try {
+			ArrayList<StgMail> StgList = new ArrayList<StgMail>();
+			File f = new File(pPNTS_1);
+			Workbook wb = Workbook.getWorkbook(f);
+			Sheet sh = wb.getSheet(0);
+			StgMail h = new StgMail(sh.getRow(0),0);
+			PrintWriter P;
+
+			for (int i=1; i< sh.getRows(); i++) {
+				Cell[] c = sh.getRow(i);
+				StgList.add(new StgMail(c,i-1));
+			}
+			wb.close();
+
+			P = new PrintWriter(new FileWriter("dataExport/Liste PNT-VOL.txt"));
+			P.println(h.toString());
+
+			for (StgMail s : StgList) {
+				P.println(s.toString());
+			}
+			P.close();
+			
+		} catch (BiffException e) {
+			good = false;
+			JOptionPane.showMessageDialog(null, "<html>probleme de lecture de" +
+					"<br>"+pPNTS_1+"</html>", "Erreur", JOptionPane.ERROR_MESSAGE);
+		} catch (IOException e) {
+			good = false;
+			JOptionPane.showMessageDialog(null, "<html>probleme de lecture de" +
+					"<br>"+pPNTS_1+"</html>", "Erreur", JOptionPane.ERROR_MESSAGE);
+		}
+
+		if (good) {
+			JOptionPane.showMessageDialog(null, "<html>Operation terminée !" +
+					"<br>les fichiers sont dans dataExport/Interview/...</html>", "Termine", JOptionPane.INFORMATION_MESSAGE);
+		}
+	}
+
 	public static ArrayList<Stagiaire> chargerTousStagiairesPNC(){
 		
 		ArrayList<Stagiaire> StagiaireList = new ArrayList<Stagiaire>();
@@ -65,8 +152,9 @@ public class PasserelleStagiaire {
 				Sheet sheet = workbook.getSheet(0);
 				for (int i = 1; i < sheet.getRows()-1; i++) {
 					Cell[] cell = sheet.getRow(i);
-					StagiaireList.add(new Stagiaire(cell[4].getContents(), cell[11].getContents(), cell[5].getContents()
-							, cell[6].getContents(), cell[2].getContents(), cell[3].getContents()
+					StagiaireList.add(new Stagiaire(cell[4].getContents(), cell[11].getContents()
+							, cell[5].getContents(), cell[6].getContents()
+							, cell[2].getContents(), cell[3].getContents()
 							, cell[0].getContents(), cell[12].getContents()));
 				}
 			} catch (BiffException e) {
@@ -93,8 +181,9 @@ public class PasserelleStagiaire {
 				Sheet sheet = workbook.getSheet(0);
 				for (int i = 1; i < sheet.getRows()-1; i++) {
 					Cell[] cell = sheet.getRow(i);
-					StagiaireList.add(new Stagiaire(cell[3].getContents(), cell[9].getContents(), cell[5].getContents()
-							, cell[6].getContents(), cell[1].getContents(), cell[2].getContents()
+					StagiaireList.add(new Stagiaire(cell[3].getContents(), cell[9].getContents()
+							, cell[4].getContents(), cell[5].getContents()
+							, cell[1].getContents(), cell[2].getContents()
 							, cell[0].getContents(), cell[12].getContents()));
 				}
 			} catch (BiffException e) {
@@ -113,49 +202,48 @@ public class PasserelleStagiaire {
 	
 	public static ArrayList<Stage> ajoutPnt(ArrayList<Stage> stageList,ArrayList<Stagiaire> pntList){
 		ArrayList<Stage> newStageList = stageList;
-		ArrayList<String> stagePNTList = new ArrayList<String>();
-		stagePNTList.add("S2");
-		stagePNTList.add("QT");
-		int index;
+		String site = Config.get("app.site");
+		String s2pat = Config.get("imp.pnt.s2."+site);
+		
 		for (Stage stage : newStageList) {
-			index = -1;
-			for (int i = 0 ; i < stagePNTList.size(); i++) {
-				if(stage.getCode().startsWith(stagePNTList.get(i))){
-					index = i;
-					break;
+			if (stage.getCodeI().startsWith("S2")) {
+				int n = 0;
+				long modulo = 0;
+				for (Stagiaire stagiaire : pntList) {
+					if (stagiaire.getCodeStage().trim().matches(s2pat)) {
+						// modulo pour les S2
+						modulo = (n % stage.getIdxMax()) +1 ;
+						if (modulo == stage.getIdx()) {
+							System.out.println("Ajout PNT "+n+ " " + stagiaire.getNom() + " au stage " +stage.getCode());
+							stage.ajoutStagiaire(stagiaire);
+						}
+						n++;
+					}
 				}
 			}
-			switch (index) {
-			case 0:
+			if (stage.getCodeI().startsWith("QT")) {
+				String qtPat = null;
+				String codeStage = stage.getCodeI();
+				for (String s : codeStage.split(" ")) {
+					if (s.length() < 6) {
+						continue;
+					}
+					if (qtPat == null) {
+						qtPat = "^("+s.substring(0,2) + "." + s.substring(3,6)+".";
+					}
+					else {
+						qtPat += "|"+s.substring(0,2) + "." + s.substring(3,6)+".";
+					}
+				}
+				qtPat += ") *";
+				
 				for (Stagiaire stagiaire : pntList) {
-					if (stagiaire.getCodeStage().trim().endsWith("S2CC")) {
+					if (stagiaire.getCodeStage().matches(qtPat)) {
+						System.out.println("Ajout PNT :" + stagiaire.getNom() + ":"+stagiaire.getCodeStage()
+								+ " au stage :" + ":" +stage.getCode());
 						stage.ajoutStagiaire(stagiaire);
 					}
 				}
-				break;
-			case 1:
-				ArrayList<String> qtinfo = new ArrayList<String>();
-				String codeStage = stage.getCode();
-				String chaine = "";
-				for (int i = 0; i < codeStage.length(); i++) {
-					if(codeStage.substring(i, i+1).equalsIgnoreCase(" ")){
-						qtinfo.add(chaine);
-						chaine = "";
-					}else{
-						chaine = chaine + codeStage.substring(i, i+1);
-					}
-				}
-				qtinfo.add(chaine);
-				for (Stagiaire stagiaire : pntList) {
-					for (String string : qtinfo) {
-						if (stagiaire.getCodeStage().startsWith(string)) {
-							stage.ajoutStagiaire(stagiaire);
-						}
-					}
-				}
-				break;
-			default:
-				break;
 			}
 		}
 		
@@ -166,7 +254,7 @@ public class PasserelleStagiaire {
 		ArrayList<Stage> newStageList = stageList;
 		
 		for (Stage stage : newStageList) {
-			String strCodeStage = stage.getCode().replace(" ", "");
+			String strCodeStage = stage.getCodeI().replace(" ", "");
 			for (Stagiaire stagiaire : stagiairePNCList) {
 				String strCodeStagiaire = stagiaire.getCodeStage().replace(" ", "").trim();
 				if(strCodeStagiaire.startsWith(strCodeStage)
@@ -178,6 +266,7 @@ public class PasserelleStagiaire {
 							&& ! stage.getDateDt().before(stagiaire.getDateDeb())  
 							&& ! stage.getDateDt().after(stagiaire.getDateFin())){
 						stage.ajoutStagiaire(stagiaire);
+
 					}
 				}
 			}
@@ -193,16 +282,19 @@ public class PasserelleStagiaire {
 		
 		ArrayList<Stagiaire> newStagiaireList = StagiaireList;
 		
-		ArrayList<String> stageList = new ArrayList<String>();
+		//ArrayList<String> stageList = new ArrayList<String>();
 		ArrayList<Stagiaire> stagiaireGood = new ArrayList<Stagiaire>();
-		FileReader fichier;
+		String selDate = "";
+		//FileReader fichier;
 			try {
+				/*
 				String ligne;
 				fichier = new FileReader("dataSystem\\StageSMSPNC.txt");
 				BufferedReader reader = new BufferedReader(fichier);
 				while ((ligne = reader.readLine()) != null){
 					stageList.add(ligne);
 				}
+				*/
 				
 				//recuperation de la date de demain
 				Calendar cl=new GregorianCalendar();
@@ -212,19 +304,27 @@ public class PasserelleStagiaire {
 				}else{
 					cl.add(Calendar.DATE, 1);
 				}
-				dateDemain = new Date((cl.get(Calendar.YEAR)-1900), cl.get(Calendar.MONTH), cl.get(Calendar.DATE));
-				
+
+				dateDemain = new Date((cl.get(Calendar.YEAR)-1900), cl.get(Calendar.MONTH), cl.get(Calendar.DATE));		
+				selDate = JOptionPane.showInputDialog("Séléction de la date: ", dateFormat.format(dateDemain));
+				dateDemain = dateFormat.parse(selDate);				
+
 				for (Stagiaire stagiaire : newStagiaireList) {
 					if(dateDemain.before(stagiaire.getDateDeb()) == false && dateDemain.after(stagiaire.getDateFin()) == false){
+						/*
 						for (String string : stageList) {
 							if(stagiaire.getCodeStage().startsWith(string)){
 								stagiaireGood.add(stagiaire);
 								break;
 							}
 						}
+						*/
+						if (stagiaire.getCodeStage().matches(Config.get("exp.sms.pattern"))) {
+							stagiaireGood.add(stagiaire);
+						}
 					}
 				}
-				
+			/*	
 			} catch (FileNotFoundException e) {
 				good = false;
 				JOptionPane.showMessageDialog(null, "<html>fichier non trouvé" +
@@ -233,6 +333,11 @@ public class PasserelleStagiaire {
 				good = false;
 				JOptionPane.showMessageDialog(null, "<html>probleme de lecture de" +
 						"<br/>dataSystem\\StageSMSPNC.txt</html>", "Erreur", JOptionPane.ERROR_MESSAGE);;
+			*/
+			} catch (ParseException e) {
+				good = false;
+				JOptionPane.showMessageDialog(null, "<html>probleme de format" +
+						"<br/>de la date " + selDate + "</html>", "Erreur", JOptionPane.ERROR_MESSAGE);;
 			}
 			
 		newStagiaireList.retainAll(stagiaireGood);
@@ -245,34 +350,36 @@ public class PasserelleStagiaire {
 	private static void ecritureListeSMSxls(ArrayList<Stagiaire> StagiaireList){
 		
 			try {
-				File file = new File("dataExport\\listeSMS.xls");
+				File file = new File(pathFileSMS);
 				WritableWorkbook workbook;
 				workbook = Workbook.createWorkbook(file);
 				WritableSheet sheet = workbook.createSheet("ListeMAT", 0);
 				for (int i = 0; i < StagiaireList.size(); i++) {
 					sheet.addCell(new Label(0, i, StagiaireList.get(i).getMatricule()));
+					sheet.addCell(new Label(1, i, StagiaireList.get(i).getCodeStage()));
+					sheet.addCell(new Label(2, i, StagiaireList.get(i).getDateDebStage()));
 				}
-				workbook.write(); 
+				workbook.write();
 				workbook.close();
 			} catch (IOException e) {
 				good = false;
-				JOptionPane.showMessageDialog(null, "<html>probleme d'ecriture de" +
-						"<br/>dataExport\\listeSMS.xls", "Erreur", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null, "<html>probleme d'ecriture de<br>"+pathFileSMS,
+						"Erreur", JOptionPane.ERROR_MESSAGE);
 			} catch (RowsExceededException e) {
 				good = false;
-				JOptionPane.showMessageDialog(null, "<html>probleme d'ecriture de" +
-						"<br/>dataExport\\listeSMS.xls</html>", "Erreur", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null, "<html>probleme d'ecriture de<br>"+pathFileSMS,
+						"Erreur", JOptionPane.ERROR_MESSAGE);
 			} catch (WriteException e) {
 				good = false;
-				JOptionPane.showMessageDialog(null, "<html>probleme d'ecriture de" +
-						"<br/>dataExport\\listeSMS.xls</html>", "Erreur", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null, "<html>probleme d'ecriture de<br>"+pathFileSMS,
+						"Erreur", JOptionPane.ERROR_MESSAGE);
 			}
 
 	}//fin ecritureListeSMSxls
 
 	private static void ecritureListeTests(ArrayList<Stagiaire> stagiaireList) {
 		Hashtable<String,StringBuffer> stgMap = new Hashtable<String,StringBuffer>();
-		String pathDossier = "dataExport/Tests du "+dateFormat.format(dateDemain)+"/";
+		String pathDossier = pathDirTests+dateFormat.format(dateDemain)+"/";
 		String key = "";
 		
 		for (Stagiaire s : stagiaireList) {
@@ -307,6 +414,7 @@ public class PasserelleStagiaire {
 					"<br>"+pathDossier+key+".txt", "Erreur", JOptionPane.ERROR_MESSAGE);
 		}
 	}
+
 
 
 }//fin class
