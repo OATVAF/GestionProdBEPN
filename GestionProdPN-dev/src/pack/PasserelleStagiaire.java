@@ -303,13 +303,6 @@ public class PasserelleStagiaire {
 						stage.ajoutStagiaire(stagiaire);
 
 					}
-					else {
-						System.out.println(strCodeStage+" " + stagiaire.getMatricule()+":"+strCodeStagiaire+":"+
-								stagiaire.getDateDeb() + "=" + stage.getDateDt().before(stagiaire.getDateDeb()) + " " +
-								stagiaire.getDateFin() + "=" + stage.getDateDt().after(stagiaire.getDateFin())
-								);
-
-					}
 				}
 			}
 		}
