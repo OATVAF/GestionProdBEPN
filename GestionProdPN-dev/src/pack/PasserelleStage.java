@@ -226,6 +226,11 @@ public class PasserelleStage {
 					if(infoLigne.get(3).equalsIgnoreCase("activité") && ! infoLigne.get(4).endsWith("annulé")) {
 						Long id  = Long.parseLong(infoLigne.get(0));
 						String code = infoLigne.get(4);
+						if (code.matches("P[123].*")) {
+							code = code.replaceFirst(
+								Config.get("imp.p123.pat."+Config.get("app.site")),
+								Config.get("imp.p123.rep."+Config.get("app.site")));
+						}
 						//System.out.println(" ? "+id +"/"+code+" => " + hsCode.get(code));
 						if (hsCode.containsKey(code)) {
 							if (hsId.containsKey(id)) {
