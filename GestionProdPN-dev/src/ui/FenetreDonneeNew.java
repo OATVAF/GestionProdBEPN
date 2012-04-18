@@ -6,6 +6,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -21,7 +23,6 @@ import javax.swing.JTable;
 import javax.swing.event.ChangeListener;
 
 import java.awt.FlowLayout;
-import java.util.ArrayList;
 
 import javax.swing.ListSelectionModel;
 import javax.swing.JTabbedPane;
@@ -31,6 +32,8 @@ import pack.Stage;
 
 import data.ModelStages;
 import data.ModelStagiaires;
+import pack.Config;
+
 
 /**
  * Fenetre qui permet a l'utilisateur de modifier les données importées<br>
@@ -53,7 +56,7 @@ public class FenetreDonneeNew extends JFrame implements ActionListener {
 
 	private JPanel stagePane;//conteneur  contenant le formulaire de modification
 	private JButton stagiaireBtn;
-	private JButton modifBtn;
+	private JButton addBtn;
 	private JButton removeBtn;
 	private JButton stagesBtn;
 	private JButton addStBtn;
@@ -77,7 +80,7 @@ public class FenetreDonneeNew extends JFrame implements ActionListener {
 	private JLabel lblDate;
 	private JLabel lbl_3;
 	private JLabel lblStage;
-
+	
 	//-Dswing.defaultlaf=com.sun.java.swing.plaf.windows.WindowsLookAndFeel
 	/**
 	 * constructeur de la fenetre
@@ -93,6 +96,26 @@ public class FenetreDonneeNew extends JFrame implements ActionListener {
 		this.setLocationRelativeTo(null);
 		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
+		
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				System.out.println("Window Closing Event"); //$NON-NLS-1$
+				if (ms.isMod() || mss.isMod()) {
+					//fenetre de dialogue
+					int rep = JOptionPane.showConfirmDialog(null, Messages.getString("FenetreDonneeNew.saveMsg") //$NON-NLS-1$
+							,Messages.getString("FenetreDonneeNew.Mod"),JOptionPane.YES_NO_OPTION,
+							JOptionPane.WARNING_MESSAGE, new ImageIcon(Config.getRes("save.png"))); //$NON-NLS-1$
+					//si la reponse est "oui"
+					if(rep == JOptionPane.YES_OPTION) {
+						ms.saveStages();
+						JOptionPane.showMessageDialog(null, Messages.getString("FenetreDonneeNew.savedMsg"), Messages.getString("FenetreDonneeNew.saveTitle"), JOptionPane.INFORMATION_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+					}
+
+				}
+			}
+		});
+
 		//construction du contentPane
 		constructionContentPane();
 		
@@ -159,7 +182,6 @@ public class FenetreDonneeNew extends JFrame implements ActionListener {
 			    }});
 		centerPane.add(tabbedPane, BorderLayout.CENTER);
 		
-
 		//construction du stagePane
 		stagePane = new JPanel();
 		stagePane.setBackground(Color.WHITE);
@@ -199,13 +221,13 @@ public class FenetreDonneeNew extends JFrame implements ActionListener {
 		stagiaireBtn.setPreferredSize(new Dimension(200, 35));
 		stagiaireBtn.addActionListener(this);
 		btnPane.add(stagiaireBtn);
-		modifBtn = new JButton(Messages.getString("FenetreDonneeNew.Save")); //$NON-NLS-1$
-		modifBtn.setIcon(new ImageIcon(Messages.getString("FenetreDonneeNew.saveImg"))); //$NON-NLS-1$
-		modifBtn.setPreferredSize(new Dimension(200, 35));
-		modifBtn.addActionListener(this);
-		btnPane.add(modifBtn);
+		addBtn = new JButton(Messages.getString("FenetreDonneeNew.Add")); //$NON-NLS-1$
+		addBtn.setIcon(new ImageIcon(Config.getRes("modif.png"))); //$NON-NLS-1$
+		addBtn.setPreferredSize(new Dimension(200, 35));
+		addBtn.addActionListener(this);
+		btnPane.add(addBtn);
 		removeBtn = new JButton(Messages.getString("FenetreDonneeNew.Remove")); //$NON-NLS-1$
-		removeBtn.setIcon(new ImageIcon(Messages.getString("FenetreDonneeNew.remImg"))); //$NON-NLS-1$
+		removeBtn.setIcon(new ImageIcon(Config.getRes("remove.png"))); //$NON-NLS-1$
 		removeBtn.setPreferredSize(new Dimension(200, 35));
 		removeBtn.addActionListener(this);
 		btnPane.add(removeBtn);
@@ -234,7 +256,7 @@ public class FenetreDonneeNew extends JFrame implements ActionListener {
 		infoPane.add(lblStage);
 
 		tableStagiaires = new JTable();
-		tableStagiaires.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		tableStagiaires.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		mss = new ModelStagiaires(tableStagiaires);
 		scrollPane_1 = new JScrollPane(tableStagiaires);
 		stagiairesPane.add(scrollPane_1, BorderLayout.CENTER);
@@ -248,12 +270,12 @@ public class FenetreDonneeNew extends JFrame implements ActionListener {
 		stagesBtn.addActionListener(this);
 		btnPane2.add(stagesBtn);
 		addStBtn = new JButton(Messages.getString("FenetreDonneeNew.Add")); //$NON-NLS-1$
-		addStBtn.setIcon(new ImageIcon(Messages.getString("FenetreDonneeNew.saveImg"))); //$NON-NLS-1$
+		addStBtn.setIcon(new ImageIcon(Config.getRes("modif.png"))); //$NON-NLS-1$
 		addStBtn.setPreferredSize(new Dimension(200, 35));
 		addStBtn.addActionListener(this);
 		btnPane2.add(addStBtn);
 		remStBtn = new JButton(Messages.getString("FenetreDonneeNew.Remove")); //$NON-NLS-1$
-		remStBtn.setIcon(new ImageIcon(Messages.getString("FenetreDonneeNew.remImg"))); //$NON-NLS-1$
+		remStBtn.setIcon(new ImageIcon(Config.getRes("remove.png"))); //$NON-NLS-1$
 		remStBtn.setPreferredSize(new Dimension(200, 35));
 		remStBtn.addActionListener(this);
 		btnPane2.add(remStBtn);
@@ -274,17 +296,25 @@ public class FenetreDonneeNew extends JFrame implements ActionListener {
 			ms.selDate((String) dateBox.getSelectedItem());
 		}
 		
-		//si le bouton est le bouton du choix de la date
+		//si le bouton est le bouton add Stagiaire
 		if (source.equals(addStBtn)) {
 			mss.newStagiaire();
 		}
 		
 		//si le bouton est le bouton du choix du stage
 		if (source.equals(remStBtn)) {
-			mss.remStagiaire();
+			int rep = JOptionPane.NO_OPTION;
+			//fenetre de dialogue
+			rep = JOptionPane.showConfirmDialog(null, "<html>Supprimer les stagiaires sélectionnés du "+ms.filterDate+" ?</html>"
+					,Messages.getString("FenetreDonneeNew.Mod"),JOptionPane.YES_NO_OPTION); //$NON-NLS-1$
+			//si la reponse est "oui"
+			if(rep == JOptionPane.YES_OPTION) {
+				mss.removeSelectedStagiaires();
+			}
 		}
 
 		//si le bouton est le bouton d'enregistrement
+		/*
 		if(source.equals(modifBtn)){
 			//fenetre de dialogue
 			int rep = JOptionPane.showConfirmDialog(null, Messages.getString("FenetreDonneeNew.saveMsg") + //$NON-NLS-1$
@@ -296,6 +326,7 @@ public class FenetreDonneeNew extends JFrame implements ActionListener {
 				JOptionPane.showMessageDialog(null, Messages.getString("FenetreDonneeNew.savedMsg"), Messages.getString("FenetreDonneeNew.saveTitle"), JOptionPane.INFORMATION_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
+		*/
 		
 		//si le bouton est le bouton de l'affichage des stages
 		if(source.equals(stagesBtn)){
@@ -307,26 +338,21 @@ public class FenetreDonneeNew extends JFrame implements ActionListener {
 			tabbedPane.setSelectedIndex(1);
 		}
 
+		//si le bouton est le bouton add Stage
+		if (source.equals(addBtn)) {
+			ms.newStage();
+		}
+
+
 		//si le bouton est le bouton de la suppression de stage
 		if(source.equals(removeBtn)){
 			int rep = JOptionPane.NO_OPTION;
 			//fenetre de dialogue
-			Stage s = ms.getSelectedStage();
-			ArrayList<Stage> sl = ms.getSelectedStages();
-			if (sl.size() == 1) {
-				rep = JOptionPane.showConfirmDialog(null, "<html>Supprimer le stage "+s.getCode()+" du "+ms.filterDate+" ?<br>" +
-					"les modifications seront definitives !</html>"
+			rep = JOptionPane.showConfirmDialog(null, "<html>Supprimer les stages sélectionnés du "+ms.filterDate+" ?"
 					,Messages.getString("FenetreDonneeNew.Mod"),JOptionPane.YES_NO_OPTION); //$NON-NLS-1$
-			}
-			else {
-				rep = JOptionPane.showConfirmDialog(null, "<html>Supprimer les stages séléctionnés du "+ms.filterDate+" ?<br>" +
-						"les modifications seront definitives !</html>"
-						,Messages.getString("FenetreDonneeNew.Mod"),JOptionPane.YES_NO_OPTION); //$NON-NLS-1$
-			}
 			//si la reponse est "oui"
 			if(rep == JOptionPane.YES_OPTION) {
-				ms.removeStages(sl);
-				//ms.saveStages();
+				ms.removeSelectedStages();
 				//JOptionPane.showMessageDialog(null, "<html>Suppresion réussi !</html>", "Suppression", JOptionPane.INFORMATION_MESSAGE);
 			}
 		}

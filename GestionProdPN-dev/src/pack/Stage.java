@@ -34,7 +34,11 @@ public class Stage implements Serializable /*,Cloneable*/ {
 	 * constructeur par defaut
 	 */
 	public Stage(){
-		//nothing
+		moduleList = new ArrayList<Module>();
+		stagiaireList = new ArrayList<Stagiaire>();
+		this.idx = 0;
+		this.idxMax = 0;
+		this.setCoStage(null);
 	}
 	
 	/**
@@ -55,7 +59,6 @@ public class Stage implements Serializable /*,Cloneable*/ {
 		this.idxMax = 0;
 		this.setCoStage(null);
 		affectationInfoStage();
-		
 	}//fin Stage(Module unModule)
 	
 	/*
@@ -102,6 +105,7 @@ public class Stage implements Serializable /*,Cloneable*/ {
 		for (Module m: moduleList) {
 			m.setCodeStage(getCode());
 		}
+		affectationInfoStage();
 	}
 	/**
 	 * getter de code
@@ -275,6 +279,10 @@ public class Stage implements Serializable /*,Cloneable*/ {
 		stagiaireList.remove(st);
 	}
 	
+	public void supprimerStagiaire(ArrayList<Stagiaire> sl){
+		stagiaireList.removeAll(sl);
+	}
+
 	/**
 	 * procedure triant les stagiaire par ordre alphabetique
 	 */

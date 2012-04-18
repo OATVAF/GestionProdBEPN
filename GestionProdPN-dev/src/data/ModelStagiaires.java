@@ -26,6 +26,8 @@ public class ModelStagiaires extends AbstractTableModel {
 	private TableModelSorter sorter;
 	private JTable table;
 
+	private boolean mod = false;
+	
 	private static final int[][] colWidths = { 
 			{ 40, 50, 50},
 			{ 80,200,150},
@@ -90,22 +92,34 @@ public class ModelStagiaires extends AbstractTableModel {
     }
 	
 	public void newStagiaire() {
-		Stagiaire st = new Stagiaire("xxx", stage.getCode(), stage.getDateStr(), stage.getDateStr(), "NNN", "ppp", "-", "-");
+		Stagiaire st = new Stagiaire("_MATR_", stage.getCode(), stage.getDateStr(), stage.getDateStr(), "_NOM_", "_PRENOM_", "-", "-");
 		stage.ajoutStagiaire(st);
+        setMod(true);
 		fireTableDataChanged();
 	}
 	
-	public void remStagiaire() {
-		int idx;
-    	idx = table.getSelectedRow();
-    	if (idx >= 0) {
-    		int id2 = sorter.modelIndex(idx);
-    		Stagiaire st = stagiaires.get(id2);
-    		stage.supprimerStagiaire(st);
-       	}
+	
+    public ArrayList<Stagiaire> getSelectedStagiaires() {
+    	ArrayList<Stagiaire> sl = new ArrayList<Stagiaire>();
+    	int[] idx = table.getSelectedRows();
+    	for (int i : idx) {
+    		if (i >= 0) {
+    			sl.add(stagiaires.get(sorter.modelIndex(i)));
+    		}
+    	}
+    	return sl;
+    }
+
+	public void removeStagiaires(ArrayList<Stagiaire> sl) {
+		stage.supprimerStagiaire(sl);
+		setMod(true);
 		fireTableDataChanged();
 	}
 	
+	public void removeSelectedStagiaires() {
+    	removeStagiaires(getSelectedStagiaires());
+	}
+
 	/**
 	 * retourne la valeur de la case du tableau dont les coordonnées sont passés en paramétre
 	 */
@@ -170,6 +184,7 @@ public class ModelStagiaires extends AbstractTableModel {
                 default:
                     System.out.println("[ERR] ModelStagiaires.setValueAt("+columnIndex+")");
             }
+            setMod(true);
             System.out.println("Set Value " + columnIndex + " of " + rowIndex);
         }
     }
@@ -182,5 +197,13 @@ public class ModelStagiaires extends AbstractTableModel {
                 return Object.class;
         }
     }
+
+	public boolean isMod() {
+		return mod;
+	}
+
+	public void setMod(boolean mod) {
+		this.mod = mod;
+	}
 
 }//fin class

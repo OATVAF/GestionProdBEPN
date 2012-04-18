@@ -9,6 +9,7 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.JTable;
 import javax.swing.UIManager;
 
+import pack.Module;
 import pack.PasserelleStage;
 import pack.Stage;
 import ui.TableModelSorter;
@@ -28,6 +29,8 @@ public class ModelStages extends AbstractTableModel
 	private TableModelSorter sorter;
 	private JTable table;
 	public String filterDate;
+	
+	private boolean mod = false;
 	
     private static final String[] entetes = {"Cie", "Code" , "Libellé", "Leader", "Salle", "Heure"};
     
@@ -129,6 +132,7 @@ public class ModelStages extends AbstractTableModel
 	    	case 2:
 	    	case 3:
 	    	case 4:
+	    	case 5:
 	    		write=true;
     	}
     	return write;
@@ -154,10 +158,13 @@ public class ModelStages extends AbstractTableModel
                    break;
                 case 4:
                 	stage.getFirstModule().setSalle((String)aValue);
+                case 5:
+                	stage.getFirstModule().setHeureDebut((String)aValue);
                	break;
                 default:
                     System.out.println("[ERR] ModelStages.setValueAt("+columnIndex+")");
             }
+            setMod(true);
             System.out.println("Set Value " + columnIndex + " of " + rowIndex);
         }
     }
@@ -213,6 +220,7 @@ public class ModelStages extends AbstractTableModel
     public void removeStage(Stage s) {
     	stagesAll.remove(s);
     	stages.remove(s);
+		setMod(true);
 		fireTableDataChanged();
     }
 
@@ -235,6 +243,7 @@ public class ModelStages extends AbstractTableModel
     public void removeStages(ArrayList<Stage> sl) {
     	stagesAll.removeAll(sl);
     	stages.removeAll(sl);
+		setMod(true);
 		fireTableDataChanged();
     }
 
@@ -243,6 +252,23 @@ public class ModelStages extends AbstractTableModel
 		//fireTableDataChanged();
     }
 
+	public void newStage() {
+		Module m = new Module((long) 0, "_CODE_", "_LIB_", filterDate, "08:00", "10:00");
+		Stage s = new Stage(m);
+		s.setCompagnie("AFR");
+		stagesAll.add(s);
+		stages.add(s);
+        setMod(true);
+		fireTableDataChanged();
+	}
+
+	public boolean isMod() {
+		return mod;
+	}
+
+	public void setMod(boolean mod) {
+		this.mod = mod;
+	}
 }
 
 /*

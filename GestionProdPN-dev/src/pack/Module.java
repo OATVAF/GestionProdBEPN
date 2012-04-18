@@ -102,12 +102,20 @@ public class Module implements Serializable{
 		return heureDebut;
 	}
 	
+	public void setHeureDebut(String heureDebut) {
+		this.heureDebut=heureDebut;
+	}
+
 	/**
 	 * getter de  heureFin
 	 * @return heurefin
 	 */
 	public String getHeureFin() {
 		return heureFin;
+	}
+	
+	public void setHeureFin(String heureFin) {
+		this.heureFin=heureFin;
 	}
 
 	/**
