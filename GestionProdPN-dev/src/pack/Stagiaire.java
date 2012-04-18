@@ -1,5 +1,7 @@
 package pack;
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -21,6 +23,9 @@ public class Stagiaire implements Serializable{
 	private String spe;
 	private String comment;
 	
+	private static SimpleDateFormat fmt1 = new SimpleDateFormat("dd/MM/yyyy");
+	private static SimpleDateFormat fmt2 = new SimpleDateFormat("dd/MM/yy");
+
 	/**
 	 * constructeur
 	 * @param unMat
@@ -32,20 +37,20 @@ public class Stagiaire implements Serializable{
 	 * @param uneSpe
 	 * @param unSecteur
 	 */
-	public Stagiaire(String unMat,String unCodeStage ,String dateDeb,String datefin,
+	public Stagiaire(String unMat,String unCodeStage ,String dateDeb, String dateFin,
 						String unNom,String unprenom,String uneSpe,String unSecteur){
 		
 		this.matricule = unMat;
 		this.codeStage = unCodeStage;
-		this.dateDebStage = dateDeb;
-		this.dateFinStage = datefin;
+		this.dateDebStage = fmt1.format(convDate(dateDeb));
+		this.dateFinStage = fmt1.format(convDate(dateFin));
 		this.nom = unNom;
 		this.prenom = unprenom;
 		this.spe = uneSpe;
 		this.comment = unSecteur;
 		
 	}//fin Stagiaire()
-	
+		
 	/**
 	 * getter de matricule
 	 * @return
@@ -146,36 +151,36 @@ public class Stagiaire implements Serializable{
 		
 	}//fin getInfo()
 	
+	private Date convDate(String D) {
+		Date r = null;
+		try {
+			if (D.length() > 9) {
+				r = fmt1.parse(D);
+			}
+			else {
+				r = fmt2.parse(D);
+			}
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return r;
+	}
+
 	/**
 	 * fonction retournant la date de debut de stage en format Date
 	 * @return
 	 */
-	@SuppressWarnings("deprecation")
 	public Date getDateDeb(){
-		//recuperation du jour, du mois, de l'année
-		int year = Integer.parseInt(dateDebStage.substring(6, 10))-1900;
-		int mois = Integer.parseInt(dateDebStage.substring(3, 5))-1;
-		int day = Integer.parseInt(dateDebStage.substring(0, 2));
-		//creation de la date
-		Date date = new Date(year,mois,day);
-		//retour
-		return date;
+		return convDate(dateDebStage);
 	}//fin getDateDeb()
 	
 	/**
 	 * fonction retournant la date de fin de stage en format Date
 	 * @return
 	 */
-	@SuppressWarnings("deprecation")
 	public Date getDateFin(){
-		//recuperation du jour, du mois, de l'année
-		int year = Integer.parseInt(dateFinStage.substring(6, 10))-1900;
-		int mois = Integer.parseInt(dateFinStage.substring(3, 5))-1;
-		int day = Integer.parseInt(dateFinStage.substring(0, 2));
-		//creation de la date
-		Date date = new Date(year,mois,day);
-		//retour
-		return date;
+		return convDate(dateFinStage);
 		
 	}//fin getDateFin()
 
