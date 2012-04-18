@@ -152,8 +152,9 @@ public class PasserelleStagiaire {
 				Sheet sheet = workbook.getSheet(0);
 				for (int i = 1; i < sheet.getRows()-1; i++) {
 					Cell[] cell = sheet.getRow(i);
-					StagiaireList.add(new Stagiaire(cell[4].getContents(), cell[11].getContents(), cell[5].getContents()
-							, cell[6].getContents(), cell[2].getContents(), cell[3].getContents()
+					StagiaireList.add(new Stagiaire(cell[4].getContents(), cell[11].getContents()
+							, cell[5].getContents(), cell[6].getContents()
+							, cell[2].getContents(), cell[3].getContents()
 							, cell[0].getContents(), cell[12].getContents()));
 				}
 			} catch (BiffException e) {
@@ -180,8 +181,9 @@ public class PasserelleStagiaire {
 				Sheet sheet = workbook.getSheet(0);
 				for (int i = 1; i < sheet.getRows()-1; i++) {
 					Cell[] cell = sheet.getRow(i);
-					StagiaireList.add(new Stagiaire(cell[3].getContents(), cell[9].getContents(), cell[5].getContents()
-							, cell[6].getContents(), cell[1].getContents(), cell[2].getContents()
+					StagiaireList.add(new Stagiaire(cell[3].getContents(), cell[9].getContents()
+							, cell[4].getContents(), cell[5].getContents()
+							, cell[1].getContents(), cell[2].getContents()
 							, cell[0].getContents(), cell[12].getContents()));
 				}
 			} catch (BiffException e) {
@@ -264,6 +266,7 @@ public class PasserelleStagiaire {
 							&& ! stage.getDateDt().before(stagiaire.getDateDeb())  
 							&& ! stage.getDateDt().after(stagiaire.getDateFin())){
 						stage.ajoutStagiaire(stagiaire);
+
 					}
 				}
 			}

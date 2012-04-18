@@ -2,6 +2,8 @@ package pack;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -22,6 +24,7 @@ public class Stage implements Serializable /*,Cloneable*/ {
 	private String code;
 	private Integer idx, idxMax;
 	private String date;
+	private Date dateD;
 	private String libelle;
 	private int maxiPresent;
 	private String leader;
@@ -29,6 +32,8 @@ public class Stage implements Serializable /*,Cloneable*/ {
 	private ArrayList<Module> moduleList;
 	private ArrayList<Stagiaire> stagiaireList;
 	private Stage coStage;
+	
+	private SimpleDateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
 	
 	/**
 	 * constructeur par defaut
@@ -51,6 +56,12 @@ public class Stage implements Serializable /*,Cloneable*/ {
 		stagiaireList = new ArrayList<Stagiaire>();
 		this.code = unModule.getCodeStage();
 		this.date = unModule.getDate();
+		try {
+			this.dateD = fmt.parse(date);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		this.leader = unModule.getNomLeader();
 		this.compagnie = unModule.getCompagnie();
 		unModule.setStage(this);
@@ -128,6 +139,12 @@ public class Stage implements Serializable /*,Cloneable*/ {
 	 */
 	public void setDate(String date) {
 		this.date = date;
+		try {
+			this.dateD = fmt.parse(date);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -142,16 +159,8 @@ public class Stage implements Serializable /*,Cloneable*/ {
 	 * retourne la date sous le format date
 	 * @return
 	 */
-	@SuppressWarnings("deprecation")
 	public Date getDateDt() {
-		//recuperation de chaque élément de la date
-		int year = Integer.parseInt(date.substring(6, 10))-1900;
-		int mois = Integer.parseInt(date.substring(3, 5))-1;
-		int day = Integer.parseInt(date.substring(0, 2));
-		//formation de la date
-		Date newdate = new Date(year,mois,day);
-		//retour
-		return newdate;
+		return dateD;
 	}//fin getDateDt()
 	
 	/**
