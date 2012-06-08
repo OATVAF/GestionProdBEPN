@@ -6,6 +6,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -57,13 +58,20 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 	
 	private boolean TVall = false;
 			
+	private int nextStartsIn = 0;
+	private Process pptProc;
+	private String pptExe;
+	private String pptFile;
+	
 	/**
 	 * constructeur
 	 */
 	public FenetreTVAffichage(){
 		
 		TVall = Config.get("aff.TV").equals("all");
-		
+		pptExe = Config.get("aff.cheminpptexe");
+		pptFile = Config.get("aff.ppt");
+
 		//recuperation de la date d'aujourd'hui
 		dateActuelle = new Date();
 		
@@ -108,6 +116,29 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 		run = true;
 		
 	}//fin start()
+	
+	private void startDiapo() {
+		//recherche de l'executable de powerpoint
+		Runtime x = Runtime.getRuntime();
+		String[] args = { pptExe, "/s", pptFile };
+		//execution du diaporama
+		try {
+			stopDiapo();
+			System.out.println("Starts Diapo proc : " + args);
+			pptProc = x.exec(args);
+		} catch (IOException e1) {
+			//boite de dialogue d'erreur
+			JOptionPane.showMessageDialog(null, "soit le chemin vers powerpnt.exe est incorrect ! soit le ppt n'est pas nommé TVAFFPPT.ppt !", "Erreur", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+	
+	private void stopDiapo() {
+		if (pptProc != null) {
+			System.out.println("Stop Diapo proc");
+			pptProc.destroy();
+			pptProc = null;
+		}
+	}
 	
 	/**
 	 * procedure qui construit le contentPane
@@ -292,6 +323,8 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 		centerPane.add(stagePane,BorderLayout.CENTER);
 		stageLabels = new JLabel[NBAFF][5];
 		
+		nextStartsIn = 9999;
+		
 		if (TVall == false) {
 			//list qui retient les stages a enlever
 			ArrayList<Stage> removeStage = new ArrayList<Stage>();
@@ -300,9 +333,20 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 					//enleve les stages qui sont debutés depuis plus de NBMIN minutes
 					removeStage.add(unstage);
 				}
+				else {
+					int d = unstage.getnbMin()-nbmin;
+					if( (d>0) && (d<nextStartsIn)) {
+						nextStartsIn = d;
+					}
+				}
 			}//fin pour
 			//suppression des stages a enlever de l'affichage
 			StageList.removeAll(removeStage);
+		}
+		
+		if (nextStartsIn > NBMIN) {
+			System.out.println("Next Starts In : "+ nextStartsIn);
+			startDiapo();
 		}
 		
 		//affichage
