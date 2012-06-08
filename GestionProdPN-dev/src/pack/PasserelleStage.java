@@ -177,6 +177,8 @@ public class PasserelleStage {
 		Map<Long, Integer> hsId = new HashMap<Long, Integer>();
 		Map<String, Stage> hsStages = new HashMap<String,Stage>();
 		
+		String site = Config.get("app.site");
+		
 			try {
 				fichier = new FileReader(pathExport);
 				BufferedReader reader = new BufferedReader(fichier);
@@ -228,8 +230,8 @@ public class PasserelleStage {
 						String code = infoLigne.get(4);
 						if (code.matches("P[123].*")) {
 							code = code.replaceFirst(
-								Config.get("imp.p123.pat."+Config.get("app.site")),
-								Config.get("imp.p123.rep."+Config.get("app.site")));
+								Config.get("imp.p123.pat."+site),
+								Config.get("imp.p123.rep."+site));
 						}
 						//System.out.println(" ? "+id +"/"+code+" => " + hsCode.get(code));
 						if (hsCode.containsKey(code)) {
@@ -253,7 +255,13 @@ public class PasserelleStage {
 						
 						newmodule.setCompagnie(infoLigne.get(7));
 						if(infoLigne.get(2).equalsIgnoreCase("salle")){
-							newmodule.setSalle("Salle "+infoLigne.get(1));
+							String salle = "Salle "+infoLigne.get(1);
+							String s = salle.substring(salle.lastIndexOf(" ")+1);
+							String n = Config.get("salle."+site+"."+s);
+							if (n != null) {
+								salle = n;
+							}
+							newmodule.setSalle(salle);
 						}
 						if(infoLigne.get(2).equalsIgnoreCase("moyen-bepn")){
 							newmodule.setSalle(infoLigne.get(1));
@@ -315,7 +323,7 @@ public class PasserelleStage {
 					if(indexmod == -1){
 						//module.setCodeStage(stage.getCode());
 						stage.ajoutModule(module);
-						System.out.println(" +"+stage.getCode()+" Add Module:" + module.getLibelle() + " L:" + module.getNomLeader()+"/"+stage.getLeader() + " s:"+module.getStage());
+						System.out.println(" +"+stage.getCode()+" Add Module:" + module.getLibelle() + "S:" + module.getSalle() + " L:" + module.getNomLeader()+"/"+stage.getLeader() + " s:"+module.getStage());
 					}
 				}
 			}
