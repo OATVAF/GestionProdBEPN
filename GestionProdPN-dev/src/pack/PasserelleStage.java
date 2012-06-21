@@ -237,6 +237,10 @@ public class PasserelleStage {
 								Config.get("imp.p123.pat."+site),
 								Config.get("imp.p123.rep."+site));
 						}
+						// 4S
+						if (!code.matches(filterCancelPat)) {
+							code = code.replaceAll(Config.get("imp.delia.s2.pat"), "$1");
+						}
 						//System.out.println(" ? "+id +"/"+code+" => " + hsCode.get(code));
 						if (hsCode.containsKey(code)) {
 							if (hsId.containsKey(id)) {
@@ -341,7 +345,6 @@ public class PasserelleStage {
 				|| module.getCodeStage().equalsIgnoreCase("non instruction")
 				|| module.getCodeStage().equalsIgnoreCase("mts")){
 				*/
-				boolean m = module.getCodeStage().matches(filterCancelPat);
 				if ( (filterCancel && module.getCodeStage().matches(filterCancelPat))
 						|| module.getCodeStage().matches(filterPat) ) {
 					System.out.println("- "+module.getCodeStage());
