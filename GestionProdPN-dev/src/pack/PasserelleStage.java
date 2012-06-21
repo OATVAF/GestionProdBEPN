@@ -26,7 +26,9 @@ public class PasserelleStage {
 	private static boolean good;
 	private static final String pathObj = Config.get("data.obj");
 	private static final String pathExport = Config.get("imp.delia");
-	
+	private static final String filterPat = Config.get("imp.delia.filter.stage");
+	private static final boolean filterCancel = Config.getB("imp.delia.filter.cancel");
+	private static final String filterCancelPat = Config.get("imp.delia.filter.cancel.pat");
 	/**
 	 * procedure de mise a jour des stages
 	 * fait l'importation des données de delia
@@ -46,7 +48,9 @@ public class PasserelleStage {
 		stageExportList = importExportDelia();
 		
 		Date dateactuelle = new Date();
-		if(stageExportList.get(0).getDateDt().equals(dateactuelle) || stageExportList.get(0).getDateDt().before(dateactuelle)){
+		if(!Config.getB("imp.test") && 
+				(stageExportList.get(0).getDateDt().equals(dateactuelle) || stageExportList.get(0).getDateDt().before(dateactuelle)) )
+		{
 			JOptionPane.showMessageDialog(null, "<html>ERREUR ! la date des stages que vous essayez d'importer n'est pas celle de demain !<br> veuillez refaire l'exportation DELIA</html>"
 					,"Erreur",JOptionPane.YES_NO_OPTION);
 		}else{
@@ -225,7 +229,7 @@ public class PasserelleStage {
 					infoLigne.add(chaine.trim());//recup de la derniere information
 
 					//ajout des modules
-					if(infoLigne.get(3).equalsIgnoreCase("activité") && ! infoLigne.get(4).endsWith("annulé")) {
+					if(infoLigne.get(3).equalsIgnoreCase("activité")) {
 						Long id  = Long.parseLong(infoLigne.get(0));
 						String code = infoLigne.get(4);
 						if (code.matches("P[123].*")) {
@@ -327,15 +331,22 @@ public class PasserelleStage {
 					}
 				}
 			}
+
 			// nouveau stage 
 			if(! good){
 				// filter
+				/*
 				if(module.getCodeStage().equalsIgnoreCase("dry")
 				|| module.getCodeStage().equalsIgnoreCase("réserve")
 				|| module.getCodeStage().equalsIgnoreCase("non instruction")
 				|| module.getCodeStage().equalsIgnoreCase("mts")){
+				*/
+				boolean m = module.getCodeStage().matches(filterCancelPat);
+				if ( (filterCancel && module.getCodeStage().matches(filterCancelPat))
+						|| module.getCodeStage().matches(filterPat) ) {
+					System.out.println("- "+module.getCodeStage());
 					//nothing
-				}else{
+				} else {
 					Stage s = new Stage(module);
 					s.setIdx(hsId.get(s.getId()), hsCode.get(s.getCodeI()));
 					stageExportList.add(s);
