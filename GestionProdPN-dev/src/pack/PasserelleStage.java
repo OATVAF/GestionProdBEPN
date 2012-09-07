@@ -282,7 +282,7 @@ public class PasserelleStage {
 							}
 						}
 						if(infoLigne.get(2).equalsIgnoreCase("intervenant")){
-							newmodule.setNomAide(infoLigne.get(1));
+							newmodule.setNomIntervenant(infoLigne.get(1));
 						}
 						moduleList.add(newmodule);
 					}
@@ -325,13 +325,18 @@ public class PasserelleStage {
 					}
 					if(! module.getNomAide().equalsIgnoreCase("")){
 						mm.setNomAide(module.getNomAide());
-						//System.out.println("  "+stage.getCode()+" Mod Module:" + mm.getLibelle()+"  A:" + mm.getNomAide() + " s:"+mm.getStage());
+						//System.out.println("  "+stage.getCode()+" Mod Module:" + mm.getLibelle()+" A:" + mm.getNomAide() + " s:"+mm.getStage());
+					}
+					if(! module.getNomIntervenant().equalsIgnoreCase("") &&  
+							mm.getNomAide().equalsIgnoreCase("")) {
+						mm.setNomAide(module.getNomIntervenant());
+						System.out.println("  "+stage.getCode()+" Mod Module:" + mm.getLibelle()+" I>A:" + mm.getNomAide() + " s:"+mm.getStage());
 					}
 					//}else{
 					if(indexmod == -1){
 						//module.setCodeStage(stage.getCode());
 						stage.ajoutModule(module);
-						System.out.println(" +"+stage.getCode()+" Add Module:" + module.getLibelle() + "S:" + module.getSalle() + " L:" + module.getNomLeader()+"/"+stage.getLeader() + " s:"+module.getStage());
+						System.out.println(" +"+stage.getCode()+" Add Module:" + module.getLibelle() + " S:" + module.getSalle() + " L:" + module.getNomLeader()+"/"+stage.getLeader() + " s:"+module.getStage());
 					}
 				}
 			}

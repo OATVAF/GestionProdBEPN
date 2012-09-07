@@ -23,6 +23,7 @@ public class Module implements Serializable{
 	private String salle;
 	private String nomLeader;
 	private String nomAide;
+	private String nomIntervenant;
 	private String compagnie;
 
 	/**
@@ -44,6 +45,7 @@ public class Module implements Serializable{
 		this.setSalle("");
 		this.setNomLeader("");
 		this.setNomAide("");
+		this.setNomIntervenant("");
 	}
 	
 	public long getId() {
@@ -169,6 +171,22 @@ public class Module implements Serializable{
 		return nomAide;
 	}
 	
+	/**
+	 * setter de nomIntervenant
+	 * @param nomIntervenant
+	 */
+	public void setNomIntervenant(String nomIntervenant) {
+		this.nomIntervenant = nomIntervenant;
+	}
+
+	/**
+	 * getter de nomIntervenant
+	 * @return nomIntervenant
+	 */
+	public String getNomIntervenant() {
+		return nomIntervenant;
+	}
+
 	/**
 	 * retourne le nombre de minutes de l'heure de debut
 	 * @return nbmin
