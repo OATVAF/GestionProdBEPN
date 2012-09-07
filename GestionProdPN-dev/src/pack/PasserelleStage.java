@@ -26,7 +26,9 @@ public class PasserelleStage {
 	private static boolean good;
 	private static final String pathObj = Config.get("data.obj");
 	private static final String pathExport = Config.get("imp.delia");
-	
+	private static final String filterPat = Config.get("imp.delia.filter.stage");
+	private static final boolean filterCancel = Config.getB("imp.delia.filter.cancel");
+	private static final String filterCancelPat = Config.get("imp.delia.filter.cancel.pat");
 	/**
 	 * procedure de mise a jour des stages
 	 * fait l'importation des données de delia
@@ -46,7 +48,9 @@ public class PasserelleStage {
 		stageExportList = importExportDelia();
 		
 		Date dateactuelle = new Date();
-		if(stageExportList.get(0).getDateDt().equals(dateactuelle) || stageExportList.get(0).getDateDt().before(dateactuelle)){
+		if(!Config.getB("imp.test") && 
+				(stageExportList.get(0).getDateDt().equals(dateactuelle) || stageExportList.get(0).getDateDt().before(dateactuelle)) )
+		{
 			JOptionPane.showMessageDialog(null, "<html>ERREUR ! la date des stages que vous essayez d'importer n'est pas celle de demain !<br> veuillez refaire l'exportation DELIA</html>"
 					,"Erreur",JOptionPane.YES_NO_OPTION);
 		}else{
@@ -177,6 +181,8 @@ public class PasserelleStage {
 		Map<Long, Integer> hsId = new HashMap<Long, Integer>();
 		Map<String, Stage> hsStages = new HashMap<String,Stage>();
 		
+		String site = Config.get("app.site");
+		
 			try {
 				fichier = new FileReader(pathExport);
 				BufferedReader reader = new BufferedReader(fichier);
@@ -223,13 +229,17 @@ public class PasserelleStage {
 					infoLigne.add(chaine.trim());//recup de la derniere information
 
 					//ajout des modules
-					if(infoLigne.get(3).equalsIgnoreCase("activité") && ! infoLigne.get(4).endsWith("annulé")) {
+					if(infoLigne.get(3).equalsIgnoreCase("activité")) {
 						Long id  = Long.parseLong(infoLigne.get(0));
 						String code = infoLigne.get(4);
 						if (code.matches("P[123].*")) {
 							code = code.replaceFirst(
-								Config.get("imp.p123.pat."+Config.get("app.site")),
-								Config.get("imp.p123.rep."+Config.get("app.site")));
+								Config.get("imp.p123.pat."+site),
+								Config.get("imp.p123.rep."+site));
+						}
+						// 4S
+						if (!code.matches(filterCancelPat)) {
+							code = code.replaceAll(Config.get("imp.delia.s2.pat"), "$1");
 						}
 						//System.out.println(" ? "+id +"/"+code+" => " + hsCode.get(code));
 						if (hsCode.containsKey(code)) {
@@ -253,7 +263,13 @@ public class PasserelleStage {
 						
 						newmodule.setCompagnie(infoLigne.get(7));
 						if(infoLigne.get(2).equalsIgnoreCase("salle")){
-							newmodule.setSalle("Salle "+infoLigne.get(1));
+							String salle = "Salle "+infoLigne.get(1);
+							String s = salle.substring(salle.lastIndexOf(" ")+1);
+							String n = Config.get("salle."+site+"."+s);
+							if (n != null) {
+								salle = n;
+							}
+							newmodule.setSalle(salle);
 						}
 						if(infoLigne.get(2).equalsIgnoreCase("moyen-bepn")){
 							newmodule.setSalle(infoLigne.get(1));
@@ -315,19 +331,25 @@ public class PasserelleStage {
 					if(indexmod == -1){
 						//module.setCodeStage(stage.getCode());
 						stage.ajoutModule(module);
-						System.out.println(" +"+stage.getCode()+" Add Module:" + module.getLibelle() + " L:" + module.getNomLeader()+"/"+stage.getLeader() + " s:"+module.getStage());
+						System.out.println(" +"+stage.getCode()+" Add Module:" + module.getLibelle() + "S:" + module.getSalle() + " L:" + module.getNomLeader()+"/"+stage.getLeader() + " s:"+module.getStage());
 					}
 				}
 			}
+
 			// nouveau stage 
 			if(! good){
 				// filter
+				/*
 				if(module.getCodeStage().equalsIgnoreCase("dry")
 				|| module.getCodeStage().equalsIgnoreCase("réserve")
 				|| module.getCodeStage().equalsIgnoreCase("non instruction")
 				|| module.getCodeStage().equalsIgnoreCase("mts")){
+				*/
+				if ( (filterCancel && module.getCodeStage().matches(filterCancelPat))
+						|| module.getCodeStage().matches(filterPat) ) {
+					System.out.println("- "+module.getCodeStage());
 					//nothing
-				}else{
+				} else {
 					Stage s = new Stage(module);
 					s.setIdx(hsId.get(s.getId()), hsCode.get(s.getCodeI()));
 					stageExportList.add(s);

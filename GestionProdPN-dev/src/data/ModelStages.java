@@ -160,7 +160,7 @@ public class ModelStages extends AbstractTableModel
                 	stage.getFirstModule().setSalle((String)aValue);
                 	break;
                 case 5:
-                	stage.getFirstModule().setHeureDebut((String)aValue);
+                	stage.getFirstModule().setHeureDebut(((String)aValue).replace(" ", ""));
                 	break;
                 default:
                     System.out.println("[ERR] ModelStages.setValueAt("+columnIndex+")");
