@@ -33,6 +33,15 @@ import com.itextpdf.text.pdf.PdfWriter;
  */
 public class PasserellePDF {
 	
+	private static String expDir = Config.get("pdf.expDir");
+	private static Font font    = new Font(Font.HELVETICA, 10);
+	private static Font fontB09 = new Font(Font.HELVETICA,  9, Font.BOLD);
+	private static Font fontB10 = new Font(Font.HELVETICA, 10, Font.BOLD);
+	private static Font fontB12 = new Font(Font.HELVETICA, 12, Font.BOLD);
+	private static Font fontB14 = new Font(Font.HELVETICA, 14, Font.BOLD);
+	private static Font fontB15 = new Font(Font.HELVETICA, 15, Font.BOLD);
+	private static Font fontB22 = new Font(Font.HELVETICA, 22, Font.BOLD);
+	
 	/**
 	 * creer le pdf pour la liste des stagiaires pour le stage passé en parametre
 	 * @param leStage
@@ -40,15 +49,18 @@ public class PasserellePDF {
 	public static void creationListeStagiaire(Stage leStage){
 		
 		//creation du dossier
+		String cfgP="pdf.stagiaires.";
 		String date = leStage.getDateStr();
 		date = date.replace("/", ".");
-		String pathDossier = "ListeStagiaire du "+date;
-		new File("dataExport\\"+pathDossier).mkdir();
+		String pathDossier = expDir+Config.get(cfgP+"dir")+date;
+		new File(pathDossier).mkdir();
+
 		
 		try {
 			//creation du document et du fichier
 			Document doc = new Document(PageSize.A4,20,20,10,0);
-			FileOutputStream fichier = new FileOutputStream("dataExport\\"+pathDossier+"\\listeStagiaire - "+leStage.getCode()+".pdf");
+			FileOutputStream fichier = new FileOutputStream(pathDossier+"/"
+					+ Config.get(cfgP+"file")+" - "+leStage.getCode()+".pdf");
 			//ouverture du writer
 			PdfWriter.getInstance(doc, fichier);
 			doc.open();
@@ -58,7 +70,7 @@ public class PasserellePDF {
 			header.setWidthPercentage(100);
 			
 			//la date
-			PdfPCell cell = new PdfPCell(new Phrase(leStage.getDateStr(),new Font(Font.HELVETICA, 14, Font.BOLD)));
+			PdfPCell cell = new PdfPCell(new Phrase(leStage.getDateStr(),fontB14));
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setBorder(0);
 			header.addCell(cell);
@@ -72,7 +84,7 @@ public class PasserellePDF {
 			header.addCell(cell);
 			
 			//le libelle du stage
-			par = new Phrase(leStage.getLibelle(),new Font(Font.HELVETICA, 14, Font.BOLD));
+			par = new Phrase(leStage.getLibelle(),fontB14);
 			cell = new PdfPCell(par);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setPadding(10);
@@ -119,12 +131,12 @@ public class PasserellePDF {
 			cell = new PdfPCell();
 			cell.setBorder(0);
 			footer.addCell(cell);
-			cell = new PdfPCell(new Phrase("Formateur : "+leStage.getLeader(),new Font(Font.HELVETICA, 12, Font.BOLD)));
+			cell = new PdfPCell(new Phrase("Formateur : "+leStage.getLeader(),fontB12));
 			cell.setColspan(2);
 			cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
 			cell.setBorder(0);
 			footer.addCell(cell);
-			cell = new PdfPCell(new Phrase(leStage.getFirstModule().getSalle(),new Font(Font.HELVETICA, 22, Font.BOLD)));
+			cell = new PdfPCell(new Phrase(leStage.getFirstModule().getSalle(),fontB22));
 			cell.setBorder(0);
 			footer.addCell(cell);
 			cell = new PdfPCell(new Phrase(leStage.getFirstModule().getLibelle(),new Font(Font.HELVETICA, 18, Font.BOLD)));
@@ -132,7 +144,7 @@ public class PasserellePDF {
 			cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			footer.addCell(cell);
-			cell = new PdfPCell(new Phrase(leStage.getFirstModule().getHeureDebut(),new Font(Font.HELVETICA, 22, Font.BOLD)));
+			cell = new PdfPCell(new Phrase(leStage.getFirstModule().getHeureDebut(),fontB22));
 			cell.setBorder(0);
 			cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
 			footer.addCell(cell);
@@ -167,77 +179,59 @@ public class PasserellePDF {
 				return;
 			}
 		}
+		String cfgP="pdf.emargement.";
+		Integer colNum = Config.getI(cfgP+"colnum");
 		String date = leStage.getDateStr();
 		date = date.replace("/", ".");
-		String pathDossier = "Emargement du "+date;
-		new File("dataExport\\"+pathDossier).mkdir();
+		String pathDossier = expDir+Config.get(cfgP+"dir")+date;
+		new File(pathDossier).mkdir();
 		
 		try {
-			
 			//creation du document
 			Document doc = new Document(PageSize.A4,10,10,10,0);
-			FileOutputStream fichier = new FileOutputStream("dataExport\\"+pathDossier+"\\listeEmargement - "+leStage.getCode()+".pdf");
+			FileOutputStream fichier = new FileOutputStream(pathDossier+"/"
+					+Config.get(cfgP+"file")+" - "+leStage.getCode()+".pdf");
 			PdfWriter.getInstance(doc, fichier);
 			doc.open();
 			
 			PdfPTable header = new PdfPTable(1);
 			header.setWidthPercentage(100);
 			
-			PdfPCell cell = new PdfPCell(new Phrase(leStage.getDateStr(),new Font(Font.HELVETICA, 12, Font.BOLD)));
+			PdfPCell cell = new PdfPCell(new Phrase(leStage.getDateStr(),fontB12));
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setBorder(0);
 			header.addCell(cell);
 
-			Phrase par = new Phrase(leStage.getCode(),new Font(Font.HELVETICA, 22, Font.BOLD));
+			Phrase par = new Phrase(leStage.getCode(),fontB22);
 			cell = new PdfPCell(par);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setPadding(5);
 			cell.setBorder(0);
 			header.addCell(cell);
 			
+			cell = new PdfPCell(new Phrase(Config.get(cfgP+"s1"), fontB10));
+			cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+			cell.setPadding(0);
+			cell.setPaddingTop(5);
+			cell.setBorder(0);
+
 			//formation du center
-			PdfPTable center = new PdfPTable(5);
+			PdfPTable center = new PdfPTable(colNum);
 			//center.setWidthPercentage(95);
 
 			float[] widths = new float[] { 1f, 8f, 1.5f, 4f, 1.5f };
+			for (int i=1; i<=colNum; i++) { widths[i-1]=Config.getF(cfgP+"col"+i+".w"); }
 			center.setWidths(widths);
 			
-			Font fontB = new Font(Font.HELVETICA, 10, Font.BOLD);
-			cell = new PdfPCell(new Phrase("",fontB));
-			cell.setBorder(0);
-			center.addCell(cell);
-			//cell = new PdfPCell(new Phrase("Stagiaire",font));
-			//cell.setBorder(0);
-			//cell.setColspan(6);
-			cell.setPhrase(new Phrase("Stagiaire",fontB));
-			center.addCell(cell);
-			//cell = new PdfPCell(new Phrase("Presence",font));
-			//cell.setBorder(0);
-			//cell.setColspan(2);
-			cell.setPhrase(new Phrase("Presence",fontB));
-			center.addCell(cell);
-			//cell = new PdfPCell(new Phrase("Emargement",font));
-			//cell.setBorder(0);
-			//cell.setColspan(4);
-			cell.setPhrase(new Phrase("Emargement",fontB));
-			center.addCell(cell);
-			//cell = new PdfPCell(new Phrase("IS.VS/MP",font));
-			//cell.setColspan(2);
-			//cell.setBorder(0);
-			cell.setPhrase(new Phrase("IS.VS/MP",fontB));
-			center.addCell(cell);
-			
+			cell = new PdfPCell(new Phrase("N",fontB10)); cell.setBorder(0);
+
+			for (int i=1; i<=5; i++) {
+				cell.setPhrase(new Phrase(Config.get(cfgP+"col"+i+".str"),fontB10));
+				center.addCell(cell);
+			}
+
 			int i;
-			Font font = new Font(Font.HELVETICA, 10);
 			// TODO SG font constante
-			/*
-			if(leStage.getSizeStagiaireList()>=20 && leStage.getSizeStagiaireList() < 25){
-				font.setSize(11);
-			}
-			if(leStage.getSizeStagiaireList()>=25){
-				font.setSize(9);
-			}
-			*/
 			for (i = 0; i < leStage.getSizeStagiaireList(); i++) {
 					cell.setPhrase(new Phrase(""+(i+1), font));
 					cell.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -246,18 +240,6 @@ public class PasserellePDF {
 					center.addCell(cell);
 					// String str = "";
 					// TODO  SG liste statique
-					/*
-					for (int j = 0; j < 5; j++) {
-						str = str + leStage.getEltStagiaireList(i).getInfo(j);
-						if(j == 1){
-							str = str+"\n";
-						}else{
-							if(j < 4){
-								str = str + "  ";
-							}
-						}
-					}//fin pour
-					*/
 					cell.setHorizontalAlignment(Element.ALIGN_LEFT);
 					PdfPTable stgCell = new PdfPTable(10);
 					center.setWidthPercentage(100);
@@ -265,7 +247,7 @@ public class PasserellePDF {
 					//str = String.format("%-20s%-20s\n%25s%10s%10s", 
 					cell.setBorder(0);
 					cell.setColspan(5);
-					cell.setPhrase(new Phrase(leStage.getEltStagiaireList(i).getInfo(0), fontB));
+					cell.setPhrase(new Phrase(leStage.getEltStagiaireList(i).getInfo(0), fontB10));
 					stgCell.addCell(cell);
 					cell.setPhrase(new Phrase(leStage.getEltStagiaireList(i).getInfo(1), font));
 					stgCell.addCell(cell);
@@ -286,21 +268,13 @@ public class PasserellePDF {
 					cell.setPhrase(new Phrase(leStage.getEltStagiaireList(i).getInfo(2), font));
 					stgCell.addCell(cell);
 					
-					//Phrase phrs = new Phrase(str, font);
-					//cell = new PdfPCell(phrs);
-					//cell.setColspan(6);
 					cell.setColspan(1);
 					center.addCell(stgCell);
 					//presence
-					//cell = new PdfPCell(new Phrase(" "));
-					//cell.setColspan(2);
 					center.addCell(" ");
 					//emargement
-					//cell.setColspan(4);
 					center.addCell(" ");
 					//isvsmp
-					//cell = new PdfPCell(new Phrase(" "));
-					//cell.setColspan(2);
 					center.addCell(" ");
 			}
 			if(i<=20){
@@ -308,24 +282,18 @@ public class PasserellePDF {
 				cell.setPhrase(new Phrase(" ", font));
 				cell.setColspan(5);
 				for (int j = i; j < 20; j++) {
-					//for (int k = 0; k < 5; k++) {
-						//Phrase phrs = new Phrase("- \n ", new Font(Font.TIMES_ROMAN, 10));
-						//cell = new PdfPCell(phrs);
-						//cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-						//cell.setPadding(4);
 						center.addCell(cell);
-					//}
 				}//fin pour
 			}//fin si
 			
 			PdfPTable footer = new PdfPTable(3);
 			footer.setWidthPercentage(75);
-			cell = new PdfPCell(new Phrase("Nombre de stagiaires :",new Font(Font.HELVETICA, 14, Font.BOLD)));
+			cell = new PdfPCell(new Phrase("Nombre de stagiaires :",fontB14));
 			cell.setColspan(3);
 			cell.setBorder(0);
 			footer.addCell(cell);
 			
-			cell = new PdfPCell(new Phrase("Prévus",new Font(Font.HELVETICA, 14, Font.BOLD)));
+			cell = new PdfPCell(new Phrase("Prévus",fontB14));
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setBorderWidthTop(0);
 			cell.setBorderWidthLeft(0);
@@ -333,7 +301,7 @@ public class PasserellePDF {
 			cell.setBorderWidthRight(1);
 			footer.addCell(cell);
 			
-			cell = new PdfPCell(new Phrase("Présents",new Font(Font.HELVETICA, 14, Font.BOLD)));
+			cell = new PdfPCell(new Phrase("Présents",fontB14));
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setBorderWidthTop(0);
 			cell.setBorderWidthLeft(1);
@@ -341,7 +309,7 @@ public class PasserellePDF {
 			cell.setBorderWidthRight(1);
 			footer.addCell(cell);
 			
-			cell = new PdfPCell(new Phrase("Maxi Présents",new Font(Font.HELVETICA, 14, Font.BOLD)));
+			cell = new PdfPCell(new Phrase("Maxi Présents",fontB14));
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setBorderWidthTop(0);
 			cell.setBorderWidthLeft(1);
@@ -349,7 +317,7 @@ public class PasserellePDF {
 			cell.setBorderWidthBottom(1);
 			footer.addCell(cell);
 			
-			cell = new PdfPCell(new Phrase(""+leStage.getSizeStagiaireList(),new Font(Font.HELVETICA, 14, Font.BOLD)));
+			cell = new PdfPCell(new Phrase(""+leStage.getSizeStagiaireList(),fontB14));
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setBorderWidthTop(1);
 			cell.setBorderWidthLeft(0);
@@ -357,7 +325,7 @@ public class PasserellePDF {
 			cell.setBorderWidthBottom(0);
 			footer.addCell(cell);
 			
-			cell = new PdfPCell(new Phrase(" ",new Font(Font.HELVETICA, 14, Font.BOLD)));
+			cell = new PdfPCell(new Phrase(" ",fontB14));
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setBorderWidthTop(1);
 			cell.setBorderWidthLeft(1);
@@ -365,7 +333,7 @@ public class PasserellePDF {
 			cell.setBorderWidthBottom(0);;
 			footer.addCell(cell);
 			
-			cell = new PdfPCell(new Phrase(""+leStage.getMaxiPresent(),new Font(Font.HELVETICA, 14, Font.BOLD)));
+			cell = new PdfPCell(new Phrase(""+leStage.getMaxiPresent(),fontB14));
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setBorderWidthTop(1);
 			cell.setBorderWidthLeft(1);
@@ -376,7 +344,7 @@ public class PasserellePDF {
 			//formateur
 			PdfPTable footer2 = new PdfPTable(1);
 			footer2.setWidthPercentage(80);
-			par = new Phrase("Formateurs : _ _ _ _ _ _ _ _ _ _ _ _ _ _ _/ "+leStage.getLeader(),new Font(Font.HELVETICA, 14, Font.BOLD));
+			par = new Phrase("Formateurs : _ _ _ _ _ _ _ _ _ _ _ _ _ _ _/ "+leStage.getLeader(),fontB14);
 			cell = new PdfPCell(par);
 			cell.setBorder(0);
 			footer2.addCell(cell);
@@ -398,41 +366,42 @@ public class PasserellePDF {
 		
 	}//fin
 	
-	public static void creationListeEmargementDIF(Stage leStage){
-		
+	public static void creationListeEmargementDIF(Stage leStage)
+	{			
+		String cfgP="pdf.emargement.";
+		Integer colNum = Config.getI(cfgP+"dif.colnum");
 		String date = leStage.getDateStr();
 		date = date.replace("/", ".");
-		String pathDossier = "Emargement du "+date;
-		new File("dataExport\\"+pathDossier).mkdir();
-		
+		String pathDossier = expDir+Config.get(cfgP+"dir")+date;
+		new File(pathDossier).mkdir();
+	
 		try {
 			
 			//creation du document
 			Document doc = new Document(PageSize.A4,10,10,10,0);
-			FileOutputStream fichier = new FileOutputStream("dataExport\\"+pathDossier+"\\listeEmargement - "+leStage.getCode()+".pdf");
+			FileOutputStream fichier = new FileOutputStream(pathDossier+"/"
+					+Config.get(cfgP+"file")+" - "+leStage.getCode()+".pdf");
 			PdfWriter.getInstance(doc, fichier);
 			doc.open();
+			
+			cfgP=cfgP+"dif.";
 			
 			PdfPTable header = new PdfPTable(1);
 			header.setWidthPercentage(100);
 			
-			PdfPCell cell = new PdfPCell(new Phrase(leStage.getDateStr(),new Font(Font.HELVETICA, 12, Font.BOLD)));
+			PdfPCell cell = new PdfPCell(new Phrase(leStage.getDateStr(),fontB12));
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setBorder(0);
 			header.addCell(cell);
 
-			Phrase par = new Phrase(leStage.getCode(),new Font(Font.HELVETICA, 22, Font.BOLD));
+			Phrase par = new Phrase(leStage.getCode(),fontB22);
 			cell = new PdfPCell(par);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setPadding(5);
 			cell.setBorder(0);
 			header.addCell(cell);
 	
-			Font font   = new Font(Font.HELVETICA, 10);
-			Font fontB  = new Font(Font.HELVETICA, 10, Font.BOLD);
-			Font fontB2 = new Font(Font.HELVETICA, 12, Font.BOLD);
-
-			cell = new PdfPCell(new Phrase(" DIF : Formation éligible au titre du DIF (*)", fontB));
+			cell = new PdfPCell(new Phrase(Config.get(cfgP+"s1"), fontB10));
 			cell.setHorizontalAlignment(Element.ALIGN_LEFT);
 			cell.setPadding(0);
 			cell.setPaddingTop(5);
@@ -444,32 +413,39 @@ public class PasserellePDF {
 			center.setWidthPercentage(98);
 
 			float[] widths = new float[] { 0.8f, 8f, 1.5f, 4f, 4f, 1f, 1.5f };
+			for (int i=1; i<=colNum; i++) { widths[i-1]=Config.getF(cfgP+"col"+i+".w"); }
 			center.setWidths(widths);
 			
 			cell.setPadding(0);
 			cell.setPaddingTop(0);
 			cell.setPaddingBottom(0);
 
-			cell = new PdfPCell(new Phrase("N",fontB)); cell.setBorder(0);
+			cell = new PdfPCell(new Phrase("N",fontB10)); cell.setBorder(0);
 			cell.setColspan(3);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-			cell.setPhrase(new Phrase("",fontB));				center.addCell(cell);		
+			cell.setPhrase(new Phrase("",fontB10));				center.addCell(cell);		
 			cell.setColspan(1);
-			cell.setPhrase(new Phrase("Emargement",fontB));		center.addCell(cell);
+			cell.setPhrase(new Phrase("Emargement",fontB10));		center.addCell(cell);
 			cell.setColspan(3);
-			cell.setPhrase(new Phrase("",fontB));				center.addCell(cell);		
+			cell.setPhrase(new Phrase("",fontB10));				center.addCell(cell);		
 			cell.setColspan(1);
 
 			cell.setHorizontalAlignment(Element.ALIGN_LEFT);
-			cell.setPhrase(new Phrase("",fontB));				center.addCell(cell);		
-			cell.setPhrase(new Phrase("Stagiaire",fontB));		center.addCell(cell);
-			cell.setPhrase(new Phrase("Pres.",fontB));			center.addCell(cell);
-			cell.setPhrase(new Phrase("Matin",fontB));		center.addCell(cell);
-			cell.setPhrase(new Phrase("Après-Midi",fontB));		center.addCell(cell);
+			for (int i=1; i<=colNum; i++) {
+					cell.setPhrase(new Phrase(Config.get(cfgP+"col"+i+".str"),fontB10));
+					center.addCell(cell);				
+			}
+			/*
+			cell.setPhrase(new Phrase("",fontB10));				center.addCell(cell);		
+			cell.setPhrase(new Phrase("Stagiaire",fontB10));		center.addCell(cell);
+			cell.setPhrase(new Phrase("Pres.",fontB10));			center.addCell(cell);
+			cell.setPhrase(new Phrase("Matin",fontB10));		center.addCell(cell);
+			cell.setPhrase(new Phrase("Après-Midi",fontB10));		center.addCell(cell);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-			cell.setPhrase(new Phrase("DIF",fontB));			center.addCell(cell);
-			cell.setPhrase(new Phrase("IS.VS",fontB));			center.addCell(cell);
-
+			cell.setPhrase(new Phrase("DIF",fontB10));			center.addCell(cell);
+			cell.setPhrase(new Phrase("IS.VS",fontB10));			center.addCell(cell);
+			*/
+			
 			int i;
 			// TODO SG font constante
 			/*
@@ -495,7 +471,7 @@ public class PasserellePDF {
 					//str = String.format("%-20s%-20s\n%25s%10s%10s", 
 					cell.setBorder(0);
 					cell.setColspan(5);
-					cell.setPhrase(new Phrase(leStage.getEltStagiaireList(i).getInfo(0), fontB));
+					cell.setPhrase(new Phrase(leStage.getEltStagiaireList(i).getInfo(0), fontB10));
 					stgCell.addCell(cell);
 					cell.setPhrase(new Phrase(leStage.getEltStagiaireList(i).getInfo(1), font));
 					stgCell.addCell(cell);
@@ -530,11 +506,11 @@ public class PasserellePDF {
 					//isvsmp
 					center.addCell(" ");
 			}
-			if(i<=20){
+			if(i<19){
 				cell.setBorder(0);
-				cell.setPhrase(new Phrase(" ", font));
+				cell.setPhrase(new Phrase("", font));
 				cell.setColspan(5);
-				for (int j = i; j < 20; j++) {
+				for (int j = i; j < 19; j++) {
 					//for (int k = 0; k < 5; k++) {
 						//Phrase phrs = new Phrase("- \n ", new Font(Font.TIMES_ROMAN, 10));
 						//cell = new PdfPCell(phrs);
@@ -544,16 +520,26 @@ public class PasserellePDF {
 					//}
 				}//fin pour
 			}//fin si
+
+			// DIF
+			PdfPTable footer0 = new PdfPTable(1);
+			footer0.setWidthPercentage(95);
+			cell = new PdfPCell(new Phrase(Config.get(cfgP+"s2"), font));
+			cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+			cell.setPaddingBottom(5);
+			cell.setBorder(0);
+			footer0.addCell(cell);
 			
+			// Footer
 			PdfPTable footer = new PdfPTable(3);
 			footer.setWidthPercentage(75);
-						
-			cell = new PdfPCell(new Phrase("Nombre de stagiaires :", fontB2));
+			
+			cell = new PdfPCell(new Phrase("Nombre de stagiaires :", fontB12));
 			cell.setColspan(3);
 			cell.setBorder(0);
 			footer.addCell(cell);
 			
-			cell = new PdfPCell(new Phrase("Prévus", fontB2));
+			cell = new PdfPCell(new Phrase("Prévus", fontB12));
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setBorderWidthTop(0);
 			cell.setBorderWidthLeft(0);
@@ -561,7 +547,7 @@ public class PasserellePDF {
 			cell.setBorderWidthRight(1);
 			footer.addCell(cell);
 			
-			cell = new PdfPCell(new Phrase("Présents", fontB2));
+			cell = new PdfPCell(new Phrase("Présents", fontB12));
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setBorderWidthTop(0);
 			cell.setBorderWidthLeft(1);
@@ -569,7 +555,7 @@ public class PasserellePDF {
 			cell.setBorderWidthRight(1);
 			footer.addCell(cell);
 			
-			cell = new PdfPCell(new Phrase("Maxi Présents", fontB2));
+			cell = new PdfPCell(new Phrase("Maxi Présents", fontB12));
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setBorderWidthTop(0);
 			cell.setBorderWidthLeft(1);
@@ -577,7 +563,7 @@ public class PasserellePDF {
 			cell.setBorderWidthBottom(1);
 			footer.addCell(cell);
 			
-			cell = new PdfPCell(new Phrase(""+leStage.getSizeStagiaireList(), fontB2));
+			cell = new PdfPCell(new Phrase(""+leStage.getSizeStagiaireList(), fontB12));
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setBorderWidthTop(1);
 			cell.setBorderWidthLeft(0);
@@ -585,7 +571,7 @@ public class PasserellePDF {
 			cell.setBorderWidthBottom(0);
 			footer.addCell(cell);
 			
-			cell = new PdfPCell(new Phrase(" ", fontB2));
+			cell = new PdfPCell(new Phrase(" ", fontB12));
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setBorderWidthTop(1);
 			cell.setBorderWidthLeft(1);
@@ -593,7 +579,7 @@ public class PasserellePDF {
 			cell.setBorderWidthBottom(0);;
 			footer.addCell(cell);
 			
-			cell = new PdfPCell(new Phrase(""+leStage.getMaxiPresent(),new Font(Font.HELVETICA, 14, Font.BOLD)));
+			cell = new PdfPCell(new Phrase(""+leStage.getMaxiPresent(),fontB14));
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setBorderWidthTop(1);
 			cell.setBorderWidthLeft(1);
@@ -604,28 +590,30 @@ public class PasserellePDF {
 			//formateur
 			PdfPTable footer2 = new PdfPTable(1);
 			footer2.setWidthPercentage(80);
-			par = new Phrase("Formateurs : _ _ _ _ _ _ _ _ _ _ _ _ _ _ _/ "+leStage.getLeader(), fontB2);
+			par = new Phrase("Formateurs : _ _ _ _ _ _ _ _ _ _ _ _ _ _ _/ "+leStage.getLeader(), fontB12);
 			cell = new PdfPCell(par);
 			cell.setBorder(0);
 			footer2.addCell(cell);
 						
 			// DIF
+			/*
 			PdfPTable footer3 = new PdfPTable(1);
 			footer3.setWidthPercentage(95);
-			cell = new PdfPCell(new Phrase("\n* Si vous ne souhaitez pas activer votre compteur DIF pour cette formation, cochez la case DIF ci-dessus", font));
+			cell = new PdfPCell(new Phrase(Config.get(cfgP+"s2"), font));
 			cell.setHorizontalAlignment(Element.ALIGN_LEFT);
 			cell.setPaddingBottom(5);
 			cell.setBorder(0);
 			footer3.addCell(cell);
-
+			*/
+			
 			//ajout des composants
 			doc.add(header);
 			//doc.add(new Paragraph("        "));
 			doc.add(center);
+			doc.add(footer0);
 			doc.add(new Paragraph("        "));
 			doc.add(footer);
 			doc.add(footer2);
-			doc.add(footer3);
 			
 			doc.close();
 		} catch (FileNotFoundException e) {
@@ -645,20 +633,20 @@ public class PasserellePDF {
 		String date = leStage.getDateStr();
 		date = date.replace("/", ".");
 		String pathDossier = "Emargement du "+date;
-		new File("dataExport\\"+pathDossier).mkdir();
+		new File(expDir+pathDossier).mkdir();
 		
 		try {
 			
 			//creation du document
 			Document doc = new Document(PageSize.A4,10,10,10,0);
-			FileOutputStream fichier = new FileOutputStream("dataExport\\"+pathDossier+"\\listeEmargement - "+leStage.getCode()+".pdf");
+			FileOutputStream fichier = new FileOutputStream(expDir+pathDossier+"\\listeEmargement - "+leStage.getCode()+".pdf");
 			PdfWriter.getInstance(doc, fichier);
 			doc.open();
 			
 			PdfPTable header = new PdfPTable(1);
 			header.setWidthPercentage(100);
 			
-			PdfPCell cell = new PdfPCell(new Phrase(leStage.getDateStr(),new Font(Font.HELVETICA, 12, Font.BOLD)));
+			PdfPCell cell = new PdfPCell(new Phrase(leStage.getDateStr(),fontB12));
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setBorder(0);
 			header.addCell(cell);
@@ -672,53 +660,51 @@ public class PasserellePDF {
 			
 			PdfPTable center = new PdfPTable(34);
 			center.setWidthPercentage(95);
-			Font font = new Font(Font.HELVETICA, 10, Font.BOLD);
-			cell = new PdfPCell(new Phrase("",font));
+			cell = new PdfPCell(new Phrase("",fontB10));
 			cell.setBorder(0);
 			cell.setColspan(2);
 			center.addCell(cell);
-			cell = new PdfPCell(new Phrase("Nom",font));
+			cell = new PdfPCell(new Phrase("Nom",fontB10));
 			cell.setBorder(0);
 			cell.setColspan(8);
 			center.addCell(cell);
-			cell = new PdfPCell(new Phrase("Prenom",font));
+			cell = new PdfPCell(new Phrase("Prenom",fontB10));
 			cell.setBorder(0);
 			cell.setColspan(8);
 			center.addCell(cell);
-			cell = new PdfPCell(new Phrase("Matricule",font));
+			cell = new PdfPCell(new Phrase("Matricule",fontB10));
 			cell.setBorder(0);
 			cell.setColspan(8);
 			center.addCell(cell);
-			cell = new PdfPCell(new Phrase("Emargement",font));
+			cell = new PdfPCell(new Phrase("Emargement",fontB10));
 			cell.setColspan(8);
 			cell.setBorder(0);
 			center.addCell(cell);
 			
-			font = new Font(Font.HELVETICA, 13, Font.BOLD);
 			for (int j = 0; j < 20; j++) {
-					Phrase phrs = new Phrase(""+(j+1), font);
+					Phrase phrs = new Phrase(""+(j+1), fontB12);
 					cell = new PdfPCell(phrs);
 					cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 					cell.setColspan(2);
 					center.addCell(cell);
 					//nom
-					phrs = new Phrase(" \n ", font);
+					phrs = new Phrase(" \n ", fontB12);
 					cell = new PdfPCell(phrs);
 					cell.setColspan(8);
 					center.addCell(cell);
 					//prenom
-					phrs = new Phrase("  ", font);
+					phrs = new Phrase("  ", fontB12);
 					cell = new PdfPCell(phrs);;
 					cell.setColspan(8);
 					center.addCell(cell);
 					//matricule
 					for (int k = 0; k < 8; k++) {
-						phrs = new Phrase(" ", font);
+						phrs = new Phrase(" ", fontB12);
 						cell = new PdfPCell(phrs);
 						center.addCell(cell);
 					}
 					//emargement
-					phrs = new Phrase("  ", font);
+					phrs = new Phrase("  ", fontB12);
 					cell = new PdfPCell(phrs);
 					cell.setPadding(4);
 					cell.setColspan(8);
@@ -728,12 +714,12 @@ public class PasserellePDF {
 			//nombre de stagiares
 			PdfPTable footer = new PdfPTable(3);
 			footer.setWidthPercentage(75);
-			cell = new PdfPCell(new Phrase("Nombre de stagiaires :",new Font(Font.HELVETICA, 14, Font.BOLD)));
+			cell = new PdfPCell(new Phrase("Nombre de stagiaires :",fontB14));
 			cell.setColspan(3);
 			cell.setBorder(0);
 			footer.addCell(cell);
 			
-			cell = new PdfPCell(new Phrase("Prévus",new Font(Font.HELVETICA, 14, Font.BOLD)));
+			cell = new PdfPCell(new Phrase("Prévus",fontB14));
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setBorderWidthTop(0);
 			cell.setBorderWidthLeft(0);
@@ -742,7 +728,7 @@ public class PasserellePDF {
 			footer.addCell(cell);
 			
 			//presents
-			cell = new PdfPCell(new Phrase("Présents",new Font(Font.HELVETICA, 14, Font.BOLD)));
+			cell = new PdfPCell(new Phrase("Présents",fontB14));
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setBorderWidthTop(0);
 			cell.setBorderWidthLeft(1);
@@ -751,7 +737,7 @@ public class PasserellePDF {
 			footer.addCell(cell);
 			
 			//maxipresent
-			cell = new PdfPCell(new Phrase("Maxi Présents",new Font(Font.HELVETICA, 14, Font.BOLD)));
+			cell = new PdfPCell(new Phrase("Maxi Présents",fontB14));
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setBorderWidthTop(0);
 			cell.setBorderWidthLeft(1);
@@ -760,7 +746,7 @@ public class PasserellePDF {
 			footer.addCell(cell);
 			
 			//cellule vide
-			cell = new PdfPCell(new Phrase(" ",new Font(Font.HELVETICA, 14, Font.BOLD)));
+			cell = new PdfPCell(new Phrase(" ",fontB14));
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setBorderWidthTop(1);
 			cell.setBorderWidthLeft(0);
@@ -769,7 +755,7 @@ public class PasserellePDF {
 			footer.addCell(cell);
 			
 			//cellule vide
-			cell = new PdfPCell(new Phrase(" ",new Font(Font.HELVETICA, 14, Font.BOLD)));
+			cell = new PdfPCell(new Phrase(" ",fontB14));
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setBorderWidthTop(1);
 			cell.setBorderWidthLeft(1);
@@ -778,7 +764,7 @@ public class PasserellePDF {
 			footer.addCell(cell);
 			
 			//cellule vide
-			cell = new PdfPCell(new Phrase(" ",new Font(Font.HELVETICA, 14, Font.BOLD)));
+			cell = new PdfPCell(new Phrase(" ",fontB14));
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setBorderWidthTop(1);
 			cell.setBorderWidthLeft(1);
@@ -789,7 +775,7 @@ public class PasserellePDF {
 			//formateur
 			PdfPTable footer2 = new PdfPTable(1);
 			footer2.setWidthPercentage(80);
-			par = new Phrase("Formateurs : _ _ _ _ _ _ _ _ _ _ _ _ _ _ _/ "+leStage.getLeader(),new Font(Font.HELVETICA, 14, Font.BOLD));
+			par = new Phrase("Formateurs : _ _ _ _ _ _ _ _ _ _ _ _ _ _ _/ "+leStage.getLeader(),fontB14);
 			cell = new PdfPCell(par);
 			cell.setBorder(0);
 			footer2.addCell(cell);
@@ -867,7 +853,7 @@ public class PasserellePDF {
 		//creation du dossier
 		String ladate = date.replace("/", ".");
 		String pathDossier = "Feuilles de routes du "+ladate;
-		new File("dataExport\\"+pathDossier).mkdir();
+		new File(expDir+pathDossier).mkdir();
 		
 		
 		// Suppression des feuilles inutiles :
@@ -897,12 +883,12 @@ public class PasserellePDF {
 		try {
 			
 			Document doc = new Document(PageSize.A4);
-			FileOutputStream fichier = new FileOutputStream("dataExport\\"+pathDossier+"\\FeuilleRouteFSS - "+Nom+".pdf");
+			FileOutputStream fichier = new FileOutputStream(expDir+pathDossier+"\\FeuilleRouteFSS - "+Nom+".pdf");
 			PdfWriter.getInstance(doc, fichier);
 			doc.open();
 			
 			PdfPTable header = new PdfPTable(1);
-			Phrase phrs = new Phrase(date,new Font(Font.HELVETICA, 15, Font.BOLD));
+			Phrase phrs = new Phrase(date, fontB15);
 			PdfPCell cell = new PdfPCell(phrs);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setBorder(0);
@@ -912,7 +898,7 @@ public class PasserellePDF {
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setBorder(0);
 			header.addCell(cell);
-			phrs = new Phrase("Stages du jour",new Font(Font.HELVETICA, 15, Font.BOLD));
+			phrs = new Phrase("Stages du jour",fontB15);
 			cell = new PdfPCell(phrs);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setBorder(0);
@@ -923,27 +909,27 @@ public class PasserellePDF {
 			float[] widths = new float[] { 1f, 1f, 1f, 1.2f, 1.2f };
 			center.setWidths(widths);
 
-			phrs = new Phrase("Code Stage",new Font(Font.HELVETICA, 12, Font.BOLD));
+			phrs = new Phrase("Code Stage",fontB12);
 			cell = new PdfPCell(phrs);
 			cell.setBorder(0);
 			cell.setPadding(10);
 			center.addCell(cell);
-			phrs = new Phrase("Leader/Aide",new Font(Font.HELVETICA, 12, Font.BOLD));
+			phrs = new Phrase("Leader/Aide",fontB12);
 			cell = new PdfPCell(phrs);
 			cell.setBorder(0);
 			cell.setPadding(10);
 			center.addCell(cell);
-			phrs = new Phrase("Horaire",new Font(Font.HELVETICA, 12, Font.BOLD));
+			phrs = new Phrase("Horaire",fontB12);
 			cell = new PdfPCell(phrs);
 			cell.setBorder(0);
 			cell.setPadding(10);
 			center.addCell(cell);
-			phrs = new Phrase("Module",new Font(Font.HELVETICA, 12, Font.BOLD));
+			phrs = new Phrase("Module",fontB12);
 			cell = new PdfPCell(phrs);
 			cell.setBorder(0);
 			cell.setPadding(10);
 			center.addCell(cell);
-			phrs = new Phrase("Salle",new Font(Font.HELVETICA, 12, Font.BOLD));
+			phrs = new Phrase("Salle",fontB12);
 			cell = new PdfPCell(phrs);
 			cell.setBorder(0);
 			cell.setPadding(10);
@@ -1009,12 +995,12 @@ public class PasserellePDF {
 		String date = leStage.getDateStr();
 		date = date.replace("/", ".");
 		String pathDossier = "FREP du "+date;
-		new File("dataExport\\"+pathDossier).mkdir();
+		new File(expDir+pathDossier).mkdir();
 		
 		try {
 			Document doc = new Document(PageSize.A4,60,60,10,10);
 			FileOutputStream fichier;
-			fichier = new FileOutputStream("dataExport\\"+pathDossier+"\\FREP - "+leStage.getCode()+".pdf");
+			fichier = new FileOutputStream(expDir+pathDossier+"\\FREP - "+leStage.getCode()+".pdf");
 			PdfWriter.getInstance(doc, fichier);
 			doc.open();
 			
@@ -1023,7 +1009,7 @@ public class PasserellePDF {
 			header.setWidthPercentage(100);
 			
 			//la date
-			PdfPCell cell = new PdfPCell(new Phrase(leStage.getDateStr(),new Font(Font.HELVETICA, 14, Font.BOLD)));
+			PdfPCell cell = new PdfPCell(new Phrase(leStage.getDateStr(),fontB14));
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setBorder(0);
 			header.addCell(cell);
@@ -1234,11 +1220,11 @@ public class PasserellePDF {
 		String date = leStage.getDateStr();
 		date = date.replace("/", ".");
 		String pathDossier = "Surbook du "+date;
-		new File("dataExport\\"+pathDossier).mkdir();
+		new File(expDir+pathDossier).mkdir();
 		
 		try {
 			FileOutputStream fichier;
-			fichier = new FileOutputStream("dataExport\\"+pathDossier+"\\Surbook - "+leStage.getCode()+".pdf");
+			fichier = new FileOutputStream(expDir+pathDossier+"\\Surbook - "+leStage.getCode()+".pdf");
 			Document doc = new Document(PageSize.A4,40,40,20,20);
 			PdfWriter.getInstance(doc, fichier);
 			doc.open();
@@ -1248,7 +1234,7 @@ public class PasserellePDF {
 			Phrase phrs = new Phrase("Direction Générale de la Qualité et des Opérations\n" +
 									"Centre de Formation du PN\n" +
 									"Formation Sécurité Sauvetage du PN"
-									,new Font(Font.HELVETICA, 12, Font.BOLD));
+									,fontB12);
 			PdfPCell cell = new PdfPCell(phrs);
 			cell.setBorder(0);
 			cell.setColspan(2);
@@ -1265,12 +1251,12 @@ public class PasserellePDF {
 			PdfPTable title = new PdfPTable(1);
 			title.setWidthPercentage(75);
 			
-			phrs = new Phrase(leStage.getDateStr(),new Font(Font.HELVETICA, 15, Font.BOLD));
+			phrs = new Phrase(leStage.getDateStr(),fontB15);
 			cell = new PdfPCell(phrs);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setBorder(0);
 			title.addCell(cell);
-			phrs = new Phrase(leStage.getCode(),new Font(Font.HELVETICA, 15, Font.BOLD));
+			phrs = new Phrase(leStage.getCode(),fontB15);
 			cell = new PdfPCell(phrs);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setBorder(0);
@@ -1354,7 +1340,7 @@ public class PasserellePDF {
 		
 		String date = ladate.replace("/", ".");
 		String pathDossier = "CheckListPoleAdm du "+date;
-		new File("dataExport\\"+pathDossier).mkdir();
+		new File(expDir+pathDossier).mkdir();
 		
 		//tri des stages par ordre alphabetique
 		Stage stgTemps ;
@@ -1375,7 +1361,7 @@ public class PasserellePDF {
 		
 		try {
 			FileOutputStream fichier;
-			fichier = new FileOutputStream("dataExport\\"+pathDossier+"\\CheckListPôleAdm - "+date+".pdf");
+			fichier = new FileOutputStream(expDir+pathDossier+"\\CheckListPôleAdm - "+date+".pdf");
 			Document doc = new Document(PageSize.A4,20,20,10,10);
 			doc.setPageSize(PageSize.A4.rotate());
 			doc.newPage();
@@ -1385,11 +1371,11 @@ public class PasserellePDF {
 			PdfPTable header = new PdfPTable(2);
 			header.setWidthPercentage(100);
 			
-			Phrase phrs = new Phrase("RETOUR Listes Stagiaires et Emargements", new Font(Font.HELVETICA, 15, Font.BOLD));
+			Phrase phrs = new Phrase("RETOUR Listes Stagiaires et Emargements", fontB15);
 			PdfPCell cell = new PdfPCell(phrs);
 			cell.setBorder(0);
 			header.addCell(cell);
-			phrs = new Phrase(ladate, new Font(Font.HELVETICA, 15, Font.BOLD));
+			phrs = new Phrase(ladate, fontB15);
 			cell = new PdfPCell(phrs);
 			cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
 			cell.setBorder(0);
@@ -1397,11 +1383,7 @@ public class PasserellePDF {
 			
 			doc.add(header);
 			doc.add(new Phrase("\n"));
-			
-			Font fonth1 = new Font(Font.HELVETICA, 15, Font.BOLD);
-			Font fonth2 = new Font(Font.HELVETICA, 12, Font.BOLD);
-			Font fonth3 = new Font(Font.HELVETICA, 9, Font.BOLD);
-			
+					
 			BaseColor gray = new BaseColor(175, 175, 175);
 			BaseColor lightGray = new BaseColor(210, 210, 210);
 			
@@ -1413,42 +1395,42 @@ public class PasserellePDF {
 			cell.setBorder(0);
 			tableau.addCell(cell);
 			
-			phrs = new Phrase("ABSENCES",fonth1);
+			phrs = new Phrase("ABSENCES",fontB15);
 			cell = new PdfPCell(phrs);
 			cell.setBackgroundColor(gray);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setColspan(3);
 			tableau.addCell(cell);
 			
-			phrs = new Phrase("TRAITEMENT AF",fonth1);
+			phrs = new Phrase("TRAITEMENT AF",fontB15);
 			cell = new PdfPCell(phrs);
 			cell.setBackgroundColor(gray);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setColspan(2);
 			tableau.addCell(cell);
 			
-			phrs = new Phrase("TRAITEMENT TIERS",fonth1);
+			phrs = new Phrase("TRAITEMENT TIERS",fontB15);
 			cell = new PdfPCell(phrs);
 			cell.setBackgroundColor(gray);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setColspan(2);
 			tableau.addCell(cell);
 			
-			phrs = new Phrase("TRAITEMENT DELIA",fonth1);
+			phrs = new Phrase("TRAITEMENT DELIA",fontB15);
 			cell = new PdfPCell(phrs);
 			cell.setBackgroundColor(gray);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setColspan(2);
 			tableau.addCell(cell);
 			
-			phrs = new Phrase("FREP",fonth1);
+			phrs = new Phrase("FREP",fontB15);
 			cell = new PdfPCell(phrs);
 			cell.setBackgroundColor(gray);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setRowspan(2);
 			tableau.addCell(cell);
 			
-			phrs = new Phrase("STATS",fonth1);
+			phrs = new Phrase("STATS",fontB15);
 			cell = new PdfPCell(phrs);
 			cell.setBackgroundColor(gray);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -1462,55 +1444,55 @@ public class PasserellePDF {
 			cell.setBorder(0);
 			tableau.addCell(cell);
 			
-			phrs = new Phrase("ABS",fonth3);
+			phrs = new Phrase("ABS",fontB09);
 			cell = new PdfPCell(phrs);
 			cell.setBackgroundColor(lightGray);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			tableau.addCell(cell);
 			
-			phrs = new Phrase("R/Prod",fonth3);
+			phrs = new Phrase("R/Prod",fontB09);
 			cell = new PdfPCell(phrs);
 			cell.setBackgroundColor(lightGray);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			tableau.addCell(cell);
 			
-			phrs = new Phrase("Débarqués",fonth3);
+			phrs = new Phrase("Débarqués",fontB09);
 			cell = new PdfPCell(phrs);
 			cell.setBackgroundColor(lightGray);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			tableau.addCell(cell);
 			
-			phrs = new Phrase("ITRI",fonth3);
+			phrs = new Phrase("ITRI",fontB09);
 			cell = new PdfPCell(phrs);
 			cell.setBackgroundColor(lightGray);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			tableau.addCell(cell);
 			
-			phrs = new Phrase("SCAN",fonth3);
+			phrs = new Phrase("SCAN",fontB09);
 			cell = new PdfPCell(phrs);
 			cell.setBackgroundColor(lightGray);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			tableau.addCell(cell);
 			
-			phrs = new Phrase("Attestations",fonth3);
+			phrs = new Phrase("Attestations",fontB09);
 			cell = new PdfPCell(phrs);
 			cell.setBackgroundColor(lightGray);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			tableau.addCell(cell);
 			
-			phrs = new Phrase("SCAN",fonth3);
+			phrs = new Phrase("SCAN",fontB09);
 			cell = new PdfPCell(phrs);
 			cell.setBackgroundColor(lightGray);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			tableau.addCell(cell);
 			
-			phrs = new Phrase("PREVUS",fonth3);;
+			phrs = new Phrase("PREVUS",fontB09);;
 			cell = new PdfPCell(phrs);
 			cell.setBackgroundColor(lightGray);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			tableau.addCell(cell);
 			
-			phrs = new Phrase("PRESENTS",fonth3);
+			phrs = new Phrase("PRESENTS",fontB09);
 			cell = new PdfPCell(phrs);
 			cell.setBackgroundColor(lightGray);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -1521,7 +1503,7 @@ public class PasserellePDF {
 			for (Stage lestage : stageList) {
 				//premiere cellule
 				index++;
-				phrs = new Phrase(lestage.getCode(),fonth2);
+				phrs = new Phrase(lestage.getCode(),fontB12);
 				cell = new PdfPCell(phrs);
 				cell.setColspan(3);
 				cell.setFixedHeight(480 / stageList.size());

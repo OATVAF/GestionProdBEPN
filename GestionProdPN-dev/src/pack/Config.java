@@ -15,19 +15,21 @@ public enum Config {
 	
 	private Properties appProp = new Properties();
 	private Properties cfgProp = new Properties();
+	private Properties pdfProp = new Properties();
 	private static final String  appConfigFile = "dataSystem/app.properties";
 	private static final String  cfgConfigFile = "dataSystem/cfg.properties";
+	private static final String  pdfConfigFile = "dataSystem/pdf.properties";
 
 	private Config() {
 		System.out.println("[Config()] : Reading "+appConfigFile+" !");
 		try {
 			appProp.load(new FileInputStream(appConfigFile));
 		} catch (FileNotFoundException e1) {
-			System.out.println("[ERR]Config File " + cfgConfigFile + " Not Found for reading");
+			System.out.println("[ERR]Config File " + appConfigFile + " Not Found for reading");
 			JOptionPane.showMessageDialog(null, "Fichier de configuration " + appConfigFile +
 					"\nnon trouvé pour lecture!", "Erreur", JOptionPane.ERROR_MESSAGE);
 		} catch (IOException e) {
-			System.out.println("[ERR]Config Read Error" + cfgConfigFile);
+			System.out.println("[ERR]Config Read Error" + appConfigFile);
 			JOptionPane.showMessageDialog(null, "Erreur de lecture de du fichier de configuration !",
 					"Erreur", JOptionPane.ERROR_MESSAGE);
 		}
@@ -41,6 +43,19 @@ public enum Config {
 					"\nnon trouvé pour lecture!", "Erreur", JOptionPane.ERROR_MESSAGE);
 		} catch (IOException e) {
 			System.out.println("[ERR]Config Read Error" + cfgConfigFile);
+			JOptionPane.showMessageDialog(null, "Erreur de lecture de du fichier de configuration !",
+					"Erreur", JOptionPane.ERROR_MESSAGE);
+		}
+		//System.out.println(prop.toString());
+		System.out.println("[Config()] : Reading "+pdfConfigFile+" !");
+		try {
+			pdfProp.load(new FileInputStream(pdfConfigFile));
+		} catch (FileNotFoundException e1) {
+			System.out.println("[ERR]Config File " + pdfConfigFile + " Not Found for reading");
+			JOptionPane.showMessageDialog(null, "Fichier de configuration " + pdfConfigFile +
+					"\nnon trouvé pour lecture!", "Erreur", JOptionPane.ERROR_MESSAGE);
+		} catch (IOException e) {
+			System.out.println("[ERR]Config Read Error" + pdfConfigFile);
 			JOptionPane.showMessageDialog(null, "Erreur de lecture de du fichier de configuration !",
 					"Erreur", JOptionPane.ERROR_MESSAGE);
 		}
@@ -66,6 +81,9 @@ public enum Config {
 			//System.out.println(INSTANCE.cfgProp.getProperty(param).toString());
 			return INSTANCE.cfgProp.getProperty(param);
 		}
+		else if (INSTANCE.pdfProp.containsKey(param)) {
+			return INSTANCE.pdfProp.getProperty(param);
+		}
 		else {
 			//System.out.println(INSTANCE.appProp.getProperty(param).toString());
 			return INSTANCE.appProp.getProperty(param); 
@@ -75,13 +93,30 @@ public enum Config {
 		if (INSTANCE.cfgProp.containsKey(param)) {
 			return Integer.parseInt(INSTANCE.cfgProp.getProperty(param));
 		}
+		else if (INSTANCE.pdfProp.containsKey(param)) {
+			return Integer.parseInt(INSTANCE.pdfProp.getProperty(param));
+		}
 		else {
 			return Integer.parseInt(INSTANCE.appProp.getProperty(param)); 
+		}
+	}
+	public static float getF(String param) {
+		if (INSTANCE.cfgProp.containsKey(param)) {
+			return Float.parseFloat(INSTANCE.cfgProp.getProperty(param));
+		}
+		else if (INSTANCE.pdfProp.containsKey(param)) {
+			return Float.parseFloat(INSTANCE.pdfProp.getProperty(param));
+		}
+		else {
+			return Float.parseFloat(INSTANCE.appProp.getProperty(param)); 
 		}
 	}
 	public static boolean getB(String param) {
 		if (INSTANCE.cfgProp.containsKey(param)) {
 			return INSTANCE.cfgProp.getProperty(param).equalsIgnoreCase("true");
+		}
+		else if (INSTANCE.pdfProp.containsKey(param)) {
+			return INSTANCE.pdfProp.getProperty(param).equalsIgnoreCase("true");
 		}
 		else {
 			return INSTANCE.appProp.getProperty(param).equalsIgnoreCase("true"); 
@@ -90,6 +125,9 @@ public enum Config {
 	public static void set(String param, String val) {
 		if (INSTANCE.cfgProp.containsKey(param)) {
 			INSTANCE.cfgProp.setProperty(param,val);
+		}
+		if (INSTANCE.pdfProp.containsKey(param)) {
+			INSTANCE.pdfProp.setProperty(param,val);
 		}
 		else {
 			INSTANCE.appProp.setProperty(param,val);
