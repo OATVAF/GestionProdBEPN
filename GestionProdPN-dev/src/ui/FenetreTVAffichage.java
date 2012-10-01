@@ -30,8 +30,9 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 	private static final long serialVersionUID = 6442873953231455888L;
 	
 	//constante
-	private final int NBAFF = 19;//nombre d'affichage max
-	private final int NBMIN = 30;//nombre de minutes 
+	private final int NBAFF  = Config.getI("aff.nbstages");	// nombre d'affichage max
+	private final int MINLIM = Config.getI("aff.nbmin0");	// retard max sur stage
+	private final int NBMIN  = Config.getI("aff.nbmin");	// nombre de minutes avant supp stage
 	
 	//attributs IHM
 	private JPanel contentPane;
@@ -60,7 +61,7 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 	
 	// Date
 	private static SimpleDateFormat fmtDate   = new SimpleDateFormat("dd/MM/yyyy");
-	private static SimpleDateFormat fmtTime   = new SimpleDateFormat("hh:mm");
+	private static SimpleDateFormat fmtTime   = new SimpleDateFormat("HH:mm");
 	// Fonts
 	
 	private static Font font1 = new Font(Config.get("aff.font1.font"),1,Config.getI("aff.font1.size"));
@@ -358,10 +359,10 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 			stageLabels[i][j].setForeground(Color.BLACK);
 			stageLabels[i][j].setHorizontalAlignment(SwingConstants.CENTER);
 			//changement de couleur de l'heure
-			if((StageList.get(i).getnbMin()-nbmin) <= 0 && (unstage.getnbMin()-nbmin) >= -10){
+			if((StageList.get(i).getnbMin()-nbmin) <= 0 && (unstage.getnbMin()-nbmin) >= -MINLIM){
 				stageLabels[i][j].setForeground(new Color(255, 102, 0));
 			}
-			if((StageList.get(i).getnbMin()-nbmin) < -10){
+			if((StageList.get(i).getnbMin()-nbmin) < -MINLIM){
 				stageLabels[i][j].setForeground(new Color(255, 0, 0));
 			}
 			c.gridx = j; c.gridy = i; c.weightx = 1;
