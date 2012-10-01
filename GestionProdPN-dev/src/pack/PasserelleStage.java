@@ -32,7 +32,6 @@ public class PasserelleStage {
 	private static final String filterCancelPat = Config.get("imp.delia.filter.cancel.pat");
 	
 	private static SimpleDateFormat fmtDate   = new SimpleDateFormat("dd/MM/yyyy");
-	private static SimpleDateFormat fmtTime   = new SimpleDateFormat("hh:mm");
 
 	/**
 	 * procedure de mise a jour des stages
@@ -136,7 +135,6 @@ public class PasserelleStage {
 	 * @param stageList
 	 * @return stageList
 	 */
-	@SuppressWarnings("deprecation")
 	public static ArrayList<Stage> suppresionStage(ArrayList<Stage> stageList, boolean keepnonJ){
 		//false => suppresion stage non J
 		//true => suppresion stage J
@@ -145,18 +143,6 @@ public class PasserelleStage {
 		
 		//recuperation de la date
 		Date dateActuelle = new Date();
-		/*
-		String strDay = Integer.toString(dateActuelle.getDate());
-		if(dateActuelle.getDate()<10){
-			strDay = "0"+strDay;
-		}
-		String strMonth = Integer.toString((dateActuelle.getMonth()+1));
-		if(dateActuelle.getMonth()<10){
-			strMonth = "0"+strMonth;
-		}
-		String strYear = Integer.toString(dateActuelle.getYear()+1900);
-		String datedujour = strDay+"/"+strMonth+"/"+strYear;
-		*/
 		String datedujour = fmtDate.format(dateActuelle);
 		//recuperation des stages a enlever
 		ArrayList<Stage> stageListRem = new ArrayList<Stage>();
