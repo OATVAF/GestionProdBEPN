@@ -2,10 +2,12 @@ package ui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -56,12 +58,22 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 	private boolean run;
 	
 	private boolean TVall = false;
-			
+	
+	// Date
+	private static SimpleDateFormat fmtDate   = new SimpleDateFormat("dd/MM/yyyy");
+	private static SimpleDateFormat fmtTime   = new SimpleDateFormat("hh:mm");
+	// Fonts
+	
+	private static Font font1 = new Font(Config.get("aff.font1.font"),1,Config.getI("aff.font1.size"));
+	private static Font font2 = new Font(Config.get("aff.font2.font"),1,Config.getI("aff.font2.size"));
+	private static Font font3 = new Font(Config.get("aff.font3.font"),1,Config.getI("aff.font3.size"));
+	private static Font font4 = new Font(Config.get("aff.font4.font"),1,Config.getI("aff.font4.size"));
+
 	/**
 	 * constructeur
 	 */
 	public FenetreTVAffichage(){
-		
+
 		TVall = Config.get("aff.TV").equals("all");
 		
 		//recuperation de la date d'aujourd'hui
@@ -147,7 +159,7 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 		logoLabel = new JLabel(new ImageIcon(Config.getRes("Airfrance.jpg")));
 		headerPane.add(logoLabel,BorderLayout.LINE_START);
 		welcomeLabel = new JLabel(Config.get("aff.header"));
-		welcomeLabel.setFont(new Font("Arial", 1, 30));
+		welcomeLabel.setFont(font3);
 		welcomeLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		welcomeLabel.setForeground(Color.BLUE);
 		headerPane.add(welcomeLabel,BorderLayout.CENTER);
@@ -172,7 +184,6 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 	/**
 	 * procedure qui construit le titlePane
 	 */
-	@SuppressWarnings("deprecation")
 	private void constructionTitlePane(){
 		
 		//initialisation du titlePane
@@ -182,17 +193,8 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 		//initialisation 
 		titleLabel = new JLabel();
 		titleLabel.setForeground(Color.WHITE);
-		titleLabel.setFont(new Font("Arial", 1, 30));
-		String strDay = Integer.toString(dateActuelle.getDate());
-		if(dateActuelle.getDate()<10){
-			strDay = "0"+strDay;//met un "0" si le jour en < a 10
-		}
-		String strMonth = Integer.toString((dateActuelle.getMonth()+1));
-		if(dateActuelle.getMonth()<10){
-			strMonth = "0"+strMonth;//met un "0" si le mois en < a 10
-		}
-		String strYear = Integer.toString(dateActuelle.getYear()+1900);
-		titleLabel.setText("Stages du "+strDay+"/"+strMonth+"/"+strYear);
+		titleLabel.setFont(font3);
+		titleLabel.setText("Stages du "+fmtDate.format(dateActuelle));
 		titlePane.add(titleLabel);
 		
 	}//fin constructionTitlePane()
@@ -228,7 +230,7 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 		timeLabel = new JLabel();
 		timeLabel.setBackground(Color.WHITE);
 		timeLabel.setBorder(new LineBorder(Color.BLUE, 2));
-		timeLabel.setFont(new Font("Arial", 1, 45));
+		timeLabel.setFont(font4);
 		footerPane.add(timeLabel,BorderLayout.EAST);
 		
 	}//fin constructionFooterPane()
@@ -236,7 +238,6 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 	/**
 	 * procedure de l'interface Runnable
 	 */
-	@SuppressWarnings("deprecation")
 	public void run() {
 		
 		//variables locales
@@ -248,22 +249,12 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 			//actualisation de la date et de l'heure
 			dateActuelle = new Date();
 			//recuperation de l'heure
-			String min = ""+dateActuelle.getMinutes();
-			String heure = ""+dateActuelle.getHours();
-			if(dateActuelle.getHours()<10){
-				heure = "0"+heure;
-			}
-			if(dateActuelle.getMinutes()<10){
-				min = "0"+min;
-			}
-			strTime = "     "+heure+":"+min+"     ";
-			timeLabel.setText(strTime);
+			strTime = fmtTime.format(dateActuelle);
+			timeLabel.setText("   "+strTime+"   ");
 			
 			//actualisation des stages toutes les minutes
 			if(! strnNextTime.equalsIgnoreCase(strTime)){
 				strnNextTime = strTime;
-				
-				strTime = strTime.trim();
 				int nbmin;
 				nbmin = Integer.parseInt(strTime.substring(0, 2))*60 + Integer.parseInt(strTime.substring(3, 5));
 				
@@ -320,7 +311,7 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 			
 			stageLabels[i][j] = new JLabel();
 			//stageLabels[i][j].setText(unstage.getCompagnie());
-			stageLabels[i][j].setFont(new Font("arial", 1, 26));
+			stageLabels[i][j].setFont(font2);
 			stageLabels[i][j].setBackground(Color.BLUE);
 			stageLabels[i][j].setForeground(Color.BLACK);
 			stageLabels[i][j].setHorizontalAlignment(SwingConstants.CENTER);
@@ -336,7 +327,7 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 
 			stageLabels[i][j] = new JLabel();
 			stageLabels[i][j].setText(unstage.getCode());
-			stageLabels[i][j].setFont(new Font("arial", 1, 22));
+			stageLabels[i][j].setFont(font1);
 			stageLabels[i][j].setForeground(Color.BLACK);
 			stageLabels[i][j].setHorizontalAlignment(SwingConstants.CENTER);
 			c.gridx = j; c.gridy = i; c.weightx = 1;
@@ -345,7 +336,7 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 			
 			stageLabels[i][j] = new JLabel();
 			stageLabels[i][j].setText(unstage.getLibelle());
-			stageLabels[i][j].setFont(new Font("arial", 1, 22));
+			stageLabels[i][j].setFont(font1);
 			stageLabels[i][j].setForeground(Color.BLACK);
 			stageLabels[i][j].setHorizontalAlignment(SwingConstants.CENTER);
 			c.gridx = j; c.gridy = i; c.weightx = 2;
@@ -354,7 +345,7 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 			
 			stageLabels[i][j] = new JLabel();
 			stageLabels[i][j].setText(unstage.getFirstModule().getSalle());
-			stageLabels[i][j].setFont(new Font("arial", 1, 26));
+			stageLabels[i][j].setFont(font2);
 			stageLabels[i][j].setForeground(Color.BLACK);
 			//stageLabels[i][j].setBorder(border);
 			stageLabels[i][j].setHorizontalAlignment(SwingConstants.CENTER);
@@ -364,7 +355,7 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 			
 			stageLabels[i][j] = new JLabel();
 			stageLabels[i][j].setText(unstage.getFirstModule().getHeureDebut());
-			stageLabels[i][j].setFont(new Font("arial", 1, 26));
+			stageLabels[i][j].setFont(font2);
 			stageLabels[i][j].setForeground(Color.BLACK);
 			stageLabels[i][j].setHorizontalAlignment(SwingConstants.CENTER);
 			//changement de couleur de l'heure

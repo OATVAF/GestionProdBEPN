@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -29,6 +30,10 @@ public class PasserelleStage {
 	private static final String filterPat = Config.get("imp.delia.filter.stage");
 	private static final boolean filterCancel = Config.getB("imp.delia.filter.cancel");
 	private static final String filterCancelPat = Config.get("imp.delia.filter.cancel.pat");
+	
+	private static SimpleDateFormat fmtDate   = new SimpleDateFormat("dd/MM/yyyy");
+	private static SimpleDateFormat fmtTime   = new SimpleDateFormat("hh:mm");
+
 	/**
 	 * procedure de mise a jour des stages
 	 * fait l'importation des données de delia
@@ -140,6 +145,7 @@ public class PasserelleStage {
 		
 		//recuperation de la date
 		Date dateActuelle = new Date();
+		/*
 		String strDay = Integer.toString(dateActuelle.getDate());
 		if(dateActuelle.getDate()<10){
 			strDay = "0"+strDay;
@@ -150,7 +156,8 @@ public class PasserelleStage {
 		}
 		String strYear = Integer.toString(dateActuelle.getYear()+1900);
 		String datedujour = strDay+"/"+strMonth+"/"+strYear;
-		
+		*/
+		String datedujour = fmtDate.format(dateActuelle);
 		//recuperation des stages a enlever
 		ArrayList<Stage> stageListRem = new ArrayList<Stage>();
 		for (Stage stage : stageListnew) {
