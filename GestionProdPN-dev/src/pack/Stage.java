@@ -1,6 +1,4 @@
 package pack;
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -132,7 +130,10 @@ public class Stage implements Serializable /*,Cloneable*/ {
 		}
 		return c;
 	}
-
+	
+	public String getSCode() {
+		return code.replaceFirst(" .*", "");
+	}
 	/**
 	 * setter de date
 	 * @param date
@@ -343,43 +344,14 @@ public class Stage implements Serializable /*,Cloneable*/ {
 	 * les libelles sont dans le fichier dataSystem\libelleStage.txt
 	 */
 	private void affectationInfoStage(){
-		String libelle = "Stage Sécurité Sauvetage";
-		String[] info = new String[3];
-		try {
-			//lecture du fichier
-			FileReader fichier = new FileReader("dataSystem\\libelleStage.txt");
-			BufferedReader reader = new BufferedReader(fichier);
-			String ligne;
-			String chaine;
-			int index;
-			boolean good;
-			good = false;
-			//lecture de chaque ligne
-			while ((ligne = reader.readLine()) != null){
-				chaine = "";
-				index = 0;
-				for (int i = 0; i < ligne.length(); i++) {
-					if(ligne.substring(i, i+1).equalsIgnoreCase("/")){
-						info[index] = chaine;
-						index++;
-						chaine = "";
-					}else{//sinon
-						chaine = chaine + ligne.substring(i, i+1);
-					}//fin si
-				}//fin pour
-				if(this.code.startsWith(info[0])){
-					good = true;
-					this.libelle = info[1];
-					this.maxiPresent = Integer.parseInt(info[2]);
-				}
-			}//fin tant que
-			if(! good){
-				this.libelle = libelle;
-				this.maxiPresent = 20;
-			}
-			reader.close();
-		} catch (Exception e) {
-			e.printStackTrace();
+		String cfg = "stage."+this.getSCode();
+		if (Config.get(cfg+".info") != null) {
+			this.libelle = Config.get(cfg+".info");
+			this.maxiPresent = Config.getI(cfg+".max");
+		}
+		else {
+			this.libelle = Config.get("stage.def.info");;
+			this.maxiPresent = Config.getI("stage.def.max");
 		}
 	}//fin affectationLibelle()
 	
