@@ -30,7 +30,8 @@ public class PasserelleStage {
 	private static final String filterPat = Config.get("imp.delia.filter.stage");
 	private static final boolean filterCancel = Config.getB("imp.delia.filter.cancel");
 	private static final String filterCancelPat = Config.get("imp.delia.filter.cancel.pat");
-	
+	private static final String filterP123Pat = Config.get("imp.p123.pat");
+
 	private static SimpleDateFormat fmtDate   = new SimpleDateFormat("dd/MM/yyyy");
 
 	/**
@@ -225,7 +226,7 @@ public class PasserelleStage {
 					if(infoLigne.get(3).equalsIgnoreCase("activité")) {
 						Long id  = Long.parseLong(infoLigne.get(0));
 						String code = infoLigne.get(4);
-						if (code.matches("P[123].*")) {
+						if (code.matches(filterP123Pat)) {
 							code = code.replaceFirst(
 								Config.get("imp.p123.pat."+site),
 								Config.get("imp.p123.rep."+site));
@@ -358,7 +359,7 @@ public class PasserelleStage {
 					}
 					hsStages.put(s.getCode(), s);
 					//System.out.println("Add stage "+s.getCode()+":"+hsId.get(module.getId())+"/"+hsCode.get(module.getCodeStage()));
-					System.out.println("+ "+s.getCode()+":"+s.getIdx()+"/"+s.getIdxMax()+ "M:" + module.getLibelle()+" L:"+s.getLeader() + " s:"+module.getStage());
+					System.out.println("+ "+s.getCode()+"/"+s.getSCode()+":"+s.getIdx()+"/"+s.getIdxMax()+ "M:" + module.getLibelle()+" L:"+s.getLeader() + " s:"+module.getStage());
 				}
 			}
 		}
