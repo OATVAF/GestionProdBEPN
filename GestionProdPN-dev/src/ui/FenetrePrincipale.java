@@ -345,7 +345,7 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 		
 		//generer les document
 		if(source.equals(pdfBtn)){
-			new FenetreGénérationPDF();
+			new FenetreGénérationPDFNew();
 		}
 		
 		//modifier les données
