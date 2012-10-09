@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
+import java.util.regex.PatternSyntaxException;
 
 import javax.swing.*;
 
@@ -201,7 +202,7 @@ public class PasserelleStagiaire {
 	}//fin chargerTousStagiairesPNT()
 	
 	public static ArrayList<Stage> ajoutPnt(ArrayList<Stage> stageList,ArrayList<Stagiaire> pntList){
-		ArrayList<Stage> newStageList = stageList;
+ 		ArrayList<Stage> newStageList = stageList;
 		String site = Config.get("app.site");
 		String s2pat = Config.get("imp.pnt.s2."+site);
 		
@@ -222,7 +223,7 @@ public class PasserelleStagiaire {
 				}
 			}
 			if (stage.getCodeI().startsWith("QT")) {
-				String qtPat = null;
+				String qtPat = "(QTQTQT";
 				String codeStage = stage.getCodeI();
 				for (String s : codeStage.split(" ")) {
 					if (s.length() < 6) {
@@ -237,12 +238,23 @@ public class PasserelleStagiaire {
 				}
 				qtPat += ") *";
 				
-				for (Stagiaire stagiaire : pntList) {
-					if (stagiaire.getCodeStage().matches(qtPat)) {
-						System.out.println("Ajout PNT :" + stagiaire.getNom() + ":"+stagiaire.getCodeStage()
-								+ " au stage :" + ":" +stage.getCode());
-						stage.ajoutStagiaire(stagiaire);
+				try {
+					for (Stagiaire stagiaire : pntList) {
+						if (stagiaire.getCodeStage().matches(qtPat)) {
+							System.out.println("Ajout PNT :" + stagiaire.getNom() + ":"+stagiaire.getCodeStage()
+									+ " au stage :" + ":" +stage.getCode());
+							stage.ajoutStagiaire(stagiaire);
+						}
 					}
+				}
+				catch (PatternSyntaxException e) {
+					JOptionPane.showMessageDialog(null, "<html>Problème de pattern pour le stage : " + codeStage +
+							"<br>Vérifier les codes de QT dans Délia!</html>", "Erreur", JOptionPane.ERROR_MESSAGE);;
+				}
+				if (stage.getSizeStagiaireList() == 0) {
+					JOptionPane.showMessageDialog(null, "<html>Aucun stagiaire pour le stage : " + codeStage +
+							"<br>Vérifier les codes de QT dans Délia!</html>", "Erreur", JOptionPane.ERROR_MESSAGE);;
+
 				}
 			}
 		}
