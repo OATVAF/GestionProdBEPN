@@ -269,10 +269,17 @@ public class PasserelleStage {
 							newmodule.setSalle(infoLigne.get(1));
 						}
 						if(infoLigne.get(2).equalsIgnoreCase("instructeur")){
-							if(infoLigne.get(31).equalsIgnoreCase("oui")){
-								newmodule.setNomLeader(infoLigne.get(1));
-							}else{
-								newmodule.setNomAide(infoLigne.get(1));
+							String n = infoLigne.get(1);
+							for (int i=1; i<10; i++) {
+								String fssFilter = Config.get("imp.fss.pat."+i);
+								if (fssFilter != null ) {
+									n = n.replaceFirst(fssFilter, Config.get("imp.fss.rep."+i));
+								}
+								if(infoLigne.get(31).equalsIgnoreCase("oui")){
+									newmodule.setNomLeader(n);
+								}else{
+									newmodule.setNomAide(n);
+								}
 							}
 						}
 						if(infoLigne.get(2).equalsIgnoreCase("intervenant")){
