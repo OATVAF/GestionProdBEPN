@@ -10,6 +10,8 @@ import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 
+import ui.Common;
+
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
@@ -34,6 +36,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 public class PasserellePDF {
 	
 	private static String expDir = Config.get("pdf.expDir");
+	private static Font font9   = new Font(Font.HELVETICA, 9);
 	private static Font font    = new Font(Font.HELVETICA, 10);
 	private static Font fontB09 = new Font(Font.HELVETICA,  9, Font.BOLD);
 	private static Font fontB10 = new Font(Font.HELVETICA, 10, Font.BOLD);
@@ -55,6 +58,7 @@ public class PasserellePDF {
 		String pathDossier = expDir+Config.get(cfgP+"dir")+date;
 		new File(pathDossier).mkdir();
 
+		Common.setStatus("Création Liste Stagiaires "+leStage.getCodeI());
 		
 		try {
 			//creation du document et du fichier
@@ -186,6 +190,8 @@ public class PasserellePDF {
 		String pathDossier = expDir+Config.get(cfgP+"dir")+date;
 		new File(pathDossier).mkdir();
 		
+		Common.setStatus("Création Liste Emargement "+leStage.getCodeI());
+
 		try {
 			//creation du document
 			Document doc = new Document(PageSize.A4,10,10,10,0);
@@ -375,6 +381,8 @@ public class PasserellePDF {
 		String pathDossier = expDir+Config.get(cfgP+"dir")+date;
 		new File(pathDossier).mkdir();
 	
+		Common.setStatus("Création Liste Emargement "+leStage.getCodeI());
+
 		try {
 			
 			//creation du document
@@ -386,27 +394,30 @@ public class PasserellePDF {
 			
 			cfgP=cfgP+"dif.";
 			
-			PdfPTable header = new PdfPTable(1);
+			PdfPTable header = new PdfPTable(3);
 			header.setWidthPercentage(100);
 			
-			PdfPCell cell = new PdfPCell(new Phrase(leStage.getDateStr(),fontB12));
-			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-			cell.setBorder(0);
-			header.addCell(cell);
-
-			Phrase par = new Phrase(leStage.getCode(),fontB22);
-			cell = new PdfPCell(par);
-			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-			cell.setPadding(5);
-			cell.setBorder(0);
-			header.addCell(cell);
-	
-			cell = new PdfPCell(new Phrase(Config.get(cfgP+"s1"), fontB10));
+			PdfPCell cell = new PdfPCell(new Phrase(Config.get(cfgP+"s1"), fontB10));
 			cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+			cell.setVerticalAlignment(Element.ALIGN_BOTTOM);
 			cell.setPadding(0);
 			cell.setPaddingTop(5);
 			cell.setBorder(0);
 			header.addCell(cell);
+			
+			cell = new PdfPCell(new Phrase(leStage.getCode(),fontB22));
+			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+			cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+			cell.setPadding(5);
+			cell.setBorder(0);
+			header.addCell(cell);
+	
+			cell = new PdfPCell(new Phrase(leStage.getDateStr()+"   ",fontB12));
+			cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+			cell.setVerticalAlignment(Element.ALIGN_BOTTOM);
+			cell.setBorder(0);
+			header.addCell(cell);
+
 			
 			//formation du center
 			PdfPTable center = new PdfPTable(7);
@@ -425,7 +436,7 @@ public class PasserellePDF {
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setPhrase(new Phrase("",fontB10));				center.addCell(cell);		
 			cell.setColspan(1);
-			cell.setPhrase(new Phrase("Emargement",fontB10));		center.addCell(cell);
+			cell.setPhrase(new Phrase("Emargement",fontB10));	center.addCell(cell);
 			cell.setColspan(3);
 			cell.setPhrase(new Phrase("",fontB10));				center.addCell(cell);		
 			cell.setColspan(1);
@@ -524,7 +535,7 @@ public class PasserellePDF {
 			// DIF
 			PdfPTable footer0 = new PdfPTable(1);
 			footer0.setWidthPercentage(95);
-			cell = new PdfPCell(new Phrase(Config.get(cfgP+"s2"), font));
+			cell = new PdfPCell(new Phrase(Config.get(cfgP+"s2"), font9));
 			cell.setHorizontalAlignment(Element.ALIGN_LEFT);
 			cell.setPaddingBottom(5);
 			cell.setBorder(0);
@@ -590,8 +601,8 @@ public class PasserellePDF {
 			//formateur
 			PdfPTable footer2 = new PdfPTable(1);
 			footer2.setWidthPercentage(80);
-			par = new Phrase("Formateurs : _ _ _ _ _ _ _ _ _ _ _ _ _ _ _/ "+leStage.getLeader(), fontB12);
-			cell = new PdfPCell(par);
+			cell = new PdfPCell(new Phrase("Formateurs : _ _ _ _ _ _ _ _ _ _ _ _ _ _ _/ " +
+					leStage.getLeader(), fontB12));
 			cell.setBorder(0);
 			footer2.addCell(cell);
 						
@@ -611,7 +622,7 @@ public class PasserellePDF {
 			//doc.add(new Paragraph("        "));
 			doc.add(center);
 			doc.add(footer0);
-			doc.add(new Paragraph("        "));
+			doc.add(new Paragraph("   ", font9));
 			doc.add(footer);
 			doc.add(footer2);
 			
@@ -635,6 +646,8 @@ public class PasserellePDF {
 		String pathDossier = "Emargement du "+date;
 		new File(expDir+pathDossier).mkdir();
 		
+		Common.setStatus("Création Liste Emargememt "+leStage.getCodeI());
+
 		try {
 			
 			//creation du document
@@ -879,7 +892,8 @@ public class PasserellePDF {
 			}//finpour
 		}//fin tant que
 		
-		
+		Common.setStatus("Création Feuille de Route FSS " + Nom);
+
 		try {
 			
 			Document doc = new Document(PageSize.A4);
@@ -997,6 +1011,8 @@ public class PasserellePDF {
 		String pathDossier = "FREP du "+date;
 		new File(expDir+pathDossier).mkdir();
 		
+		Common.setStatus("Création FREP "+leStage.getCodeI());
+
 		try {
 			Document doc = new Document(PageSize.A4,60,60,10,10);
 			FileOutputStream fichier;
@@ -1222,6 +1238,8 @@ public class PasserellePDF {
 		String pathDossier = "Surbook du "+date;
 		new File(expDir+pathDossier).mkdir();
 		
+		Common.setStatus("Création Surbook "+leStage.getCodeI());
+
 		try {
 			FileOutputStream fichier;
 			fichier = new FileOutputStream(expDir+pathDossier+"\\Surbook - "+leStage.getCode()+".pdf");
@@ -1359,6 +1377,8 @@ public class PasserellePDF {
 			}//finpour
 		}//fin tant que
 		
+		Common.setStatus("Création C/L Admin du "+ladate);
+
 		try {
 			FileOutputStream fichier;
 			fichier = new FileOutputStream(expDir+pathDossier+"\\CheckListPôleAdm - "+date+".pdf");
@@ -1549,7 +1569,9 @@ public class PasserellePDF {
 		new File(pathDossier).mkdir();
 		
 		String code = leStage.getCode();
-		
+
+		Common.setStatus("Création Affichage Salle "+leStage.getCodeI());
+
 		try {
 			FileOutputStream fichier;
 			fichier = new FileOutputStream(pathDossier+"/Salle - "+leStage.getCode()+".pdf");
