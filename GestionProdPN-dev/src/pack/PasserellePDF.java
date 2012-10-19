@@ -1200,7 +1200,7 @@ public class PasserellePDF {
 			par = new Phrase("Voir Remarques / particularités du stage au verso (AT, problèmes rencontrés, ...) \n \n");
 			doc.add(par);
 			
-			par = new Phrase("Nom du FSS leader : _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n");
+			par = new Phrase("Nom du FSS leader :  " +  leStage.getLeader() + "  / _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n");
 			par.setFont(new Font(Font.HELVETICA, 14));
 			doc.add(par);
 			
