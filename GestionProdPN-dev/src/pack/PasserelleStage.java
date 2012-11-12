@@ -30,7 +30,7 @@ public class PasserelleStage {
 	private static final String filterPat = Config.get("imp.delia.filter.stage");
 	private static final boolean filterCancel = Config.getB("imp.delia.filter.cancel");
 	private static final String filterCancelPat = Config.get("imp.delia.filter.cancel.pat");
-	private static final String filterP123Pat = Config.get("imp.p123.pat");
+	private static final String filterP123Pat = Config.get("imp.pm123.pat");
 
 	private static SimpleDateFormat fmtDate   = new SimpleDateFormat("dd/MM/yyyy");
 
@@ -228,8 +228,8 @@ public class PasserelleStage {
 						String code = infoLigne.get(4);
 						if (code.matches(filterP123Pat)) {
 							code = code.replaceFirst(
-								Config.get("imp.p123.pat."+site),
-								Config.get("imp.p123.rep."+site));
+								Config.get("imp.pm123.pat."+site),
+								Config.get("imp.pm123.rep."+site));
 						}
 						// 4S
 						if (!code.matches(filterCancelPat)) {
