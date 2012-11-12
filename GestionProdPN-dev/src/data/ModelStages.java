@@ -30,6 +30,9 @@ public class ModelStages extends AbstractTableModel
 	private JTable table;
 	public String filterDate;
 	
+	public enum MODE { ALL_COLS, CODE_ONLY };
+	private MODE mode = MODE.ALL_COLS;
+	
 	private boolean mod = false;
 	
     private static final String[] entetes = {"Cie", "Code" , "Libellé", "Leader", "Salle", "Heure"};
@@ -43,7 +46,7 @@ public class ModelStages extends AbstractTableModel
 			{ 60, 80, 60}
 			};
 
-    public ModelStages(JTable table) {
+    public ModelStages(JTable table, MODE ... param) {
         super();
 		//chargement des stages J et J+1
 		stagesAll = PasserelleStage.lectureStageObj();
@@ -55,16 +58,19 @@ public class ModelStages extends AbstractTableModel
 		//cieModel.add("AFR");
 		//cieModel.add("EST");
 		//cieModel.add("CRL");
+		if (param.length == 1)
+			this.mode = param[0];
     	this.table = table;
 		sorter = new TableModelSorter(this);
 		table.setModel(sorter);
 		TableColumnModel tcm = table.getColumnModel();
-    	for (int i =0; i<tcm.getColumnCount(); i++) {
-			tcm.getColumn(i).setMinWidth(colWidths[i][0]);
-			tcm.getColumn(i).setMaxWidth(colWidths[i][1]);
-			tcm.getColumn(i).setPreferredWidth(colWidths[i][2]);
-    	}
-
+		if (mode == MODE.ALL_COLS) {
+			for (int i =0; i<tcm.getColumnCount(); i++) {
+				tcm.getColumn(i).setMinWidth(colWidths[i][0]);
+				tcm.getColumn(i).setMaxWidth(colWidths[i][1]);
+				tcm.getColumn(i).setPreferredWidth(colWidths[i][2]);
+			}
+		}
 		sorter.setTableHeader(table.getTableHeader());
 		
 		table.setRowHeight(18);
@@ -96,15 +102,39 @@ public class ModelStages extends AbstractTableModel
     }
 
     public int getColumnCount() {
-        return entetes.length;
+    	switch (mode) {
+	    	case ALL_COLS:
+	    		return entetes.length;
+	    	case CODE_ONLY:
+	    	default:
+	    		return 1;
+    	}
     }
 
     public String getColumnName(int columnIndex) {
-        return entetes[columnIndex];
+    	int i=0;
+    	switch (mode) {
+	    	case ALL_COLS:
+	    		i=columnIndex;
+	    		break;
+	    	case CODE_ONLY:
+	    	default:
+	    		i=1;
+    	}
+		return entetes[i];
     }
         
     public Object getValueAt(int rowIndex, int columnIndex) {
-		switch(columnIndex){
+    	int i=0;
+    	switch (mode) {
+	    	case ALL_COLS:
+	    		i=columnIndex;
+	    		break;
+	    	case CODE_ONLY:
+	    	default:
+	    		i=1;
+    	}
+		switch(i){
     	case 0:
         	return stages.get(rowIndex).getCompagnie();
     	case 1:
@@ -126,14 +156,19 @@ public class ModelStages extends AbstractTableModel
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
     	boolean write = false;
-    	switch (columnIndex) {
-    		case 0:
-    		case 1:
-	    	case 2:
-	    	case 3:
-	    	case 4:
-	    	case 5:
-	    		write=true;
+    	if (mode == MODE.CODE_ONLY) {
+    		write = false;
+    	}
+    	else {
+	    	switch (columnIndex) {
+	    		case 0:
+	    		case 1:
+		    	case 2:
+		    	case 3:
+		    	case 4:
+		    	case 5:
+		    		write=true;
+	    	}
     	}
     	return write;
     }
@@ -141,9 +176,19 @@ public class ModelStages extends AbstractTableModel
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
         if(aValue != null){
+        	int i=0;
+        	switch (mode) {
+    	    	case ALL_COLS:
+    	    		i=columnIndex;
+    	    		break;
+    	    	case CODE_ONLY:
+    	    	default:
+    	    		i=1;
+        	}
+
             Stage stage = stages.get(rowIndex);
             
-            switch(columnIndex){
+            switch(i){
                 case 0:
                 	stage.setCompagnie((String)aValue);
                     break;
@@ -206,6 +251,12 @@ public class ModelStages extends AbstractTableModel
 		fireTableDataChanged();
 		//fireTableRowsInserted(stages.size() -1, stages.size() -1);
     }
+    
+    @SuppressWarnings("unchecked")
+	public ArrayList<Stage> getStagesInList() {
+    	return (ArrayList<Stage>) stages.clone();
+    }
+
         
     public Stage getSelectedStage() {
     	int idx;

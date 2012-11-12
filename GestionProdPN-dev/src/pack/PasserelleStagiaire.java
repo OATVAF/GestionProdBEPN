@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
+import java.util.regex.PatternSyntaxException;
 
 import javax.swing.*;
 
@@ -201,7 +202,7 @@ public class PasserelleStagiaire {
 	}//fin chargerTousStagiairesPNT()
 	
 	public static ArrayList<Stage> ajoutPnt(ArrayList<Stage> stageList,ArrayList<Stagiaire> pntList){
-		ArrayList<Stage> newStageList = stageList;
+ 		ArrayList<Stage> newStageList = stageList;
 		String site = Config.get("app.site");
 		String s2pat = Config.get("imp.pnt.s2."+site);
 		
@@ -222,7 +223,7 @@ public class PasserelleStagiaire {
 				}
 			}
 			if (stage.getCodeI().startsWith("QT")) {
-				String qtPat = null;
+				String qtPat = "(QTQTQT";
 				String codeStage = stage.getCodeI();
 				for (String s : codeStage.split(" ")) {
 					if (s.length() < 6) {
@@ -237,12 +238,23 @@ public class PasserelleStagiaire {
 				}
 				qtPat += ") *";
 				
-				for (Stagiaire stagiaire : pntList) {
-					if (stagiaire.getCodeStage().matches(qtPat)) {
-						System.out.println("Ajout PNT :" + stagiaire.getNom() + ":"+stagiaire.getCodeStage()
-								+ " au stage :" + ":" +stage.getCode());
-						stage.ajoutStagiaire(stagiaire);
+				try {
+					for (Stagiaire stagiaire : pntList) {
+						if (stagiaire.getCodeStage().matches(qtPat)) {
+							System.out.println("Ajout PNT :" + stagiaire.getNom() + ":"+stagiaire.getCodeStage()
+									+ " au stage :" + ":" +stage.getCode());
+							stage.ajoutStagiaire(stagiaire);
+						}
 					}
+				}
+				catch (PatternSyntaxException e) {
+					JOptionPane.showMessageDialog(null, "<html>Problème de pattern pour le stage : " + codeStage +
+							"<br>Vérifier les codes de QT dans Délia!</html>", "Erreur", JOptionPane.ERROR_MESSAGE);;
+				}
+				if (stage.getSizeStagiaireList() == 0) {
+					JOptionPane.showMessageDialog(null, "<html>Aucun stagiaire pour le stage : " + codeStage +
+							"<br>Vérifier les codes de QT dans Délia!</html>", "Erreur", JOptionPane.ERROR_MESSAGE);;
+
 				}
 			}
 		}
@@ -251,8 +263,44 @@ public class PasserelleStagiaire {
 	}//
 	
 	public static ArrayList<Stage> ajoutPnc(ArrayList<Stage> stageList,ArrayList<Stagiaire> stagiairePNCList) {
-		ArrayList<Stage> newStageList = stageList;
+		//ArrayList<Stage> newStageList = stageList;
+		String site = Config.get("app.site");
+		String m123Pat = Config.get("imp.m123.pat."+site);
+
 		
+Next:	for (Stagiaire stagiaire : stagiairePNCList) {
+			String strCodeStagiaire = stagiaire.getCodeStage().replace(" ", "").trim();
+			// System.out.println("S:"+stagiaire.getNom()+"/"+strCodeStagiaire);
+			// Find stage for code
+			for (Stage stage : stageList) {
+				String strCodeStage = stage.getCodeI().replace(" ", "");
+				if ( (strCodeStagiaire.startsWith(strCodeStage)
+					  || strCodeStage.startsWith(strCodeStagiaire))
+						&& ! stage.getDateDt().before(stagiaire.getDateDeb())
+						&& ! stage.getDateDt().after(stagiaire.getDateFin())
+					) {
+					stage.ajoutStagiaire(stagiaire);
+					System.out.println("Ajout PNC "+stagiaire.getNom() +" sur "+strCodeStage);
+					continue Next;
+				}
+			}		
+			if (strCodeStagiaire.matches(m123Pat)) {
+				int n = Integer.parseInt(""+strCodeStagiaire.charAt(1));
+				String code = "M"+n+" "+site.toUpperCase();
+				System.out.println("+ "+code);
+				Module mod =  new Module(new Long(n), 
+						code, "", stagiaire.getDateDebStage(),
+						Config.get("imp.m123.m"+n+".debut"),
+						Config.get("imp.m123.m"+n+".fin"));
+				mod.setCompagnie(Config.get("imp.m123.comp"));
+				mod.setSalle(Config.get("imp.m123.salle"));
+				Stage stg = new Stage(mod);
+				stg.ajoutStagiaire(stagiaire);
+				stageList.add(stg);
+				continue Next;
+			}
+		}
+		/*
 		for (Stage stage : newStageList) {
 			String strCodeStage = stage.getCodeI().replace(" ", "");
 			for (Stagiaire stagiaire : stagiairePNCList) {
@@ -273,6 +321,8 @@ public class PasserelleStagiaire {
 		}
 		
 		return newStageList;
+		*/
+		return stageList;
 	}
 
 	

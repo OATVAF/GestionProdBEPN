@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -26,7 +27,13 @@ public class PasserelleStage {
 	private static boolean good;
 	private static final String pathObj = Config.get("data.obj");
 	private static final String pathExport = Config.get("imp.delia");
-	
+	private static final String filterPat = Config.get("imp.delia.filter.stage");
+	private static final boolean filterCancel = Config.getB("imp.delia.filter.cancel");
+	private static final String filterCancelPat = Config.get("imp.delia.filter.cancel.pat");
+	private static final String filterP123Pat = Config.get("imp.pm123.pat");
+
+	private static SimpleDateFormat fmtDate   = new SimpleDateFormat("dd/MM/yyyy");
+
 	/**
 	 * procedure de mise a jour des stages
 	 * fait l'importation des données de delia
@@ -46,7 +53,9 @@ public class PasserelleStage {
 		stageExportList = importExportDelia();
 		
 		Date dateactuelle = new Date();
-		if(stageExportList.get(0).getDateDt().equals(dateactuelle) || stageExportList.get(0).getDateDt().before(dateactuelle)){
+		if(!Config.getB("imp.test") && 
+				(stageExportList.get(0).getDateDt().equals(dateactuelle) || stageExportList.get(0).getDateDt().before(dateactuelle)) )
+		{
 			JOptionPane.showMessageDialog(null, "<html>ERREUR ! la date des stages que vous essayez d'importer n'est pas celle de demain !<br> veuillez refaire l'exportation DELIA</html>"
 					,"Erreur",JOptionPane.YES_NO_OPTION);
 		}else{
@@ -127,7 +136,6 @@ public class PasserelleStage {
 	 * @param stageList
 	 * @return stageList
 	 */
-	@SuppressWarnings("deprecation")
 	public static ArrayList<Stage> suppresionStage(ArrayList<Stage> stageList, boolean keepnonJ){
 		//false => suppresion stage non J
 		//true => suppresion stage J
@@ -136,17 +144,7 @@ public class PasserelleStage {
 		
 		//recuperation de la date
 		Date dateActuelle = new Date();
-		String strDay = Integer.toString(dateActuelle.getDate());
-		if(dateActuelle.getDate()<10){
-			strDay = "0"+strDay;
-		}
-		String strMonth = Integer.toString((dateActuelle.getMonth()+1));
-		if(dateActuelle.getMonth()<10){
-			strMonth = "0"+strMonth;
-		}
-		String strYear = Integer.toString(dateActuelle.getYear()+1900);
-		String datedujour = strDay+"/"+strMonth+"/"+strYear;
-		
+		String datedujour = fmtDate.format(dateActuelle);
 		//recuperation des stages a enlever
 		ArrayList<Stage> stageListRem = new ArrayList<Stage>();
 		for (Stage stage : stageListnew) {
@@ -176,6 +174,8 @@ public class PasserelleStage {
 		Map<String, Integer> hsCode = new HashMap<String, Integer>();
 		Map<Long, Integer> hsId = new HashMap<Long, Integer>();
 		Map<String, Stage> hsStages = new HashMap<String,Stage>();
+		
+		String site = Config.get("app.site");
 		
 			try {
 				fichier = new FileReader(pathExport);
@@ -223,13 +223,17 @@ public class PasserelleStage {
 					infoLigne.add(chaine.trim());//recup de la derniere information
 
 					//ajout des modules
-					if(infoLigne.get(3).equalsIgnoreCase("activité") && ! infoLigne.get(4).endsWith("annulé")) {
+					if(infoLigne.get(3).equalsIgnoreCase("activité")) {
 						Long id  = Long.parseLong(infoLigne.get(0));
 						String code = infoLigne.get(4);
-						if (code.matches("P[123].*")) {
+						if (code.matches(filterP123Pat)) {
 							code = code.replaceFirst(
-								Config.get("imp.p123.pat."+Config.get("app.site")),
-								Config.get("imp.p123.rep."+Config.get("app.site")));
+								Config.get("imp.pm123.pat."+site),
+								Config.get("imp.pm123.rep."+site));
+						}
+						// 4S
+						if (!code.matches(filterCancelPat)) {
+							code = code.replaceAll(Config.get("imp.delia.s2.pat"), "$1");
 						}
 						//System.out.println(" ? "+id +"/"+code+" => " + hsCode.get(code));
 						if (hsCode.containsKey(code)) {
@@ -253,20 +257,33 @@ public class PasserelleStage {
 						
 						newmodule.setCompagnie(infoLigne.get(7));
 						if(infoLigne.get(2).equalsIgnoreCase("salle")){
-							newmodule.setSalle("Salle "+infoLigne.get(1));
+							String salle = "Salle "+infoLigne.get(1);
+							String s = salle.substring(salle.lastIndexOf(" ")+1);
+							String n = Config.get("salle."+site+"."+s);
+							if (n != null) {
+								salle = n;
+							}
+							newmodule.setSalle(salle);
 						}
 						if(infoLigne.get(2).equalsIgnoreCase("moyen-bepn")){
 							newmodule.setSalle(infoLigne.get(1));
 						}
 						if(infoLigne.get(2).equalsIgnoreCase("instructeur")){
-							if(infoLigne.get(31).equalsIgnoreCase("oui")){
-								newmodule.setNomLeader(infoLigne.get(1));
-							}else{
-								newmodule.setNomAide(infoLigne.get(1));
+							String n = infoLigne.get(1);
+							for (int i=1; i<10; i++) {
+								String fssFilter = Config.get("imp.fss.pat."+i);
+								if (fssFilter != null ) {
+									n = n.replaceFirst(fssFilter, Config.get("imp.fss.rep."+i));
+								}
+								if(infoLigne.get(31).equalsIgnoreCase("oui")){
+									newmodule.setNomLeader(n);
+								}else{
+									newmodule.setNomAide(n);
+								}
 							}
 						}
 						if(infoLigne.get(2).equalsIgnoreCase("intervenant")){
-							newmodule.setNomAide(infoLigne.get(1));
+							newmodule.setNomIntervenant(infoLigne.get(1));
 						}
 						moduleList.add(newmodule);
 					}
@@ -309,25 +326,36 @@ public class PasserelleStage {
 					}
 					if(! module.getNomAide().equalsIgnoreCase("")){
 						mm.setNomAide(module.getNomAide());
-						//System.out.println("  "+stage.getCode()+" Mod Module:" + mm.getLibelle()+"  A:" + mm.getNomAide() + " s:"+mm.getStage());
+						//System.out.println("  "+stage.getCode()+" Mod Module:" + mm.getLibelle()+" A:" + mm.getNomAide() + " s:"+mm.getStage());
+					}
+					if(! module.getNomIntervenant().equalsIgnoreCase("") &&  
+							mm.getNomAide().equalsIgnoreCase("")) {
+						mm.setNomAide(module.getNomIntervenant());
+						System.out.println("  "+stage.getCode()+" Mod Module:" + mm.getLibelle()+" I>A:" + mm.getNomAide() + " s:"+mm.getStage());
 					}
 					//}else{
 					if(indexmod == -1){
 						//module.setCodeStage(stage.getCode());
 						stage.ajoutModule(module);
-						System.out.println(" +"+stage.getCode()+" Add Module:" + module.getLibelle() + " L:" + module.getNomLeader()+"/"+stage.getLeader() + " s:"+module.getStage());
+						System.out.println(" +"+stage.getCode()+" Add Module:" + module.getLibelle() + " S:" + module.getSalle() + " L:" + module.getNomLeader()+"/"+stage.getLeader() + " s:"+module.getStage());
 					}
 				}
 			}
+
 			// nouveau stage 
 			if(! good){
 				// filter
+				/*
 				if(module.getCodeStage().equalsIgnoreCase("dry")
 				|| module.getCodeStage().equalsIgnoreCase("réserve")
 				|| module.getCodeStage().equalsIgnoreCase("non instruction")
 				|| module.getCodeStage().equalsIgnoreCase("mts")){
+				*/
+				if ( (filterCancel && module.getCodeStage().matches(filterCancelPat))
+						|| module.getCodeStage().matches(filterPat) ) {
+					System.out.println("- "+module.getCodeStage());
 					//nothing
-				}else{
+				} else {
 					Stage s = new Stage(module);
 					s.setIdx(hsId.get(s.getId()), hsCode.get(s.getCodeI()));
 					stageExportList.add(s);
@@ -338,7 +366,7 @@ public class PasserelleStage {
 					}
 					hsStages.put(s.getCode(), s);
 					//System.out.println("Add stage "+s.getCode()+":"+hsId.get(module.getId())+"/"+hsCode.get(module.getCodeStage()));
-					System.out.println("+ "+s.getCode()+":"+s.getIdx()+"/"+s.getIdxMax()+ "M:" + module.getLibelle()+" L:"+s.getLeader() + " s:"+module.getStage());
+					System.out.println("+ "+s.getCode()+"/"+s.getSCode()+":"+s.getIdx()+"/"+s.getIdxMax()+ "M:" + module.getLibelle()+" L:"+s.getLeader() + " s:"+module.getStage());
 				}
 			}
 		}
