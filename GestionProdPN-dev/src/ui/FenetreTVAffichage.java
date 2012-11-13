@@ -26,7 +26,8 @@ import pack.Stage;
  * @author BERON Jean-Sébastien
  *
  */
-public class FenetreTVAffichage extends JFrame implements Runnable{
+public class FenetreTVAffichage extends JFrame implements Runnable
+{
 	
 	private static final long serialVersionUID = 6442873953231455888L;
 	
@@ -34,7 +35,8 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 	private final int NBAFF  = Config.getI("aff.nbstages");	// nombre d'affichage max
 	private final int MINLIM = Config.getI("aff.nbmin0");	// retard max sur stage
 	private final int NBMIN  = Config.getI("aff.nbmin");	// nombre de minutes avant supp stage
-	
+	//private final int NBBEF  = Config.getI("aff.nbmin");	// nombre de minutes avant stage pour affichage
+
 	//attributs IHM
 	private JPanel contentPane;
 	private JPanel headerPane;
@@ -72,7 +74,7 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 
 	// PPT
 	private int nextStartsIn = 0;
-	private Process pptProc;
+	private Process pptProc = null;
 	private String pptExe;
 	private String pptFile;
 	
@@ -104,6 +106,7 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosed(WindowEvent e) {
 				System.out.println("Window Closed Event");
+				stopDiapo();
 				run = false;
 			}
 		});
@@ -136,9 +139,14 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 		String[] args = { pptExe, "/s", pptFile };
 		//execution du diaporama
 		try {
-			stopDiapo();
-			System.out.println("Starts Diapo proc : " + args);
-			pptProc = x.exec(args);
+			if (pptProc == null) {
+				stopDiapo();
+				System.out.println("Starts Diapo proc : " + args);
+				pptProc = x.exec(args);
+			}
+			else {
+				System.out.println("Diapo proc running: "+pptProc);
+			}
 		} catch (IOException e1) {
 			//boite de dialogue d'erreur
 			JOptionPane.showMessageDialog(null, "soit le chemin vers powerpnt.exe est incorrect ! soit le ppt n'est pas nommé TVAFFPPT.ppt !", "Erreur", JOptionPane.ERROR_MESSAGE);
@@ -315,20 +323,23 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 		centerPane.add(stagePane,BorderLayout.CENTER);
 		stageLabels = new JLabel[NBAFF][5];
 		
-		nextStartsIn = 9999;
 		
 		if (TVall == false) {
+			nextStartsIn = 9999;
 			//list qui retient les stages a enlever
 			ArrayList<Stage> removeStage = new ArrayList<Stage>();
 			for (Stage unstage : StageList) {
+				int d = unstage.getnbMin()-nbmin;
 				if(unstage.getnbMin() < (nbmin - NBMIN)){
+					//System.out.println("Remove stage");
 					//enleve les stages qui sont debutés depuis plus de NBMIN minutes
 					removeStage.add(unstage);
 				}
 				else {
-					int d = unstage.getnbMin()-nbmin;
-					if( (d>0) && (d<nextStartsIn)) {
-						nextStartsIn = d;
+					//int d = unstage.getnbMin()-nbmin;
+					if( Math.abs(d)<nextStartsIn) {
+						//System.out.println("nextStartsIn="+d);
+						nextStartsIn = Math.abs(d);
 					}
 				}
 			}//fin pour
@@ -337,8 +348,13 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 		}
 		
 		if (nextStartsIn > NBMIN) {
-			System.out.println("Next Starts In : "+ nextStartsIn);
+			//System.out.println("StartDiapo, next Starts In : "+ nextStartsIn);
 			startDiapo();
+		}
+		//if (nextStartsIn <= NBBEF) {
+		else {
+			//System.out.println("StopDiapo, next Starts In : "+ nextStartsIn);
+			stopDiapo();
 		}
 		
 		//affichage
