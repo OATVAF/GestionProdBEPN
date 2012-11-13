@@ -6,6 +6,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -25,7 +26,8 @@ import pack.Stage;
  * @author BERON Jean-Sébastien
  *
  */
-public class FenetreTVAffichage extends JFrame implements Runnable{
+public class FenetreTVAffichage extends JFrame implements Runnable
+{
 	
 	private static final long serialVersionUID = 6442873953231455888L;
 	
@@ -33,7 +35,8 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 	private final int NBAFF  = Config.getI("aff.nbstages");	// nombre d'affichage max
 	private final int MINLIM = Config.getI("aff.nbmin0");	// retard max sur stage
 	private final int NBMIN  = Config.getI("aff.nbmin");	// nombre de minutes avant supp stage
-	
+	//private final int NBBEF  = Config.getI("aff.nbmin");	// nombre de minutes avant stage pour affichage
+
 	//attributs IHM
 	private JPanel contentPane;
 	private JPanel headerPane;
@@ -69,13 +72,21 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 	private static Font font3 = new Font(Config.get("aff.font3.font"),1,Config.getI("aff.font3.size"));
 	private static Font font4 = new Font(Config.get("aff.font4.font"),1,Config.getI("aff.font4.size"));
 
+	// PPT
+	private int nextStartsIn = 0;
+	private Process pptProc = null;
+	private String pptExe;
+	private String pptFile;
+	
 	/**
 	 * constructeur
 	 */
 	public FenetreTVAffichage(){
-
-		TVall = Config.get("aff.TV").equals("all");
 		
+		TVall = Config.get("aff.TV").equals("all");
+		pptExe = Config.get("aff.cheminpptexe");
+		pptFile = Config.get("aff.ppt");
+
 		//recuperation de la date d'aujourd'hui
 		dateActuelle = new Date();
 		
@@ -95,6 +106,7 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosed(WindowEvent e) {
 				System.out.println("Window Closed Event");
+				stopDiapo();
 				run = false;
 			}
 		});
@@ -120,6 +132,34 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 		run = true;
 		
 	}//fin start()
+	
+	private void startDiapo() {
+		//recherche de l'executable de powerpoint
+		Runtime x = Runtime.getRuntime();
+		String[] args = { pptExe, "/s", pptFile };
+		//execution du diaporama
+		try {
+			if (pptProc == null) {
+				stopDiapo();
+				System.out.println("Starts Diapo proc : " + args);
+				pptProc = x.exec(args);
+			}
+			else {
+				System.out.println("Diapo proc running: "+pptProc);
+			}
+		} catch (IOException e1) {
+			//boite de dialogue d'erreur
+			JOptionPane.showMessageDialog(null, "soit le chemin vers powerpnt.exe est incorrect ! soit le ppt n'est pas nommé TVAFFPPT.ppt !", "Erreur", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+	
+	private void stopDiapo() {
+		if (pptProc != null) {
+			System.out.println("Stop Diapo proc");
+			pptProc.destroy();
+			pptProc = null;
+		}
+	}
 	
 	/**
 	 * procedure qui construit le contentPane
@@ -283,17 +323,38 @@ public class FenetreTVAffichage extends JFrame implements Runnable{
 		centerPane.add(stagePane,BorderLayout.CENTER);
 		stageLabels = new JLabel[NBAFF][5];
 		
+		
 		if (TVall == false) {
+			nextStartsIn = 9999;
 			//list qui retient les stages a enlever
 			ArrayList<Stage> removeStage = new ArrayList<Stage>();
 			for (Stage unstage : StageList) {
+				int d = unstage.getnbMin()-nbmin;
 				if(unstage.getnbMin() < (nbmin - NBMIN)){
+					//System.out.println("Remove stage");
 					//enleve les stages qui sont debutés depuis plus de NBMIN minutes
 					removeStage.add(unstage);
+				}
+				else {
+					//int d = unstage.getnbMin()-nbmin;
+					if( Math.abs(d)<nextStartsIn) {
+						//System.out.println("nextStartsIn="+d);
+						nextStartsIn = Math.abs(d);
+					}
 				}
 			}//fin pour
 			//suppression des stages a enlever de l'affichage
 			StageList.removeAll(removeStage);
+		}
+		
+		if (nextStartsIn > NBMIN) {
+			//System.out.println("StartDiapo, next Starts In : "+ nextStartsIn);
+			startDiapo();
+		}
+		//if (nextStartsIn <= NBBEF) {
+		else {
+			//System.out.println("StopDiapo, next Starts In : "+ nextStartsIn);
+			stopDiapo();
 		}
 		
 		//affichage
