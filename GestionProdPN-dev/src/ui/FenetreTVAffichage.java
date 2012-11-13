@@ -77,6 +77,7 @@ public class FenetreTVAffichage extends JFrame implements Runnable
 	private Process pptProc = null;
 	private String pptExe;
 	private String pptFile;
+	private boolean autoPPT = Config.getB("aff.autoppt");
 	
 	/**
 	 * constructeur
@@ -347,14 +348,16 @@ public class FenetreTVAffichage extends JFrame implements Runnable
 			StageList.removeAll(removeStage);
 		}
 		
-		if (nextStartsIn > NBMIN) {
-			//System.out.println("StartDiapo, next Starts In : "+ nextStartsIn);
-			startDiapo();
-		}
-		//if (nextStartsIn <= NBBEF) {
-		else {
-			//System.out.println("StopDiapo, next Starts In : "+ nextStartsIn);
-			stopDiapo();
+		if (autoPPT) {
+			if (nextStartsIn > NBMIN) {
+				//System.out.println("StartDiapo, next Starts In : "+ nextStartsIn);
+				startDiapo();
+			}
+			//if (nextStartsIn <= NBBEF) {
+			else {
+				//System.out.println("StopDiapo, next Starts In : "+ nextStartsIn);
+				stopDiapo();
+			}
 		}
 		
 		//affichage
