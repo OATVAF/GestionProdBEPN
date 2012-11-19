@@ -154,13 +154,22 @@ public class PasserellePDF {
 		try {
 			String pathDossier = expDir+Config.get(cfgP+"dir")+dateP;
 			new File(pathDossier).mkdir();
-
+			
+			// Margin
+			int vMargin = Config.getI(cfgP+"margin.v");
+			int hMargin = Config.getI(cfgP+"margin.h");
 			//creation du document et du fichier
-			Document doc = new Document(PageSize.A4,20,20,10,0);
+			Document doc = new Document(PageSize.A4,hMargin,hMargin,vMargin,vMargin);
 			FileOutputStream fichier = new FileOutputStream(pathDossier+"/"+fileName);
 			//ouverture du writer
 			PdfWriter.getInstance(doc, fichier);			
 			doc.open();
+			
+			// Rotate
+			if (Config.getB(cfgP+"rotate")) {
+				doc.setPageSize(PageSize.A4.rotate());
+			}
+			doc.newPage();
 			
 			// Génération du doc
 			switch(type) {
@@ -315,10 +324,10 @@ public class PasserellePDF {
 		
 		Common.setStatus("Création Liste Emargement "+leStage.getCodeI());
 			
-		PdfPTable header = new PdfPTable(1);
+		PdfPTable header = new PdfPTable(3);
 		header.setWidthPercentage(100);
 		
-		PdfPCell cell = new PdfPCell(new Phrase(Config.get(cfgP+"s1"), fontB10));
+		PdfPCell cell = new PdfPCell(new Phrase(leStage.getLibelle(), fontB12));
 		cell.setHorizontalAlignment(Element.ALIGN_LEFT);
 		cell.setVerticalAlignment(Element.ALIGN_BOTTOM);
 		cell.setPadding(0);
@@ -494,7 +503,7 @@ public class PasserellePDF {
 		PdfPTable header = new PdfPTable(3);
 		header.setWidthPercentage(100);
 		
-		PdfPCell cell = new PdfPCell(new Phrase(Config.get(cfgP+"s1"), fontB10));
+		PdfPCell cell = new PdfPCell(new Phrase(leStage.getLibelle(), fontB10));
 		cell.setHorizontalAlignment(Element.ALIGN_LEFT);
 		cell.setVerticalAlignment(Element.ALIGN_BOTTOM);
 		cell.setPadding(0);
@@ -530,12 +539,13 @@ public class PasserellePDF {
 
 		cell = new PdfPCell(new Phrase("N",fontB10)); cell.setBorder(0);
 		cell.setColspan(3);
+		cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+		cell.setPhrase(new Phrase(Config.get(cfgP+"s1"),fontB10));	center.addCell(cell);		
 		cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-		cell.setPhrase(new Phrase("",fontB10));				center.addCell(cell);		
 		cell.setColspan(1);
-		cell.setPhrase(new Phrase("Emargement",fontB10));	center.addCell(cell);
+		cell.setPhrase(new Phrase(Config.get(cfgP+"l1"),fontB10));	center.addCell(cell);
 		cell.setColspan(3);
-		cell.setPhrase(new Phrase("",fontB10));				center.addCell(cell);		
+		cell.setPhrase(new Phrase("",fontB10));						center.addCell(cell);		
 		cell.setColspan(1);
 
 		cell.setHorizontalAlignment(Element.ALIGN_LEFT);
@@ -737,11 +747,27 @@ public class PasserellePDF {
 
 		//creation du document
 		
-		PdfPTable header = new PdfPTable(1);
+		PdfPTable header = new PdfPTable(2);
 		header.setWidthPercentage(100);
-		
-		PdfPCell cell = new PdfPCell(new Phrase(leStage.getDateStr(),fontB12));
-		cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+		PdfPCell cell;
+		try {
+			Image img = Image.getInstance(Config.get("data.logos")+"Orig/"+leStage.getCompagnie()+".jpg");
+			img.scaleAbsoluteWidth(30*img.getWidth()/img.getHeight());
+			img.scaleAbsoluteHeight(30);
+			cell = new PdfPCell(img); 
+		} catch (FileNotFoundException e) {
+			cell = new PdfPCell(new Phrase("")); 
+		} catch (MalformedURLException e) {
+			cell = new PdfPCell(new Phrase("")); 
+		} catch (IOException e) {
+			cell = new PdfPCell(new Phrase("")); 
+		}
+		cell.setBorder(0);
+		header.addCell(cell);
+	
+		cell = new PdfPCell(new Phrase(leStage.getDateStr(),fontB12));
+		cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		cell.setBorder(0);
 		header.addCell(cell);
 
@@ -750,8 +776,9 @@ public class PasserellePDF {
 		cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		cell.setPadding(5);
 		cell.setBorder(0);
+		cell.setColspan(2);
 		header.addCell(cell);
-		
+
 		PdfPTable center = new PdfPTable(34);
 		center.setWidthPercentage(95);
 		cell = new PdfPCell(new Phrase("",fontB10));
@@ -1398,8 +1425,7 @@ public class PasserellePDF {
 		
 		Common.setStatus("Création C/L Admin du "+date);
 
-		doc.setPageSize(PageSize.A4.rotate());
-		doc.newPage();
+		//doc.newPage();
 		//PdfWriter.getInstance(doc, fichier);
 		//doc.open();
 		
