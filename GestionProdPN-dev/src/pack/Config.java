@@ -150,7 +150,8 @@ public enum Config {
 		} catch (ConfigException e) {
 			System.out.println("[ERR] get("+param+"):" + e.getMessage());
 		}
-		return null;
+		System.out.println("[WRN] get("+param+"): key not found!");
+		return "";
 	}
 	public static int getI(String param) {
 		try {
@@ -162,6 +163,7 @@ public enum Config {
 		} catch (ConfigException e) {
 			System.out.println("[ERR] getI("+param+"):" + e.getMessage());
 		}
+		System.out.println("[WRN] getI("+param+"): key not found!");
 		return 0;
 	}
 	public static float getF(String param) {
@@ -174,6 +176,7 @@ public enum Config {
 		} catch (ConfigException e) {
 			System.out.println("[ERR] getF("+param+"):" + e.getMessage());
 		}
+		System.out.println("[WRN] getF("+param+"): key not found!");
 		return 0;
 	}
 	public static boolean getB(String param) {
@@ -186,6 +189,7 @@ public enum Config {
 		} catch (ConfigException e) {
 			System.out.println("[ERR] getB("+param+"):" + e.getMessage());
 		}
+		System.out.println("[WRN] getB("+param+"): key not found!");
 		return false;
 	}
 	public static void set(String param, String val) {
@@ -198,6 +202,7 @@ public enum Config {
 		} catch (ConfigException e) {
 			System.out.println("[ERR] set("+param+","+val+"):" + e.getMessage());
 		}
+		System.out.println("[WRN] set("+param+"): key not found!");
 	}
 	public static URL getRes(String param) {
 		return Config.class.getResource("/res/"+param);
