@@ -217,6 +217,18 @@ public class Stage implements Serializable /*,Cloneable*/ {
 		}
 	}
 
+	/**
+	 * revoit le dernier module du stage
+	 * @return module
+	 */
+	public Module getLastModule(){
+		if (coStage != null) {
+			return coStage.getLastModule();
+		}
+		else {
+			return moduleList.get(moduleList.size()-1);
+		}
+	}
 
 	/**
 	 * /**

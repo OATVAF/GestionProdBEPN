@@ -362,30 +362,42 @@ public class PasserellePDF {
 		PdfPTable header = new PdfPTable(3);
 		header.setWidthPercentage(100);
 		
+		// Head 1
 		Phrase p = new Phrase(getCellImage(leStage, cfg));
 		p.add(new Phrase("\n"+leStage.getLibelle(), fontB12));
 		PdfPCell cell = new PdfPCell(p);
 		cell.setHorizontalAlignment(Element.ALIGN_LEFT);
 		cell.setVerticalAlignment(Element.ALIGN_BOTTOM);
 		cell.setPadding(0);
-		//cell.setPaddingTop(5);
 		cell.setBorder(0);
 		header.addCell(cell);
 		
-		cell = new PdfPCell(new Phrase(leStage.getCode(),fontB22));
+		cell.setPhrase(new Phrase(leStage.getCode(),fontB22));
 		cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-		//cell.setPadding(5);
-		cell.setBorder(0);
+		cell.setPadding(5);
 		header.addCell(cell);
 
-		cell = new PdfPCell(new Phrase(leStage.getDateStr()+"   ",fontB12));
+		cell.setPhrase(new Phrase(leStage.getDateStr()+"   ",fontB12));
 		cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-		cell.setVerticalAlignment(Element.ALIGN_BOTTOM);
-		cell.setPadding(0);
-		cell.setBorder(0);
+		cell.setPadding(2);
 		header.addCell(cell);
 				
+		cell.setPhrase(new Phrase(Config.get(cfg+"s1"),fontB10));
+		cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+		header.addCell(cell);		
+		
+		cell.setPhrase(new Phrase(Config.get(cfg+"l1"),fontB10));
+		cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+		header.addCell(cell);
+
+		cell.setPhrase(new Phrase(Config.get(cfg+"h1") + 
+				leStage.getFirstModule().getHeureDebut() + " à " +
+				leStage.getLastModule().getHeureFin(),
+				fontB10));
+		cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+		header.addCell(cell);		
+		
 		//formation du center
 		PdfPTable center = new PdfPTable(colNum);
 		//center.setWidthPercentage(95);
@@ -394,7 +406,8 @@ public class PasserellePDF {
 		for (int i=1; i<=colNum; i++) { widths[i-1]=Config.getF(cfg+"col"+i+".w"); }
 		center.setWidths(widths);
 		
-		cell = new PdfPCell(new Phrase("N",fontB10)); cell.setBorder(0);
+		//cell = new PdfPCell(new Phrase("N",fontB10)); cell.setBorder(0);
+		cell.setHorizontalAlignment(Element.ALIGN_LEFT);
 
 		for (int i=1; i<=5; i++) {
 			cell.setPhrase(new Phrase(Config.get(cfg+"col"+i+".str"),fontB10));
@@ -525,7 +538,7 @@ public class PasserellePDF {
 		
 		//ajout des composants
 		doc.add(header);
-		doc.add(new Paragraph("        "));
+		//doc.add(new Paragraph("        "));
 		doc.add(center);
 		doc.add(new Paragraph("        "));
 		doc.add(footer);
@@ -544,28 +557,39 @@ public class PasserellePDF {
 		PdfPTable header = new PdfPTable(3);
 		header.setWidthPercentage(100);
 		
+		// Head 1
 		PdfPCell cell = new PdfPCell(new Phrase(leStage.getLibelle(), fontB10));
 		cell.setHorizontalAlignment(Element.ALIGN_LEFT);
-		cell.setVerticalAlignment(Element.ALIGN_BOTTOM);
-		cell.setPadding(0);
-		cell.setPaddingTop(5);
-		cell.setBorder(0);
-		header.addCell(cell);
-		
-		cell = new PdfPCell(new Phrase(leStage.getCode(),fontB22));
-		cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-		cell.setPadding(5);
 		cell.setBorder(0);
 		header.addCell(cell);
-
-		cell = new PdfPCell(new Phrase(leStage.getDateStr()+"   ",fontB12));
-		cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-		cell.setVerticalAlignment(Element.ALIGN_BOTTOM);
-		cell.setBorder(0);
-		header.addCell(cell);
-
 		
+		cell.setPhrase(new Phrase(leStage.getCode(),fontB22));
+		cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+		cell.setPadding(5);
+		header.addCell(cell);
+
+		cell.setPhrase(new Phrase(leStage.getDateStr()+"   ",fontB12));
+		cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+		cell.setPadding(2);
+		header.addCell(cell);
+
+		// Dif + emargement + horaires
+		cell.setPhrase(new Phrase(Config.get(cfg+"s1"),fontB10));
+		cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+		header.addCell(cell);		
+		
+		cell.setPhrase(new Phrase(Config.get(cfg+"l1"),fontB10));
+		cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+		header.addCell(cell);
+
+		cell.setPhrase(new Phrase(Config.get(cfg+"h1") + 
+				leStage.getFirstModule().getHeureDebut() + " à " +
+				leStage.getLastModule().getHeureFin(),
+				fontB10));
+		cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+		header.addCell(cell);		
+
 		//formation du center
 		PdfPTable center = new PdfPTable(7);
 		center.setWidthPercentage(98);
@@ -574,27 +598,16 @@ public class PasserellePDF {
 		for (int i=1; i<=colNum; i++) { widths[i-1]=Config.getF(cfg+"col"+i+".w"); }
 		center.setWidths(widths);
 		
-		cell.setPadding(0);
-		cell.setPaddingTop(0);
-		cell.setPaddingBottom(0);
-
-		cell = new PdfPCell(new Phrase("N",fontB10)); cell.setBorder(0);
-		cell.setColspan(3);
+		//cell.setPaddingTop(0);
+		//cell.setPaddingBottom(0);
 		cell.setHorizontalAlignment(Element.ALIGN_LEFT);
-		cell.setPhrase(new Phrase(Config.get(cfg+"s1"),fontB10));	center.addCell(cell);		
-		cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-		cell.setColspan(1);
-		cell.setPhrase(new Phrase(Config.get(cfg+"l1"),fontB10));	center.addCell(cell);
-		cell.setColspan(3);
-		cell.setPhrase(new Phrase("",fontB10));						center.addCell(cell);		
-		cell.setColspan(1);
-
-		cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+		// Col Head
 		for (int i=1; i<=colNum; i++) {
 				cell.setPhrase(new Phrase(Config.get(cfg+"col"+i+".str"),fontB10));
 				center.addCell(cell);				
 		}
-		
+
+		cell.setPadding(2);
 		int i;
 		for (i = 0; i < leStage.getSizeStagiaireList(); i++) {
 				cell.setPhrase(new Phrase(""+(i+1), font));
