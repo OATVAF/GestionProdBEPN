@@ -121,10 +121,10 @@ public class FenetreGenerationPDFNew extends JFrame implements ActionListener,
 
 			if (source.equals(allActionsBtn)) {
 				genAll = true;
-				max = allStages.size()*4+FssModules.size()+2;
+				max = allStages.size()*3+FssModules.size()+2;
 			}
 			else {
-				max=Math.max(ms.getSelectedStages().size(),FssModules.size()+1);
+				max=Math.max(allStages.size(),FssModules.size()+1);
 			}
 			//statusBar.setMax(max);
 
@@ -132,7 +132,7 @@ public class FenetreGenerationPDFNew extends JFrame implements ActionListener,
     		if(source.equals(listStagiaireBtn)){
     			for (Stage leStage :  ms.getSelectedStages()) {
     				PasserellePDF.creationDoc(leStage, DocTypes.LISTE_STAGIAIRES);
-               		setProgress(100*progress++/max);
+    				//setProgress(100*progress++/max);
     				PasserellePDF.creationDoc(leStage, DocTypes.AFFICHAGE_SALLE);
                		setProgress(100*progress++/max);
     			}
@@ -150,7 +150,7 @@ public class FenetreGenerationPDFNew extends JFrame implements ActionListener,
     		if(source.equals(allListStagiaireBtn) || genAll){
     			for (Stage leStage : allStages) {
     				PasserellePDF.creationDoc(leStage, DocTypes.LISTE_STAGIAIRES);
-               		setProgress(100*progress++/max);
+    				//setProgress(100*progress++/max);
     				PasserellePDF.creationDoc(leStage, DocTypes.AFFICHAGE_SALLE);
              		setProgress(100*progress++/max);
     			}//finpour
