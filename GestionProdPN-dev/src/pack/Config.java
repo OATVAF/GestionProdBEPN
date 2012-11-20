@@ -151,7 +151,7 @@ public enum Config {
 			System.out.println("[ERR] get("+param+"):" + e.getMessage());
 		}
 		System.out.println("[WRN] get("+param+"): key not found!");
-		return "";
+		return null;
 	}
 	public static int getI(String param) {
 		try {
