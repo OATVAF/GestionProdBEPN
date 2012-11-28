@@ -10,6 +10,10 @@ import java.util.Properties;
 
 import javax.swing.JOptionPane;
 
+/**
+ * Config Enum : reads ini.properties to get conf.files
+ */
+
 public enum Config {
 	
 	INSTANCE;
@@ -53,15 +57,15 @@ public enum Config {
 				throw new ConfigException("key not found");
 			}
 		}
-		public int getI(String param) throws ConfigException {
+		public int getI(String param) throws ConfigException, NumberFormatException {
 			if (prop.containsKey(param)) {
-				return Integer.parseInt(prop.getProperty(param)); 
+				return Integer.decode(prop.getProperty(param)); 
 			}
 			else {
 				throw new ConfigException("key not found");
 			}
 		}
-		public float getF(String param) throws ConfigException {
+		public float getF(String param) throws ConfigException, NumberFormatException {
 			if (prop.containsKey(param)) {
 				return Float.parseFloat(prop.getProperty(param)); 
 			}
@@ -139,7 +143,11 @@ public enum Config {
 			}
 		}
 	}
-	
+	/**
+	 * Gets string value of param config
+	 * @param param		the config string
+	 * @return the value as string
+	 */
 	public static String get(String param) {
 		try {
 			for (myProp p : INSTANCE.Props) {
@@ -150,9 +158,14 @@ public enum Config {
 		} catch (ConfigException e) {
 			System.out.println("[ERR] get("+param+"):" + e.getMessage());
 		}
-		System.out.println("[WRN] get("+param+"): key not found!");
+		//System.out.println("[WRN] get("+param+"): key not found!");
 		return null;
 	}
+	/**
+	 * Gets integer value of param config
+	 * @param param		the config string
+	 * @return the value as int
+	 */
 	public static int getI(String param) {
 		try {
 			for (myProp p : INSTANCE.Props) {
@@ -161,11 +174,18 @@ public enum Config {
 				}
 			}
 		} catch (ConfigException e) {
+		} catch (NumberFormatException e) { 
 			System.out.println("[ERR] getI("+param+"):" + e.getMessage());
+			return 0;
 		}
 		System.out.println("[WRN] getI("+param+"): key not found!");
 		return 0;
 	}
+	/**
+	 * Gets float value of param config
+	 * @param param		the config string
+	 * @return the value as float
+	 */
 	public static float getF(String param) {
 		try {
 			for (myProp p : INSTANCE.Props) {
@@ -174,11 +194,18 @@ public enum Config {
 				}
 			}
 		} catch (ConfigException e) {
+		} catch (NumberFormatException e) { 
 			System.out.println("[ERR] getF("+param+"):" + e.getMessage());
+			return 0;
 		}
 		System.out.println("[WRN] getF("+param+"): key not found!");
 		return 0;
 	}
+	/**
+	 * Gets boolean value of param config
+	 * @param param		the config string
+	 * @return the value as boolean
+	 */
 	public static boolean getB(String param) {
 		try {
 			for (myProp p : INSTANCE.Props) {
@@ -188,6 +215,7 @@ public enum Config {
 			}
 		} catch (ConfigException e) {
 			System.out.println("[ERR] getB("+param+"):" + e.getMessage());
+			return false;
 		}
 		System.out.println("[WRN] getB("+param+"): key not found!");
 		return false;
@@ -201,6 +229,7 @@ public enum Config {
 			}
 		} catch (ConfigException e) {
 			System.out.println("[ERR] set("+param+","+val+"):" + e.getMessage());
+			return;
 		}
 		System.out.println("[WRN] set("+param+"): key not found!");
 	}
