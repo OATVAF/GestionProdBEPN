@@ -73,31 +73,31 @@ public class PasserellePDF {
 	/** 
 	 *  Liste des document éditables
 	 */
-	public enum DocTypes {
-		/** Liste des stagiaires pour affichage */
-		LISTE_STAGIAIRES,
-		/** Liste des stagiaires pour émargement */
-		LISTE_EMARGEMENTS,
-		/** Liste des stagiaires pour émargement avec DIF */
-		LISTE_EMARGEMENTS_DIF,
-		/** Liste des stagiaires <b>vide</b> pour émargement */
-		LISTE_EMARGEMENT_VIDE,
-		/** FREP */
-		FREP,
-		/** Feuille de route FSS */
-		FEUILLE_ROUTE_FSS,
-		SURBOOK,
-		/** Affichage entrée salle */
-		AFFICHAGE_SALLE,
-		/** C/L pôle admin */
-		CHECKLIST,
-		/** Dossier complet FSS */
-		DOSSIER_FSS
-	};
-	
-	
+	//public enum DocTypes {
+	/** Liste des stagiaires pour affichage */
+	public static final int	LISTE_STAGIAIRES = 0x0;
+	/** Liste des stagiaires pour émargement */
+	public static final int	LISTE_EMARGEMENTS = 0x1;
+	/** Liste des stagiaires pour émargement avec DIF */
+	public static final int	LISTE_EMARGEMENTS_DIF = 0x2;
+	/** Liste des stagiaires <b>vide</b> pour émargement */
+	public static final int	LISTE_EMARGEMENT_VIDE = 0x3;
+	/** FREP */
+	public static final int	FREP = 0x4;
+	/** Feuille de route FSS */
+	public static final int	FEUILLE_ROUTE_FSS = 0x5;
+	/** Feuille Surbook stagiaire */
+	public static final int	SURBOOK = 0x6;
+	/** Affichage entrée salle */
+	public static final int	AFFICHAGE_SALLE = 0x7;
+	/** C/L pôle admin */
+	public static final int	CHECKLIST = 0x8;
+	/** Dossier complet FSS */
+	public static final int	DOSSIER_FSS = 0x9;
+	//};
+		
 	@SuppressWarnings("unchecked")
-	public static void creationDoc(/*Stage leStage*/ Object param, DocTypes type) {
+	public static void creationDoc(/*Stage leStage*/ Object param, int type) {
 		String cfgP="";
 		String fileName="";
 		boolean dif = false;
@@ -124,33 +124,14 @@ public class PasserellePDF {
 
 		//System.out.println("creationDoc("+param.getClass()+" "+leStage.getCode()+", "+type+")");
 		// Type de doc
-		switch(type) {
-		case LISTE_STAGIAIRES: 
-			cfgP="pdf.stagiaires.";
-			break;
-		case LISTE_EMARGEMENTS:
-			cfgP="pdf.emargement.";
-			break;
-		case FREP:
-			cfgP="pdf.frep.";
-			break;
-		case FEUILLE_ROUTE_FSS:
-			cfgP="pdf.frfss.";
-			break;
-		case SURBOOK:
-			cfgP="pdf.surbook.";
-			break;
-		case AFFICHAGE_SALLE:
-			cfgP="pdf.salles.";
-			break;
-		case CHECKLIST:
-			cfgP="pdf.cl.";
-			break;
-		default:
-			
-			break;
+		cfgP = Config.get("pdf.doc."+type);
+		if (cfgP == null) {
+			System.out.println("[ERR] creationDoc unknown type "+type);
 		}
-
+		else {
+			cfgP="pdf."+cfgP+".";
+		}
+		
 		// Nom du fichier
 		String date = leStage.getDateStr();
 		String dateP = date.replace("/", ".");
@@ -176,65 +157,80 @@ public class PasserellePDF {
 		if (Config.getB("pdf.dif")) {
 			dif = leStage.getCode().matches(Config.get("pdf.dif.pattern"));
 		}
-
+		// Dossier
+		ArrayList<Integer> l; 
+		if (type == DOSSIER_FSS) {
+			l = Config.getIL(cfgP+"docs");
+			System.out.println(l);
+		}
+		else {
+			l = new ArrayList<Integer>();
+			l.add(type);
+		}
+		
 		try {
 			String pathDossier = expDir+Config.get(cfgP+"dir")+dateP;
 			new File(pathDossier).mkdir();
 			
 			// Margin
-			int vMargin = Config.getI(cfgP+"margin.v");
-			int hMargin = Config.getI(cfgP+"margin.h");
+			//int vMargin = Config.getI(cfgP+"margin.v");
+			//int hMargin = Config.getI(cfgP+"margin.h");
 			//creation du document et du fichier
-			Document doc = new Document(PageSize.A4,hMargin,hMargin,vMargin,vMargin);
+			Document doc = new Document(PageSize.A4,0,0,0,0);
 			FileOutputStream fichier = new FileOutputStream(pathDossier+"/"+fileName);
 			//ouverture du writer
 			PdfWriter.getInstance(doc, fichier);			
 			doc.open();
-			
-			// Rotate
-			if (Config.getB(cfgP+"rotate")) {
-				doc.setPageSize(PageSize.A4.rotate());
-			}
-			doc.newPage();
-			
-			// Génération du doc
-			switch(type) {
-			case LISTE_STAGIAIRES: 
-				creationListStagiaire(leStage, doc, cfgP);
-				break;
-			case LISTE_EMARGEMENTS:
-				if (leStage.getSizeStagiaireList() != 0) {
-					if (dif)
-						creationListeEmargementDIF(leStage, doc, cfgP);
-					else
-						creationListeEmargement(leStage, doc, cfgP);
-				} else 
-					creationListeEmargementVide(leStage, doc, cfgP);
-				break;
-			case FREP:
-				creationFREP(leStage, doc, cfgP);
-				break;
-			case AFFICHAGE_SALLE:
-				creationAffichageSalle(leStage, doc, cfgP);
-				break;
-			case CHECKLIST:
-				creationCheckListAdm(listeStage, doc, cfgP);
-				break;
-			case SURBOOK:
-				creationSurbook(leStage, doc, cfgP);
-				break;
-			case FEUILLE_ROUTE_FSS:
-				creationFeuilRouteFSS(fssModules, doc, cfgP);
-				break;
-			default:
-				break;
-			}
-			
+				
+			for (int mType : l) {
+				cfgP = "pdf."+Config.get("pdf.doc."+mType)+".";
+				// Margin
+				int vMargin = Config.getI(cfgP+"margin.v");
+				int hMargin = Config.getI(cfgP+"margin.h");
+				doc.setMargins(hMargin,hMargin,vMargin,vMargin);
+				// Rotate
+				if (Config.getB(cfgP+"rotate")) {
+					doc.setPageSize(PageSize.A4.rotate());
+				}
+				doc.newPage();
+				
+				// Génération du doc
+				switch(mType) {
+				case LISTE_STAGIAIRES: 
+					creationListStagiaire(leStage, doc, cfgP);
+					break;
+				case LISTE_EMARGEMENTS:
+					if (leStage.getSizeStagiaireList() != 0) {
+						if (dif)
+							creationListeEmargementDIF(leStage, doc, cfgP);
+						else
+							creationListeEmargement(leStage, doc, cfgP);
+					} else 
+						creationListeEmargementVide(leStage, doc, cfgP);
+					break;
+				case FREP:
+					creationFREP(leStage, doc, cfgP);
+					break;
+				case AFFICHAGE_SALLE:
+					creationAffichageSalle(leStage, doc, cfgP);
+					break;
+				case CHECKLIST:
+					creationCheckListAdm(listeStage, doc, cfgP);
+					break;
+				case SURBOOK:
+					creationSurbook(leStage, doc, cfgP);
+					break;
+				case FEUILLE_ROUTE_FSS:
+					creationFeuilRouteFSS(fssModules, doc, cfgP);
+					break;
+				default:
+					break;
+				}
+			}			
 			//fermeture du writer
 			doc.close();
-			
 		} catch (FileNotFoundException e) {
-			JOptionPane.showMessageDialog(null, "erreur de fichier: " +fileName, "Erreur", JOptionPane.ERROR_MESSAGE);
+		JOptionPane.showMessageDialog(null, "erreur de fichier: " +fileName, "Erreur", JOptionPane.ERROR_MESSAGE);
 		} catch (DocumentException e) {
 			JOptionPane.showMessageDialog(null, "erreur de document: " +e.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
 		}

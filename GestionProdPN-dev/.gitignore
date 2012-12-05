@@ -3,6 +3,7 @@ dataImport
 dataExport
 api/db
 api/log
+api/itextpdf-5.3.4.jar
 dataSystem/Archive*
 dataSystem/logos/Orig/*.png
 *Thumbs.db

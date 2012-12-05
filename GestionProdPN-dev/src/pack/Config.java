@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JOptionPane;
 
@@ -157,8 +159,9 @@ public enum Config {
 			}
 		} catch (ConfigException e) {
 			System.out.println("[ERR] get("+param+"):" + e.getMessage());
+			return null;
 		}
-		//System.out.println("[WRN] get("+param+"): key not found!");
+		System.out.println("[WRN] get("+param+"): key not found!");
 		return null;
 	}
 	/**
@@ -181,6 +184,35 @@ public enum Config {
 		System.out.println("[WRN] getI("+param+"): key not found!");
 		return 0;
 	}
+	/**
+	 * Gets integers list value of param config
+	 * @param param		the config string
+	 * @return the value as ArrayList<Integer>
+	 */
+	public static ArrayList<Integer> getIL(String param) {
+		final String listRE = "([0-9]+),*";
+		ArrayList<Integer> r = new ArrayList<Integer>();
+		try {
+			for (myProp p : INSTANCE.Props) {
+				if (p.contains(param)) {
+					String t = p.get(param);
+					Pattern regexp = Pattern.compile(listRE);
+					Matcher matcher = regexp.matcher(t);
+					while (matcher.find()) {
+						r.add(Integer.parseInt(matcher.toMatchResult().group(1)));
+					}
+					return r;
+				}
+			}
+		} catch (ConfigException e) {
+		} catch (NumberFormatException e) { 
+			System.out.println("[ERR] getI("+param+"):" + e.getMessage());
+			return r;
+		}
+		System.out.println("[WRN] getI("+param+"): key not found!");
+		return r;
+	}
+
 	/**
 	 * Gets float value of param config
 	 * @param param		the config string

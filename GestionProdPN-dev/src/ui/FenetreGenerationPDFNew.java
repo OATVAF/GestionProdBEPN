@@ -32,7 +32,6 @@ import org.jdesktop.swingworker.SwingWorker;
 import data.ModelStages;
 
 import pack.PasserellePDF;
-import pack.PasserellePDF.DocTypes;
 import pack.PasserellePDF.FSS_Modules;
 import pack.Stage;
 
@@ -72,7 +71,8 @@ public class FenetreGenerationPDFNew extends JFrame implements ActionListener,
 	private JButton surbookBtn;
 	private JButton checkListBtn;
 	private JButton fssBtn;
-	
+	private JButton dosBtn;
+
 	// Models
 	private ModelStages ms;
 	private JPanel allPane;
@@ -131,9 +131,9 @@ public class FenetreGenerationPDFNew extends JFrame implements ActionListener,
 			//si le bouton est le bouton de la génération d'un liste de stagiaires
     		if(source.equals(listStagiaireBtn)){
     			for (Stage leStage :  ms.getSelectedStages()) {
-    				PasserellePDF.creationDoc(leStage, DocTypes.LISTE_STAGIAIRES);
+    				PasserellePDF.creationDoc(leStage, PasserellePDF.LISTE_STAGIAIRES);
     				//setProgress(100*progress++/max);
-    				PasserellePDF.creationDoc(leStage, DocTypes.AFFICHAGE_SALLE);
+    				PasserellePDF.creationDoc(leStage, PasserellePDF.AFFICHAGE_SALLE);
                		setProgress(100*progress++/max);
     			}
     		}//finsi
@@ -141,7 +141,7 @@ public class FenetreGenerationPDFNew extends JFrame implements ActionListener,
     		//si le bouton est le bouton de la génération d'un liste d'emargement
     		if(source.equals(listEmargBtn)){
     			for (Stage leStage :  ms.getSelectedStages()) {
-    				PasserellePDF.creationDoc(leStage, DocTypes.LISTE_EMARGEMENTS);
+    				PasserellePDF.creationDoc(leStage, PasserellePDF.LISTE_EMARGEMENTS);
                		setProgress(100*progress++/max);
     			}
     		}//finsi
@@ -149,9 +149,9 @@ public class FenetreGenerationPDFNew extends JFrame implements ActionListener,
     		//si le bouton est le bouton de la génération de toutes les listes de stagiaires
     		if(source.equals(allListStagiaireBtn) || genAll){
     			for (Stage leStage : allStages) {
-    				PasserellePDF.creationDoc(leStage, DocTypes.LISTE_STAGIAIRES);
+    				PasserellePDF.creationDoc(leStage, PasserellePDF.LISTE_STAGIAIRES);
     				//setProgress(100*progress++/max);
-    				PasserellePDF.creationDoc(leStage, DocTypes.AFFICHAGE_SALLE);
+    				PasserellePDF.creationDoc(leStage, PasserellePDF.AFFICHAGE_SALLE);
              		setProgress(100*progress++/max);
     			}//finpour
     		}//finsi
@@ -159,7 +159,7 @@ public class FenetreGenerationPDFNew extends JFrame implements ActionListener,
     		//si le bouton est le bouton de la génération de toutes les listes d'emargement
     		if(source.equals(allListEmargBtn) || genAll){
     			for (Stage leStage : allStages) {
-    				PasserellePDF.creationDoc(leStage, DocTypes.LISTE_EMARGEMENTS);
+    				PasserellePDF.creationDoc(leStage, PasserellePDF.LISTE_EMARGEMENTS);
                		setProgress(100*progress++/max);
     			}//finpour
     		}//finsi
@@ -167,7 +167,7 @@ public class FenetreGenerationPDFNew extends JFrame implements ActionListener,
     		//si le bouton est le bouton de la génération d'une FREP
     		if(source.equals(frepBtn) || genAll){
     			for (Stage leStage : allStages) {
-    				PasserellePDF.creationDoc(leStage, DocTypes.FREP);
+    				PasserellePDF.creationDoc(leStage, PasserellePDF.FREP);
                		setProgress(100*progress++/max);
     			}
     		}//finsi
@@ -175,25 +175,33 @@ public class FenetreGenerationPDFNew extends JFrame implements ActionListener,
     		//si le bouton est le bouton de la génération d'un surbook
     		if(source.equals(surbookBtn)){
     			for (Stage leStage : ms.getSelectedStages()) {
-    				PasserellePDF.creationDoc(leStage, DocTypes.SURBOOK);
+    				PasserellePDF.creationDoc(leStage, PasserellePDF.SURBOOK);
                		setProgress(100*progress++/max);
     			}
     		}//finsi
     		
     		//si le bouton est le bouton de la génération dde la checkList
     		if(source.equals(checkListBtn) || genAll){
-        		PasserellePDF.creationDoc(allStages, DocTypes.CHECKLIST);
+        		PasserellePDF.creationDoc(allStages, PasserellePDF.CHECKLIST);
         		setProgress(100*progress++/max);
     		}//finsi
     		
     		//si le bouton est le bouton pour les feuilles de routes
     		if(source.equals(fssBtn) || genAll){
     			for (FSS_Modules fss : FssModules) {
-    				PasserellePDF.creationDoc(fss, DocTypes.FEUILLE_ROUTE_FSS);
+    				PasserellePDF.creationDoc(fss, PasserellePDF.FEUILLE_ROUTE_FSS);
         			setProgress(100*progress++/max);
     			}
     		}
     		
+    		//si le bouton est le bouton pour les feuilles de routes
+    		if(source.equals(dosBtn)){
+    			for (FSS_Modules fss : FssModules) {
+    				PasserellePDF.creationDoc(fss, PasserellePDF.DOSSIER_FSS);
+        			setProgress(100*progress++/max);
+    			}
+    		}
+
     		return null;
         }
  
@@ -495,6 +503,10 @@ public class FenetreGenerationPDFNew extends JFrame implements ActionListener,
 		fssBtn.addActionListener(this);
 		fssBtn.setPreferredSize(btDim);
 		fssPane.add(fssBtn);
+		dosBtn = new JButton(Messages.getString("FenetreGenerationPDFNew.DoAllDos")); //$NON-NLS-1$
+		dosBtn.addActionListener(this);
+		dosBtn.setPreferredSize(btDim);
+		fssPane.add(dosBtn);
 		pdfPane.add(fssPane);
 		
 		//actualisation de la fenetre
