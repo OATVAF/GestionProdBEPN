@@ -92,7 +92,7 @@ public class FenetreDonneeNew extends JFrame implements ActionListener {
 		
 		//formation de la fenetre (titre, taille, etc.)
 		this.setTitle(Messages.getString("FenetreDonneeNew.Titre")); //$NON-NLS-1$
-		this.setSize(800, 600);
+		this.setSize(900, 600);
 		this.setLocationRelativeTo(null);
 		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		

@@ -1,19 +1,31 @@
 package data;
 
+import java.awt.Component;
 import java.awt.Font;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.swing.plaf.FontUIResource;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
+import javax.swing.DefaultCellEditor;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.ImageIcon;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JTable;
+import javax.swing.ListCellRenderer;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 
+import pack.Config;
 import pack.Module;
 import pack.PasserelleStage;
 import pack.Stage;
 import ui.TableModelSorter;
-
 
 public class ModelStages extends AbstractTableModel
 {
@@ -38,13 +50,15 @@ public class ModelStages extends AbstractTableModel
     private static final String[] entetes = {"Cie", "Code" , "Libellé", "Leader", "Salle", "Heure"};
     
 	private static final int[][] colWidths = { 
-			{ 40, 50, 50},
+			{ 50, 80, 65},
 			{ 60,250,100},
 			{ 80,500,150},
 			{ 60,180, 90},
 			{ 60,180, 90},
 			{ 60, 80, 60}
 			};
+
+	private static final boolean logoCie = Config.getB("data.logo.disp");
 
     public ModelStages(JTable table, MODE ... param) {
         super();
@@ -55,9 +69,7 @@ public class ModelStages extends AbstractTableModel
 		for (Stage s : stagesAll) {
 			dateModel.add(s.getDateStr());
 		}
-		//cieModel.add("AFR");
-		//cieModel.add("EST");
-		//cieModel.add("CRL");
+		
 		if (param.length == 1)
 			this.mode = param[0];
     	this.table = table;
@@ -83,6 +95,23 @@ public class ModelStages extends AbstractTableModel
 		table.getColumnModel().getColumn(0).setCellRenderer(new CieCellRenderer());
 		table.getColumnModel().getColumn(0).setCellEditor(new CieCellEditor(cieModel));
 		*/
+		if (logoCie) {
+			cieModel.add("AFR");
+			cieModel.add("EST");
+			cieModel.add("CRL");
+			cieModel.add("MDG");
+			cieModel.add("XLF");
+			cieModel.add("CCM");
+			cieModel.add("FWI");
+		
+
+			CieCellRenderer renderer = new CieCellRenderer();
+			JComboBox jcb = new JComboBox(cieModel);
+			//jcb.setEditable(true);
+			jcb.setRenderer(renderer);
+			table.getColumnModel().getColumn(0).setCellRenderer(renderer);
+			table.getColumnModel().getColumn(0).setCellEditor(new DefaultCellEditor(jcb));
+		}
     }
             
     public void saveStages() {
@@ -305,7 +334,7 @@ public class ModelStages extends AbstractTableModel
     }
 
 	public void newStage() {
-		Module m = new Module((long) 0, "_CODE_", "_LIB_", filterDate, "08:00", "10:00");
+		Module m = new Module((long) 0, "", "", filterDate, "08:00", "10:00");
 		Stage s = new Stage(m);
 		s.setCompagnie("AFR");
 		stagesAll.add(s);
@@ -323,36 +352,63 @@ public class ModelStages extends AbstractTableModel
 	}
 }
 
-/*
-class CieCellRenderer extends DefaultTableCellRenderer {
-		private static final long serialVersionUID = -5550185168514788951L;
+
+class CieCellRenderer implements TableCellRenderer, ListCellRenderer {
+	private static final String logoPath = Config.get("data.logos");
+
+	DefaultTableCellRenderer tableR = new DefaultTableCellRenderer();
+	DefaultListCellRenderer listR = new DefaultListCellRenderer();
+
+	//private static final long serialVersionUID = -5550185168514788951L;
 	private static HashMap<String,ImageIcon> logoIcons = new HashMap<String,ImageIcon>(); 
 
+	/*
     public CieCellRenderer() {
         super();
+    }
+    */
 
+    private void configureRenderer(JLabel renderer, Object value) {
+        if ((value != null) && (value instanceof String)) {
+            String cie = (String) value;
+			if (! logoIcons.containsKey(cie)) {
+				logoIcons.put(cie, new ImageIcon(logoPath + value + ".jpg"));
+			}
+			renderer.setText(value.toString());
+			renderer.setAlignmentX(SwingConstants.CENTER);
+			renderer.setIcon(logoIcons.get(cie));
+        }
+        else {
+			renderer.setText("???");
+        }
+    }
+    
+    //@Override
+    public Component getTableCellRendererComponent(JTable table, Object value,
+    		boolean isSelected, boolean hasFocus, int row, int column) {
+    	tableR = (DefaultTableCellRenderer) tableR.getTableCellRendererComponent(table, 
+    			value, isSelected, hasFocus, row, column);
+    	configureRenderer(tableR, value);
+    	return tableR;
     }
 
-    @Override
-    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-
-        String cie = (String) value;
-		if (! logoIcons.containsKey(cie)) {
-			logoIcons.put(cie, new ImageIcon("dataSystem/logos/" + value + ".jpg"));
-		}
-        setText("");
-        setAlignmentX(CENTER);
-        setIcon(logoIcons.get(cie));
-        return this;
-    }
+	public Component getListCellRendererComponent(JList list, Object value,
+			int index, boolean isSelected, boolean cellHasFocus) {
+		listR = (DefaultListCellRenderer) listR.getListCellRendererComponent(list, 
+				value, index, isSelected, cellHasFocus);
+    	configureRenderer(listR, value);
+		return listR;
+	}
 }
-
-class CieCellEditor extends DefaultCellEditor {
+/*
+class CieCellEditor extends DefaultCellEditor  {
 	private static final long serialVersionUID = -6147400529158086950L;
 
-	public CieCellEditor(ComboModel cm) {
-        super(new JComboBox(cm));
+	public CieCellEditor(JComboBox jcb) {
+		//JComboBox jcb = new JComboBox(mc);
+		//jcb.setRenderer(new CieCellRenderer());
+        //super(new JComboBox(mc));
+		lab = new JLabel();
     }
 }
 */
