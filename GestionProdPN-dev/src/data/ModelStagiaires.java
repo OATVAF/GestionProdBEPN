@@ -92,7 +92,7 @@ public class ModelStagiaires extends AbstractTableModel {
     }
 	
 	public void newStagiaire() {
-		Stagiaire st = new Stagiaire("_MATR_", stage.getCode(), stage.getDateStr(), stage.getDateStr(), "_NOM_", "_PRENOM_", "-", "-");
+		Stagiaire st = new Stagiaire("", stage.getCode(), stage.getDateStr(), stage.getDateStr(), "", "", "", "");
 		stage.ajoutStagiaire(st);
         setMod(true);
 		fireTableDataChanged();
