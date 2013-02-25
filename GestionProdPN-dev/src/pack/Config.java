@@ -225,6 +225,7 @@ public enum Config {
 			for (myProp p : INSTANCE.Props) {
 				if (p.contains(param)) {
 					p.set(param, val);
+					return;
 				}
 			}
 		} catch (ConfigException e) {

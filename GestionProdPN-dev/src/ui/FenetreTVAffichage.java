@@ -35,6 +35,7 @@ public class FenetreTVAffichage extends JFrame implements Runnable
 	private final int NBAFF  = Config.getI("aff.nbstages");	// nombre d'affichage max
 	private final int MINLIM = Config.getI("aff.nbmin0");	// retard max sur stage
 	private final int NBMIN  = Config.getI("aff.nbmin");	// nombre de minutes avant supp stage
+	private final int MAXMIN = Config.getI("aff.maxmin");	// nombre de minutes max pour l'affichage
 	//private final int NBBEF  = Config.getI("aff.nbmin");	// nombre de minutes avant stage pour affichage
 
 	//attributs IHM
@@ -53,7 +54,7 @@ public class FenetreTVAffichage extends JFrame implements Runnable
 	private HashMap<String,ImageIcon> logoIcons = new HashMap<String,ImageIcon>(); 
 	
 	//attributs temporaires
-	private Date dateActuelle;
+	private Date dateActuelle, pDate;
 	private ArrayList<Stage> StageList;
 	
 	//variables pour le timer
@@ -61,10 +62,12 @@ public class FenetreTVAffichage extends JFrame implements Runnable
 	private boolean run;
 	
 	private boolean TVall = false;
+	private boolean TVreload = false;
 	
 	// Date
 	private static SimpleDateFormat fmtDate   = new SimpleDateFormat("dd/MM/yyyy");
 	private static SimpleDateFormat fmtTime   = new SimpleDateFormat("HH:mm");
+	private static SimpleDateFormat fmtSec    = new SimpleDateFormat("ss");
 	// Fonts
 	
 	private static Font font1 = new Font(Config.get("aff.font1.font"),1,Config.getI("aff.font1.size"));
@@ -85,6 +88,7 @@ public class FenetreTVAffichage extends JFrame implements Runnable
 	public FenetreTVAffichage(){
 		
 		TVall = Config.get("aff.TV").equals("all");
+		TVreload = Config.getB("aff.stages.reload");
 		pptExe = Config.get("aff.cheminpptexe");
 		pptFile = Config.get("aff.ppt");
 
@@ -93,10 +97,13 @@ public class FenetreTVAffichage extends JFrame implements Runnable
 		
 		//chargement des stages
 		StageList = PasserelleStage.chargerStageList(TVall);
+		pDate = dateActuelle;
+		/*
 		if(StageList.isEmpty()){
 			//boite de dialogue
 			JOptionPane.showMessageDialog(null, "ERREUR ! pas de stages à afficher !","Erreur",JOptionPane.OK_OPTION);
 		}
+		*/
 		this.setTitle("TVAffichage");
 		this.setSize(800, 600);
 		this.setResizable(true);
@@ -291,15 +298,16 @@ public class FenetreTVAffichage extends JFrame implements Runnable
 			dateActuelle = new Date();
 			//recuperation de l'heure
 			strTime = fmtTime.format(dateActuelle);
-			timeLabel.setText("   "+strTime+"   ");
-			
+			if ( (Integer.parseInt(fmtSec.format(dateActuelle)) % 2 ) == 0) {
+				timeLabel.setText("   "+strTime.replace(":", " ")+"   ");
+			} else {
+				timeLabel.setText("   "+strTime+"   ");
+			}
+		
 			//actualisation des stages toutes les minutes
 			if(! strnNextTime.equalsIgnoreCase(strTime)){
+				afficherStages();
 				strnNextTime = strTime;
-				int nbmin;
-				nbmin = Integer.parseInt(strTime.substring(0, 2))*60 + Integer.parseInt(strTime.substring(3, 5));
-				
-				afficherStages(nbmin);
 			}//finsi
 			try {
 				//System.out.println("Sleep");
@@ -315,15 +323,25 @@ public class FenetreTVAffichage extends JFrame implements Runnable
 	
 	/**
 	 * procedure qui affiche les stages
-	 * @param nbmin
 	 */
-	private void afficherStages(int nbmin){
-		
+	private void afficherStages(){
+
+		String strTime = fmtTime.format(dateActuelle);
+		int nbmin = Integer.parseInt(strTime.substring(0, 2))*60 + Integer.parseInt(strTime.substring(3, 5));
+
+		System.out.println("nbmin :" + nbmin);
+
 		centerPane.remove(stagePane);
 		constructionStagePane();
 		centerPane.add(stagePane,BorderLayout.CENTER);
 		stageLabels = new JLabel[NBAFF][5];
 		
+		if (TVreload && PasserelleStage.ObjModDate().after(pDate)) {
+			//re-chargement des stages
+			System.out.println("Reload Liste at " + PasserelleStage.ObjModDate().toString());	
+			StageList = PasserelleStage.chargerStageList(TVall);
+			pDate = dateActuelle;
+		}
 		
 		if (TVall == false) {
 			nextStartsIn = 9999;
@@ -337,6 +355,11 @@ public class FenetreTVAffichage extends JFrame implements Runnable
 					removeStage.add(unstage);
 				}
 				else {
+					if (unstage.getnbMin() > (nbmin + MAXMIN)) {
+						System.out.println("Remove stage " + unstage.getCode());
+						//enleve les stages qui debutent dans plus de MAXMIN minutes
+						removeStage.add(unstage);
+					}
 					//int d = unstage.getnbMin()-nbmin;
 					if( Math.abs(d)<nextStartsIn) {
 						//System.out.println("nextStartsIn="+d);

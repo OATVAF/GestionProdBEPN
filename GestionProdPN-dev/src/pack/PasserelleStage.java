@@ -131,6 +131,11 @@ public class PasserelleStage {
 		
 	}//fin lectureStageAffichage()
 	
+	public static Date ObjModDate() {
+		File F = new File(pathObj);
+		return(new Date(F.lastModified()));
+	}
+	
 	/**
 	 * methodes supprimant les stages ne datant pas d'aujourd'hui
 	 * @param stageList

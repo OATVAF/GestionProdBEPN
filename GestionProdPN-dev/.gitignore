@@ -4,6 +4,7 @@ dataExport
 api/db
 api/log
 dataSystem/Archive*
+api/itextpdf-5.3.4.jar
 dataSystem/logos/Orig/*.png
 *Thumbs.db
 /GestionProdBEPN.jar
