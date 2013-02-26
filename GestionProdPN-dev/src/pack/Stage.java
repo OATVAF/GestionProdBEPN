@@ -289,7 +289,8 @@ public class Stage implements Serializable /*,Cloneable*/ {
 	 */
 	public void ajoutStagiaire(Stagiaire leStagiaire){
 		stagiaireList.add(leStagiaire);
-		trierStagiaireList();
+		//trierStagiaireList();
+		Collections.sort(stagiaireList);
 	}
 	
 	/**
@@ -311,6 +312,7 @@ public class Stage implements Serializable /*,Cloneable*/ {
 	/**
 	 * procedure triant les stagiaire par ordre alphabetique
 	 */
+	/*
 	public void trierStagiaireList(){
 		Stagiaire stgTemps ;
 		boolean good = false;
@@ -328,7 +330,7 @@ public class Stage implements Serializable /*,Cloneable*/ {
 			}//finpour
 		}//fin tant que
 	}//fin trierStagiaireList()
-	
+	*/
 	/**
 	 * getter de stagiaireList
 	 * @return stagiaireList

@@ -210,7 +210,6 @@ public class Module implements Serializable, Comparable<Module> {
 	}
 
 	public int compareTo(Module other) {
-		// TODO Auto-generated method stub
 		return (this.getnbMin() - other.getnbMin());
 	}
 

@@ -10,7 +10,7 @@ import java.util.Date;
  * @author BERON Jean-Sebastien
  *
  */
-public class Stagiaire implements Serializable {
+public class Stagiaire implements Serializable, Comparable<Stagiaire> {
 	
 	private static final long serialVersionUID = -7997348317614955828L;
 	
@@ -205,6 +205,13 @@ public class Stagiaire implements Serializable {
 		comment = aValue;
 	}
 
+	public int compareTo(Stagiaire other) {
+		return (this.toString().compareTo(other.toString()));
+	}
+
+	public String toString() {
+		return nom + "." + prenom + "." + matricule;
+	}
 }//fin class
 
 /**
@@ -229,5 +236,15 @@ class StagiaireMatriculeComparator implements Comparator<Stagiaire> {
 class StagiaireSpeComparator implements Comparator<Stagiaire> {
     public int compare(Stagiaire stg1, Stagiaire stg2) {
         return stg1.getSpe().compareTo(stg2.getSpe());
+    }
+}
+/**
+ * Comparateur de Stagiaire selon la spécialité
+ */
+class StagiaireSpeNameComparator implements Comparator<Stagiaire> {
+	public int compare(Stagiaire stg1, Stagiaire stg2) {
+		String s1 = stg1.getSpe()+stg1.toString();
+		String s2 = stg2.getSpe()+stg2.toString();
+		return s1.compareTo(s2);
     }
 }

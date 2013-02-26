@@ -5,6 +5,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
@@ -201,12 +202,17 @@ public class PasserelleStagiaire {
 		
 	}//fin chargerTousStagiairesPNT()
 	
-	public static ArrayList<Stage> ajoutPnt(ArrayList<Stage> stageList,ArrayList<Stagiaire> pntList){
- 		ArrayList<Stage> newStageList = stageList;
+	public static /*ArrayList<Stage>*/ void ajoutPnt(ArrayList<Stage> stageList,ArrayList<Stagiaire> pntList){
+ 		//ArrayList<Stage> newStageList = stageList;
 		String site = Config.get("app.site");
 		String s2pat = Config.get("imp.pnt.s2."+site);
+
+		// Tri par Spe puis Nom pour répartition équitable CDB/OPL dans les stages S2
+		if (Config.getB("imp.pnt.s2.spe_sort")) {
+			Collections.sort(pntList, new StagiaireSpeNameComparator());
+		}
 		
-		for (Stage stage : newStageList) {
+		for (Stage stage : stageList) {
 			if (stage.getCodeI().startsWith("S2")) {
 				int n = 0;
 				long modulo = 0;
@@ -258,11 +264,10 @@ public class PasserelleStagiaire {
 				}
 			}
 		}
-		
-		return newStageList;
+		//return newStageList;
 	}//
 	
-	public static ArrayList<Stage> ajoutPnc(ArrayList<Stage> stageList,ArrayList<Stagiaire> stagiairePNCList) {
+	public static /*ArrayList<Stage>*/ void ajoutPnc(ArrayList<Stage> stageList,ArrayList<Stagiaire> stagiairePNCList) {
 		//ArrayList<Stage> newStageList = stageList;
 		String site = Config.get("app.site");
 		String m123Pat = Config.get("imp.m123.pat."+site);
@@ -322,7 +327,7 @@ Next:	for (Stagiaire stagiaire : stagiairePNCList) {
 		
 		return newStageList;
 		*/
-		return stageList;
+		//return stageList;
 	}
 
 	

@@ -65,8 +65,8 @@ public class PasserelleStage {
 			ArrayList<Stagiaire> stagiairePNTList = PasserelleStagiaire.chargerTousStagiairesPNT();
 			
 			//ajout des stagiaires aux stages
-			stageExportList = PasserelleStagiaire.ajoutPnc(stageExportList, stagiairePNCList);
-			stageExportList = PasserelleStagiaire.ajoutPnt(stageExportList, stagiairePNTList);
+			/*stageExportList =*/ PasserelleStagiaire.ajoutPnc(stageExportList, stagiairePNCList);
+			/*stageExportList =*/ PasserelleStagiaire.ajoutPnt(stageExportList, stagiairePNTList);
 			
 			Date dateActuelle = new Date();
 			
