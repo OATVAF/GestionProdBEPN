@@ -1,5 +1,6 @@
 package pack;
 import java.io.Serializable;
+import java.util.Comparator;
 
 
 /**
@@ -7,7 +8,7 @@ import java.io.Serializable;
  * @author BERON Jean-Sebastien
  *
  */
-public class Module implements Serializable{
+public class Module implements Serializable, Comparable<Module> {
 	
 	private static final long serialVersionUID = -1234129121873518254L;
 
@@ -208,4 +209,21 @@ public class Module implements Serializable{
 		this.compagnie = compagnie;
 	}
 
+	public int compareTo(Module other) {
+		// TODO Auto-generated method stub
+		return (this.getnbMin() - other.getnbMin());
+	}
+
+	public String toString() {
+		return codeStage+"."+libelle+"."+heureDebut+"-"+heureFin;
+	}
 }//fin class
+
+/**
+ * Comparateur de Modules selon l'heure de début de stage
+ */
+class ModuleStartComparator implements Comparator<Module> {
+    public int compare(Module mod1, Module mod2) {
+        return mod1.getnbMin() - mod2.getnbMin();
+    }
+}

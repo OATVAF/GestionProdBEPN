@@ -2,6 +2,7 @@ package pack;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Comparator;
 import java.util.Date;
 
 /**
@@ -9,7 +10,7 @@ import java.util.Date;
  * @author BERON Jean-Sebastien
  *
  */
-public class Stagiaire implements Serializable{
+public class Stagiaire implements Serializable {
 	
 	private static final long serialVersionUID = -7997348317614955828L;
 	
@@ -205,3 +206,28 @@ public class Stagiaire implements Serializable{
 	}
 
 }//fin class
+
+/**
+ * Comparateur de Stagiaire selon le nom
+ */
+class StagiaireNameComparator implements Comparator<Stagiaire> {
+    public int compare(Stagiaire stg1, Stagiaire stg2) {
+        return stg1.getNom().compareTo(stg2.getNom());
+    }
+}
+/**
+ * Comparateur de Stagiaire selon le matricule
+ */
+class StagiaireMatriculeComparator implements Comparator<Stagiaire> {
+    public int compare(Stagiaire stg1, Stagiaire stg2) {
+        return stg1.getMatricule().compareTo(stg2.getMatricule());
+    }
+}
+/**
+ * Comparateur de Stagiaire selon la spécialité
+ */
+class StagiaireSpeComparator implements Comparator<Stagiaire> {
+    public int compare(Stagiaire stg1, Stagiaire stg2) {
+        return stg1.getSpe().compareTo(stg2.getSpe());
+    }
+}

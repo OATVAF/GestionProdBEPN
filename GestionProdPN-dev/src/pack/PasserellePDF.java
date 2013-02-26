@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import javax.swing.JOptionPane;
 
@@ -60,17 +61,18 @@ public class PasserellePDF {
 	private static String expDir = Config.get("pdf.expDir");
 	private static Font font9   = new Font(FontFamily.HELVETICA, 9);
 	private static Font font    = new Font(FontFamily.HELVETICA, 10);
-	private static Font fontB09 = new Font(FontFamily.HELVETICA,  9, Font.BOLD);
+	private static Font font12  = new Font(FontFamily.HELVETICA, 12);
+	private static Font fontB9  = new Font(FontFamily.HELVETICA,  9, Font.BOLD);
 	private static Font fontB10 = new Font(FontFamily.HELVETICA, 10, Font.BOLD);
 	private static Font fontB12 = new Font(FontFamily.HELVETICA, 12, Font.BOLD);
 	private static Font fontB14 = new Font(FontFamily.HELVETICA, 14, Font.BOLD);
 	private static Font fontB15 = new Font(FontFamily.HELVETICA, 15, Font.BOLD);
 	private static Font fontB20 = new Font(FontFamily.HELVETICA, 20, Font.BOLD);
 	private static Font fontB22 = new Font(FontFamily.HELVETICA, 22, Font.BOLD);
-	private static Font fontB24 = new Font(FontFamily.HELVETICA, 24, Font.BOLD);
 	private static Font fontB28 = new Font(FontFamily.HELVETICA, 28, Font.BOLD);
 	private static Font fontB140= new Font(FontFamily.HELVETICA,140, Font.BOLD);
 	private static Font fontB95 = new Font(FontFamily.HELVETICA, 95, Font.BOLD);
+	private static Font fontI9 =  new Font(FontFamily.HELVETICA,  9, Font.ITALIC);
 
 	/** 
 	 *  Liste des document éditables
@@ -924,115 +926,124 @@ public class PasserellePDF {
 		ArrayList<Module> moduleList = fss.modules;
 		String date = moduleList.get(0).getDate();
 		
-		//tri
-		Module modTemps ;
-		boolean good = false;
-		//tant que le tri n'est pas bon
-		while (! good) {
-			good = true;
-			for (int i = 0; i < moduleList.size()-1; i++) {
-				if(moduleList.get(i).getnbMin() > moduleList.get(i+1).getnbMin()){
-					good = false;
-					//echange
-					modTemps = moduleList.get(i);
-					moduleList.set(i, moduleList.get(i+1));
-					moduleList.set(i+1, modTemps);
-				}//finsi
-			}//finpour
-		}//fin tant que
-		
+		// tri selon l'heure de début
+		Collections.sort(moduleList, new ModuleStartComparator());
+
 		Common.setStatus("Création Feuille de Route FSS " + Nom);
 
-		PdfPTable header = new PdfPTable(1);
-		Phrase phrs = new Phrase(date, fontB15);
-		PdfPCell cell = new PdfPCell(phrs);
-		cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-		cell.setBorder(0);
+		PdfPTable header = new PdfPTable(3);
+		header.setWidthPercentage(100);
+		PdfPCell cell = new PdfPCell(new Phrase("Stages du jour", fontB15));
+		cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+		cell.setVerticalAlignment(Element.ALIGN_BOTTOM);
+		cell.setBorder(0); cell.setPadding(10);
 		header.addCell(cell);
-		phrs = new Phrase(Nom,new Font(FontFamily.HELVETICA, 20, Font.BOLD));
-		cell = new PdfPCell(phrs);
+		cell.setPhrase(new Phrase(Nom, fontB22));
 		cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-		cell.setBorder(0);
 		header.addCell(cell);
-		phrs = new Phrase("Stages du jour",fontB15);
-		cell = new PdfPCell(phrs);
-		cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-		cell.setBorder(0);
+		cell.setPhrase(new Phrase(date, fontB15));
+		cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		header.addCell(cell);
 		
 		PdfPTable center = new PdfPTable(5);
+		PdfPCell defCell = center.getDefaultCell();
+		defCell.setBorder(0);
+		defCell.setPadding(9);
+		
 		center.setWidthPercentage(100);
-		float[] widths = new float[] { 1f, 1f, 1f, 1.2f, 1.2f };
+		float[] widths = new float[] { 1f, 1f, 1f, 1.3f, 1.2f };
 		center.setWidths(widths);
 
-		phrs = new Phrase("Code Stage",fontB12);
-		cell = new PdfPCell(phrs);
-		cell.setBorder(0);
-		cell.setPadding(10);
-		center.addCell(cell);
-		phrs = new Phrase("Leader/Aide",fontB12);
-		cell = new PdfPCell(phrs);
-		cell.setBorder(0);
-		cell.setPadding(10);
-		center.addCell(cell);
-		phrs = new Phrase("Horaire",fontB12);
-		cell = new PdfPCell(phrs);
-		cell.setBorder(0);
-		cell.setPadding(10);
-		center.addCell(cell);
-		phrs = new Phrase("Module",fontB12);
-		cell = new PdfPCell(phrs);
-		cell.setBorder(0);
-		cell.setPadding(10);
-		center.addCell(cell);
-		phrs = new Phrase("Salle",fontB12);
-		cell = new PdfPCell(phrs);
-		cell.setBorder(0);
-		cell.setPadding(10);
-		center.addCell(cell);
+		center.addCell(new Phrase("Code Stage",fontB12));
+		center.addCell(new Phrase("Leader/Aide",fontB12));
+		center.addCell(new Phrase("Horaire",fontB12));
+		center.addCell(new Phrase("Module",fontB12));
+		center.addCell(new Phrase("Salle",fontB12));
+		
 		for (Module module : moduleList) {
-			phrs = new Phrase(module.getCodeStage(),new Font(FontFamily.HELVETICA, 12));
-			cell = new PdfPCell(phrs);
-			cell.setBorder(0);
-			cell.setPadding(10);
-			center.addCell(cell);
+			center.addCell(new Phrase(module.getCodeStage(), font12));
 			String lead = "Leader";
 			String aide = module.getNomAide();
 			if(! module.getNomLeader().equalsIgnoreCase(Nom)){
 				lead = "Aide";
 				aide = module.getNomLeader();
 			}
-			phrs = new Phrase(lead,new Font(FontFamily.HELVETICA, 12));
+			Phrase phrs = new Phrase(lead, font12);
 			if (!aide.equals("")) {
-				phrs.add(new Phrase("\n"+aide,new Font(FontFamily.HELVETICA, 9, Font.ITALIC)));
-
+				phrs.add(new Phrase("\n"+aide, fontI9));
 			}
-			//phrs = new Phrase(lead,new Font(FontFamily.HELVETICA, 10));
-			cell = new PdfPCell(phrs);
-			cell.setBorder(0);
-			cell.setPadding(10);
-			center.addCell(cell);
-			phrs = new Phrase(module.getHeureDebut()+" - "+module.getHeureFin(),new Font(FontFamily.HELVETICA, 12));
-			cell = new PdfPCell(phrs);
-			cell.setBorder(0);
-			cell.setPadding(10);
-			center.addCell(cell);
-			phrs = new Phrase(module.getLibelle(),new Font(FontFamily.HELVETICA, 12));
-			cell = new PdfPCell(phrs);
-			cell.setBorder(0);
-			cell.setPadding(10);
-			center.addCell(cell);
-			phrs = new Phrase(module.getSalle(),new Font(FontFamily.HELVETICA, 12));
-			cell = new PdfPCell(phrs);
-			cell.setBorder(0);
-			cell.setPadding(10);
-			center.addCell(cell);
+			center.addCell(phrs);			
+			
+			center.addCell(new Phrase(module.getHeureDebut()+" - "+module.getHeureFin(),font12));
+			center.addCell(new Phrase(module.getLibelle(),font12));
+			center.addCell(new Phrase(module.getSalle(),font12));
 		}
 		
 		doc.add(header);
 		doc.add(new Phrase("  "));
 		doc.add(center);
+		
+		if (Config.getB(cfg+"circulation")) {
+			// Liste des stages
+			ArrayList<Stage> stageList = new ArrayList<Stage>();
+			for (Module module : moduleList) {
+				if (!stageList.contains(module.getStage())) {
+					stageList.add(module.getStage());
+				}
+			}
+
+			header = new PdfPTable(2);
+			header.setWidthPercentage(100);
+			cell = new PdfPCell(new Phrase("\n"));
+			cell.setPadding(2); cell.setBorder(2);
+			header.addCell(cell); header.addCell(cell);
+		
+			for (Stage stage : stageList) {
+				//System.out.println(stage.getCodeI());
+				cell = new PdfPCell(new Phrase("\n"));
+				cell.setPadding(2); cell.setBorder(0);
+				header.addCell(cell); header.addCell(cell);
 				
+				cell = new PdfPCell(new Phrase("Stage : "+stage.getCodeI(), fontB12));
+				cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+				cell.setPadding(2); cell.setBorder(0); header.addCell(cell);
+				
+				cell = new PdfPCell(new Phrase("Date : "+ date, fontB12));
+				cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+				cell.setPadding(2); cell.setBorder(0); header.addCell(cell);
+				
+				center = new PdfPTable(6);
+				center.setWidthPercentage(100);
+				widths = new float[] { 1f, 1f, 3f, 2f, 2f, 4f };
+				center.setWidths(widths);
+				defCell = center.getDefaultCell();
+				//defCell.setBorder(7);
+				defCell.setPadding(3);
+				
+				center.addCell(new Phrase("Début", fontB9));
+				center.addCell(new Phrase("Fin", fontB9));
+				center.addCell(new Phrase("Activité", fontB9));
+				center.addCell(new Phrase("Leader", fontB9));
+				center.addCell(new Phrase("Aide", fontB9));
+				center.addCell(new Phrase("Moyen", fontB9));
+
+				for (Module m : stage.getModuleList()) {
+					center.addCell(new Phrase(m.getHeureDebut(), font9));
+					center.addCell(new Phrase(m.getHeureFin(), font9));
+					center.addCell(new Phrase(m.getLibelle(), font9));
+					center.addCell(new Phrase(m.getNomLeader(), font9));
+					center.addCell(new Phrase(m.getNomAide(), fontI9));
+					center.addCell(new Phrase(m.getSalle(), font9));
+				}
+				
+				//doc.add(new Phrase(" "));
+				doc.add(header);
+				doc.add(center);
+
+				header = new PdfPTable(2);
+				header.setWidthPercentage(100);
+			}
+		}
 	}//fin
 	
 	/**
@@ -1042,9 +1053,7 @@ public class PasserellePDF {
 	 * @throws DocumentException 
 	 */
 	private static void creationFREP(Stage leStage, Document doc, String cfg) throws DocumentException{
-		
-		PdfPCell cell;
-		
+				
 		Common.setStatus("Création FREP "+leStage.getCodeI());
 		
 		//construction du header
@@ -1085,7 +1094,6 @@ public class PasserellePDF {
 		center.addCell(new Phrase("Conformément au programme, les exercices pratiques suivant ont été réalisés :")); 
 		center.addCell(lineCell);
 		center.addCell(lineCell);		center.addCell(lineCell);
-
 
 		ArrayList<String> list = new ArrayList<String>();
 		list .add("  •  Equipement");
@@ -1395,55 +1403,55 @@ public class PasserellePDF {
 		cell.setBorder(0);
 		tableau.addCell(cell);
 		
-		phrs = new Phrase("ABS",fontB09);
+		phrs = new Phrase("ABS",fontB9);
 		cell = new PdfPCell(phrs);
 		cell.setBackgroundColor(lightGray);
 		cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		tableau.addCell(cell);
 		
-		phrs = new Phrase("R/Prod",fontB09);
+		phrs = new Phrase("R/Prod",fontB9);
 		cell = new PdfPCell(phrs);
 		cell.setBackgroundColor(lightGray);
 		cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		tableau.addCell(cell);
 		
-		phrs = new Phrase("Débarqués",fontB09);
+		phrs = new Phrase("Débarqués",fontB9);
 		cell = new PdfPCell(phrs);
 		cell.setBackgroundColor(lightGray);
 		cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		tableau.addCell(cell);
 		
-		phrs = new Phrase("ITRI",fontB09);
+		phrs = new Phrase("ITRI",fontB9);
 		cell = new PdfPCell(phrs);
 		cell.setBackgroundColor(lightGray);
 		cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		tableau.addCell(cell);
 		
-		phrs = new Phrase("SCAN",fontB09);
+		phrs = new Phrase("SCAN",fontB9);
 		cell = new PdfPCell(phrs);
 		cell.setBackgroundColor(lightGray);
 		cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		tableau.addCell(cell);
 		
-		phrs = new Phrase("Attestations",fontB09);
+		phrs = new Phrase("Attestations",fontB9);
 		cell = new PdfPCell(phrs);
 		cell.setBackgroundColor(lightGray);
 		cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		tableau.addCell(cell);
 		
-		phrs = new Phrase("SCAN",fontB09);
+		phrs = new Phrase("SCAN",fontB9);
 		cell = new PdfPCell(phrs);
 		cell.setBackgroundColor(lightGray);
 		cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		tableau.addCell(cell);
 		
-		phrs = new Phrase("PREVUS",fontB09);;
+		phrs = new Phrase("PREVUS",fontB9);;
 		cell = new PdfPCell(phrs);
 		cell.setBackgroundColor(lightGray);
 		cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		tableau.addCell(cell);
 		
-		phrs = new Phrase("PRESENTS",fontB09);
+		phrs = new Phrase("PRESENTS",fontB9);
 		cell = new PdfPCell(phrs);
 		cell.setBackgroundColor(lightGray);
 		cell.setHorizontalAlignment(Element.ALIGN_CENTER);

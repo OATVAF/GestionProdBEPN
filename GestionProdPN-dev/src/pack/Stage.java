@@ -3,6 +3,7 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 
 
@@ -237,12 +238,14 @@ public class Stage implements Serializable /*,Cloneable*/ {
 	 */
 	public void ajoutModule(Module leModule){
 		moduleList.add(leModule);
-		trierModuleList();
+		//trierModuleList();
+		Collections.sort(moduleList, new ModuleStartComparator());
 	}
 	
 	/**
 	 * procedure triant les modules dans l'ordre de passage
 	 */
+	/*
 	public void trierModuleList(){
 		
 		Module modTemps ;
@@ -260,8 +263,8 @@ public class Stage implements Serializable /*,Cloneable*/ {
 				}//finsi
 			}//finpour
 		}//fin tant que
-		
 	}//fin trierModuleList()
+	*/
 	
 	/**
 	 * getter d'un element de moduleList a un index donné
