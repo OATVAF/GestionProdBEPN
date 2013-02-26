@@ -65,39 +65,41 @@ public class PasserellePDF {
 	private static Font fontB12 = new Font(FontFamily.HELVETICA, 12, Font.BOLD);
 	private static Font fontB14 = new Font(FontFamily.HELVETICA, 14, Font.BOLD);
 	private static Font fontB15 = new Font(FontFamily.HELVETICA, 15, Font.BOLD);
-	private static Font fontB22 = new Font(FontFamily.HELVETICA, 22, Font.BOLD);
 	private static Font fontB20 = new Font(FontFamily.HELVETICA, 20, Font.BOLD);
+	private static Font fontB22 = new Font(FontFamily.HELVETICA, 22, Font.BOLD);
+	private static Font fontB24 = new Font(FontFamily.HELVETICA, 24, Font.BOLD);
+	private static Font fontB28 = new Font(FontFamily.HELVETICA, 28, Font.BOLD);
 	private static Font fontB140= new Font(FontFamily.HELVETICA,140, Font.BOLD);
 	private static Font fontB95 = new Font(FontFamily.HELVETICA, 95, Font.BOLD);
 
 	/** 
 	 *  Liste des document éditables
 	 */
-	public enum DocTypes {
-		/** Liste des stagiaires pour affichage */
-		LISTE_STAGIAIRES,
-		/** Liste des stagiaires pour émargement */
-		LISTE_EMARGEMENTS,
-		/** Liste des stagiaires pour émargement avec DIF */
-		LISTE_EMARGEMENTS_DIF,
-		/** Liste des stagiaires <b>vide</b> pour émargement */
-		LISTE_EMARGEMENT_VIDE,
-		/** FREP */
-		FREP,
-		/** Feuille de route FSS */
-		FEUILLE_ROUTE_FSS,
-		SURBOOK,
-		/** Affichage entrée salle */
-		AFFICHAGE_SALLE,
-		/** C/L pôle admin */
-		CHECKLIST,
-		/** Dossier complet FSS */
-		DOSSIER_FSS
-	};
-	
-	
+	//public enum DocTypes {
+	/** Liste des stagiaires pour affichage */
+	public static final int	LISTE_STAGIAIRES = 0x0;
+	/** Liste des stagiaires pour émargement */
+	public static final int	LISTE_EMARGEMENTS = 0x1;
+	/** Liste des stagiaires pour émargement avec DIF */
+	public static final int	LISTE_EMARGEMENTS_DIF = 0x2;
+	/** Liste des stagiaires <b>vide</b> pour émargement */
+	public static final int	LISTE_EMARGEMENT_VIDE = 0x3;
+	/** FREP */
+	public static final int	FREP = 0x4;
+	/** Feuille de route FSS */
+	public static final int	FEUILLE_ROUTE_FSS = 0x5;
+	/** Feuille Surbook stagiaire */
+	public static final int	SURBOOK = 0x6;
+	/** Affichage entrée salle */
+	public static final int	AFFICHAGE_SALLE = 0x7;
+	/** C/L pôle admin */
+	public static final int	CHECKLIST = 0x8;
+	/** Dossier complet FSS */
+	public static final int	DOSSIER_FSS = 0x9;
+	//};
+		
 	@SuppressWarnings("unchecked")
-	public static void creationDoc(/*Stage leStage*/ Object param, DocTypes type) {
+	public static void creationDoc(/*Stage leStage*/ Object param, int type) {
 		String cfgP="";
 		String fileName="";
 		boolean dif = false;
@@ -124,33 +126,14 @@ public class PasserellePDF {
 
 		//System.out.println("creationDoc("+param.getClass()+" "+leStage.getCode()+", "+type+")");
 		// Type de doc
-		switch(type) {
-		case LISTE_STAGIAIRES: 
-			cfgP="pdf.stagiaires.";
-			break;
-		case LISTE_EMARGEMENTS:
-			cfgP="pdf.emargement.";
-			break;
-		case FREP:
-			cfgP="pdf.frep.";
-			break;
-		case FEUILLE_ROUTE_FSS:
-			cfgP="pdf.frfss.";
-			break;
-		case SURBOOK:
-			cfgP="pdf.surbook.";
-			break;
-		case AFFICHAGE_SALLE:
-			cfgP="pdf.salles.";
-			break;
-		case CHECKLIST:
-			cfgP="pdf.cl.";
-			break;
-		default:
-			
-			break;
+		cfgP = Config.get("pdf.doc."+type);
+		if (cfgP == null) {
+			System.out.println("[ERR] creationDoc unknown type "+type);
 		}
-
+		else {
+			cfgP="pdf."+cfgP+".";
+		}
+		
 		// Nom du fichier
 		String date = leStage.getDateStr();
 		String dateP = date.replace("/", ".");
@@ -176,65 +159,80 @@ public class PasserellePDF {
 		if (Config.getB("pdf.dif")) {
 			dif = leStage.getCode().matches(Config.get("pdf.dif.pattern"));
 		}
-
+		// Dossier
+		ArrayList<Integer> l; 
+		if (type == DOSSIER_FSS) {
+			l = Config.getIL(cfgP+"docs");
+			//System.out.println(l);
+		}
+		else {
+			l = new ArrayList<Integer>();
+			l.add(type);
+		}
+		
 		try {
 			String pathDossier = expDir+Config.get(cfgP+"dir")+dateP;
 			new File(pathDossier).mkdir();
 			
 			// Margin
-			int vMargin = Config.getI(cfgP+"margin.v");
-			int hMargin = Config.getI(cfgP+"margin.h");
+			//int vMargin = Config.getI(cfgP+"margin.v");
+			//int hMargin = Config.getI(cfgP+"margin.h");
 			//creation du document et du fichier
-			Document doc = new Document(PageSize.A4,hMargin,hMargin,vMargin,vMargin);
+			Document doc = new Document(PageSize.A4,0,0,0,0);
 			FileOutputStream fichier = new FileOutputStream(pathDossier+"/"+fileName);
 			//ouverture du writer
 			PdfWriter.getInstance(doc, fichier);			
 			doc.open();
-			
-			// Rotate
-			if (Config.getB(cfgP+"rotate")) {
-				doc.setPageSize(PageSize.A4.rotate());
-			}
-			doc.newPage();
-			
-			// Génération du doc
-			switch(type) {
-			case LISTE_STAGIAIRES: 
-				creationListStagiaire(leStage, doc, cfgP);
-				break;
-			case LISTE_EMARGEMENTS:
-				if (leStage.getSizeStagiaireList() != 0) {
-					if (dif)
-						creationListeEmargementDIF(leStage, doc, cfgP);
-					else
-						creationListeEmargement(leStage, doc, cfgP);
-				} else 
-					creationListeEmargementVide(leStage, doc, cfgP);
-				break;
-			case FREP:
-				creationFREP(leStage, doc, cfgP);
-				break;
-			case AFFICHAGE_SALLE:
-				creationAffichageSalle(leStage, doc, cfgP);
-				break;
-			case CHECKLIST:
-				creationCheckListAdm(listeStage, doc, cfgP);
-				break;
-			case SURBOOK:
-				creationSurbook(leStage, doc, cfgP);
-				break;
-			case FEUILLE_ROUTE_FSS:
-				creationFeuilRouteFSS(fssModules, doc, cfgP);
-				break;
-			default:
-				break;
-			}
-			
+				
+			for (int mType : l) {
+				cfgP = "pdf."+Config.get("pdf.doc."+mType)+".";
+				// Margin
+				int vMargin = Config.getI(cfgP+"margin.v");
+				int hMargin = Config.getI(cfgP+"margin.h");
+				doc.setMargins(hMargin,hMargin,vMargin,vMargin);
+				// Rotate
+				if (Config.getB(cfgP+"rotate")) {
+					doc.setPageSize(PageSize.A4.rotate());
+				}
+				doc.newPage();
+				
+				// Génération du doc
+				switch(mType) {
+				case LISTE_STAGIAIRES: 
+					creationListStagiaire(leStage, doc, cfgP);
+					break;
+				case LISTE_EMARGEMENTS:
+					if (leStage.getSizeStagiaireList() != 0) {
+						if (dif)
+							creationListeEmargementDIF(leStage, doc, cfgP);
+						else
+							creationListeEmargement(leStage, doc, cfgP);
+					} else 
+						creationListeEmargementVide(leStage, doc, cfgP);
+					break;
+				case FREP:
+					creationFREP(leStage, doc, cfgP);
+					break;
+				case AFFICHAGE_SALLE:
+					creationAffichageSalle(leStage, doc, cfgP);
+					break;
+				case CHECKLIST:
+					creationCheckListAdm(listeStage, doc, cfgP);
+					break;
+				case SURBOOK:
+					creationSurbook(leStage, doc, cfgP);
+					break;
+				case FEUILLE_ROUTE_FSS:
+					creationFeuilRouteFSS(fssModules, doc, cfgP);
+					break;
+				default:
+					break;
+				}
+			}			
 			//fermeture du writer
 			doc.close();
-			
 		} catch (FileNotFoundException e) {
-			JOptionPane.showMessageDialog(null, "erreur de fichier: " +fileName, "Erreur", JOptionPane.ERROR_MESSAGE);
+		JOptionPane.showMessageDialog(null, "erreur de fichier: " +fileName, "Erreur", JOptionPane.ERROR_MESSAGE);
 		} catch (DocumentException e) {
 			JOptionPane.showMessageDialog(null, "erreur de document: " +e.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
 		}
@@ -1045,42 +1043,50 @@ public class PasserellePDF {
 	 */
 	private static void creationFREP(Stage leStage, Document doc, String cfg) throws DocumentException{
 		
+		PdfPCell cell;
+		
 		Common.setStatus("Création FREP "+leStage.getCodeI());
 		
 		//construction du header
 		PdfPTable header = new PdfPTable(1);
 		header.setWidthPercentage(100);
-		
+		PdfPCell defaultCell = header.getDefaultCell();
+		defaultCell.setBorder(0);
+		defaultCell.setPadding(5);
+		defaultCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+	
 		//la date
-		PdfPCell cell = new PdfPCell(new Phrase(leStage.getDateStr(),fontB14));
-		cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-		cell.setBorder(0);
-		header.addCell(cell);
-		
+		// = new PdfPCell();
+		header.addCell(new Phrase(leStage.getDateStr(),fontB14));
 		//le code du stage
-		Phrase par = new Phrase(leStage.getCode(),new Font(FontFamily.HELVETICA, 28, Font.BOLD));
-		cell = new PdfPCell(par);
-		cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-		cell.setPadding(5);
-		cell.setBorder(0);
-		header.addCell(cell);
-		
+		header.addCell(new Phrase(leStage.getCode(), fontB28));
 		//l'intitulé
-		par = new Phrase("Fiche récaputulative de fin de formation",new Font(FontFamily.HELVETICA, 18, Font.BOLD));
-		cell = new PdfPCell(par);
-		cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-		cell.setPadding(5);
-		cell.setBorder(0);
-		header.addCell(cell);
+		header.addCell(new Phrase("Fiche récaputulative de fin de formation", fontB20));
 		
-		doc.add(header);
+
+		float[] widths = new float[] { 4f, 1f };
 		
-		par = new Phrase("\n");
-		doc.add(par);
-		
-		par = new Phrase("Conformément au programme, les exercices pratiques suivant ont été réalisés :");
-		doc.add(par);
-		
+		PdfPTable center = new PdfPTable(2);
+		center.setWidths(widths);
+		center.setWidthPercentage(100);
+		defaultCell = center.getDefaultCell();
+		defaultCell.setBorder(0);
+		defaultCell.setPadding(3);
+		defaultCell.setHorizontalAlignment(Element.ALIGN_LEFT);
+
+		PdfPCell OSOcell = new PdfPCell(new Phrase("Oui / Sans objet *"));
+		OSOcell.setBorder(0); OSOcell.setPadding(3);
+		OSOcell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+
+		PdfPCell lineCell = new PdfPCell(new Phrase("\n", font9));
+		lineCell.setBorder(0); lineCell.setPadding(0);
+
+		center.addCell(lineCell); center.addCell(lineCell);
+		center.addCell(new Phrase("Conformément au programme, les exercices pratiques suivant ont été réalisés :")); 
+		center.addCell(lineCell);
+		center.addCell(lineCell);		center.addCell(lineCell);
+
+
 		ArrayList<String> list = new ArrayList<String>();
 		list .add("  •  Equipement");
 		list .add("  •  Feu - Fumée");
@@ -1095,155 +1101,79 @@ public class PasserellePDF {
 		list .add("  •  Vol simulé en maquette ou simulatuer cabine");
 		list .add("  •  Vol simulé en mode alternatif (en salle)");
 		
-		PdfPTable listTable = new PdfPTable(4);
-		listTable.setWidthPercentage(100);
 		for (String string : list) {
-			cell = new PdfPCell(new Phrase(string));
-			cell.setColspan(3);
-			cell.setPadding(3);
-			cell.setBorder(0);
-			listTable.addCell(cell);
-			cell = new PdfPCell(new Phrase("Oui / Sans objet *"));
-			cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-			cell.setBorder(0);
-			cell.setPadding(3);
-			listTable.addCell(cell);
-		}//fin pour
+			center.addCell(new Phrase(string));
+			center.addCell(OSOcell);
+		}
 		
-		cell = new PdfPCell(new Phrase(" • Visualisation sur avion"));
-		cell.setColspan(2);
-		cell.setPadding(3);
-		cell.setBorder(0);
-		listTable.addCell(cell);
-		cell = new PdfPCell(new Phrase("Immat. : _ _ _ _ _ _ / sans objet *"));
-		cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-		cell.setBorder(0);
-		cell.setColspan(2);
-		cell.setPadding(3);
-		listTable.addCell(cell);
+		center.addCell(new Phrase("  •  Visualisation sur avion                                            Immat. : _ _ _ _ _ _ _"));
+		OSOcell.setPhrase(new Phrase("Sans Objet *"));
+		center.addCell(OSOcell);
 		
-		cell = new PdfPCell(new Phrase(" • Visualisation virtuelle"));
-		cell.setColspan(2);
-		cell.setPadding(3);
-		cell.setBorder(0);
-		listTable.addCell(cell);
-		cell = new PdfPCell(new Phrase("Type-avion : _ _ _ _ _ _ / sans objet *"));
-		cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-		cell.setBorder(0);
-		cell.setColspan(2);
-		cell.setPadding(3);
-		listTable.addCell(cell);
+		center.addCell(new Phrase("  •  Visualisation virtuelle                                        Type-avion : _ _ _ _ _ _ _"));
+		center.addCell(OSOcell);
+	
+		center.addCell(lineCell); center.addCell(lineCell);
+						
+		defaultCell.setPadding(5);
+
+		center.addCell(new Phrase("Des stagiaires ont-ils echoué aux exercices pratiques ?"));
+		OSOcell.setPhrase(new Phrase("Oui / Non *"));
+		center.addCell(OSOcell);
+
+		center.addCell(new Phrase("      Si oui, lesquels : _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n"));
+		center.addCell(lineCell);
+
+		center.addCell(new Phrase("      Sur quel exercice : _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n"));
+		center.addCell(lineCell);
+
+		center.addCell(new Phrase("Cette information a-t-elle été transmise à IS.VS MP ?"));
+		center.addCell(OSOcell);
 		
-		listTable.addCell(new PdfPCell(new Phrase(" ")));
+		center.addCell(lineCell); center.addCell(lineCell);
+
+		center.addCell(new Phrase("Des stagiaires sont-ils partis en cours de formation ?"));
+		center.addCell(OSOcell);
+
+		center.addCell(new Phrase("      Si oui, lesquels :  _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n"));
+		center.addCell(lineCell);
 		
-		doc.add(listTable);
+		center.addCell(lineCell); center.addCell(lineCell);
+
+		center.addCell(new Phrase("Un des exercices a-t-il été réalisé en mode dérogatoire ?"));
+		center.addCell(OSOcell);
+
+		center.addCell(new Phrase("      Si oui, lesquels :  _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n"));
+		center.addCell(lineCell);
+
+		center.addCell(lineCell); center.addCell(lineCell);
+
+		center.addCell(new Phrase("La durée de formation s'est-elle écartée de plus de 15mn du temps prévu ?"));
+		center.addCell(OSOcell);
+
+		center.addCell(new Phrase("      Si oui, pourquoi :  _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n"));
+		center.addCell(lineCell);
+
+		center.addCell(lineCell); center.addCell(lineCell);
+
+		center.addCell(new Phrase("Voir Remarques / particularités du stage au verso (AT, problèmes rencontrés, ...) \n \n"));
+		center.addCell(lineCell);
+
+		center.addCell(lineCell); center.addCell(lineCell);
+		center.addCell(lineCell); center.addCell(lineCell);
+		center.addCell(lineCell); center.addCell(lineCell);
+
+		center.addCell(new Phrase("Nom du FSS leader :  " +  leStage.getLeader() + "  / _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n"));
+		center.addCell(lineCell);
 		
+		center.addCell(new Phrase("Signature du FSS leader :"));
+		center.addCell(new Phrase("Visa du CPO :"));
 		
-		PdfPTable question = new PdfPTable(5);
-		question.setWidthPercentage(100);
-		cell = new PdfPCell(new Phrase("Des stagiaires ont-ils echoué aux exercices pratiques ?"));
-		cell.setColspan(4);
-		cell.setPadding(5);
-		cell.setBorder(0);
-		question.addCell(cell);
-		cell = new PdfPCell(new Phrase("Oui / Non *"));
-		cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-		cell.setBorder(0);
-		cell.setPadding(5);
-		question.addCell(cell);
-		doc.add(question);
+		center.addCell(new Phrase("\n\n\n* Rayer la mention inutile", font9));
+		center.addCell(lineCell);
 		
-		par = new Phrase("      Si oui, lesquels ? _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n");
-		doc.add(par);
-		
-		par = new Phrase("      Sur quel exercice ? _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n");
-		doc.add(par);
-		
-		question = new PdfPTable(5);
-		question.setWidthPercentage(100);
-		cell = new PdfPCell(new Phrase("Cette information a-t-elle été transmise à IS.VS MP ?"));
-		cell.setColspan(4);
-		cell.setPadding(5);
-		cell.setBorder(0);
-		question.addCell(cell);
-		cell = new PdfPCell(new Phrase("Oui / Non *"));
-		cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-		cell.setBorder(0);
-		cell.setPadding(5);
-		question.addCell(cell);
-		doc.add(question);
-		
-		question = new PdfPTable(5);
-		question.setWidthPercentage(100);
-		cell = new PdfPCell(new Phrase("Des stagiaires sont-ils partis en cours de formation ?"));
-		cell.setColspan(4);
-		cell.setPadding(5);
-		cell.setBorder(0);
-		question.addCell(cell);
-		cell = new PdfPCell(new Phrase("Oui / Non *"));
-		cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-		cell.setBorder(0);
-		cell.setPadding(5);
-		question.addCell(cell);
-		doc.add(question);
-		
-		par = new Phrase("      Si oui, lesquels ?  _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n");
-		doc.add(par);
-		
-		question = new PdfPTable(5);
-		question.setWidthPercentage(100);
-		cell = new PdfPCell(new Phrase("Un des exercices a-t-il été réalisé en mode dérogatoire ?"));
-		cell.setColspan(4);
-		cell.setPadding(5);
-		cell.setBorder(0);
-		question.addCell(cell);
-		cell = new PdfPCell(new Phrase("Oui / Non *"));
-		cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-		cell.setBorder(0);
-		cell.setPadding(5);
-		question.addCell(cell);
-		doc.add(question);
-		
-		par = new Phrase("      Si oui, lesquels ?  _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n");
-		doc.add(par);
-		
-		question = new PdfPTable(5);
-		question.setWidthPercentage(100);
-		cell = new PdfPCell(new Phrase("La durée de formation s'est-elle écartée de plus de 15mn du temps prévu ?"));
-		cell.setColspan(4);
-		cell.setPadding(5);
-		cell.setBorder(0);
-		question.addCell(cell);
-		cell = new PdfPCell(new Phrase("Oui / Non *"));
-		cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-		cell.setBorder(0);
-		cell.setPadding(5);
-		question.addCell(cell);
-		doc.add(question);
-		
-		par = new Phrase("      Si oui, pourquoi ?  _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n");
-		doc.add(par);
-		
-		par = new Phrase("Voir Remarques / particularités du stage au verso (AT, problèmes rencontrés, ...) \n \n");
-		doc.add(par);
-		
-		par = new Phrase("Nom du FSS leader :  " +  leStage.getLeader() + "  / _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n");
-		par.setFont(new Font(FontFamily.HELVETICA, 14));
-		doc.add(par);
-		
-		PdfPTable sign = new PdfPTable(3);
-		sign.setWidthPercentage(100);
-		cell = new PdfPCell(new Phrase("Signature du FSS leader :"));
-		cell.setBorder(0);
-		cell.setColspan(2);
-		sign.addCell(cell);
-		cell = new PdfPCell(new Phrase("Visa du CPO :"));
-		cell.setBorder(0);
-		sign.addCell(cell);
-		doc.add(sign);
-		
-		par = new Phrase("\n\n\n* Rayer la mention inutile",new Font(FontFamily.HELVETICA, 8));
-		doc.add(par);
+		doc.add(header);
+		doc.add(center);
 	} 
 
 	/**
