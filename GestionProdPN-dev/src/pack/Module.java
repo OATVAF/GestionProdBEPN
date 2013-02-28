@@ -98,6 +98,14 @@ public class Module implements Serializable, Comparable<Module> {
 	}
 
 	/**
+	 * setter de libelle
+	 * @para; libelle
+	 */
+	public void setLibelle(String lib) {
+		this.libelle = lib;
+	}
+
+	/**
 	 * getter de heureDebut
 	 * @return heuredebut
 	 */

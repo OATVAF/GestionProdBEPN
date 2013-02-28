@@ -238,33 +238,24 @@ public class Stage implements Serializable /*,Cloneable*/ {
 	 */
 	public void ajoutModule(Module leModule){
 		moduleList.add(leModule);
-		//trierModuleList();
 		Collections.sort(moduleList, new ModuleStartComparator());
 	}
 	
 	/**
-	 * procedure triant les modules dans l'ordre de passage
+	 * suppression d'un stagiaire dans la liste des stagiaires
+	 * @param index
 	 */
-	/*
-	public void trierModuleList(){
-		
-		Module modTemps ;
-		boolean good = false;
-		//tant que le tri n'est pas bon
-		while (! good) {
-			good = true;
-			for (int i = 0; i < moduleList.size()-1; i++) {
-				if(moduleList.get(i).getnbMin() > moduleList.get(i+1).getnbMin()){
-					good = false;
-					//echange
-					modTemps = moduleList.get(i);
-					moduleList.set(i, moduleList.get(i+1));
-					moduleList.set(i+1, modTemps);
-				}//finsi
-			}//finpour
-		}//fin tant que
-	}//fin trierModuleList()
-	*/
+	public void supprimerModule(int index){
+		moduleList.remove(index);
+	}
+	
+	public void supprimerModule(Module mo){
+		moduleList.remove(mo);
+	}
+	
+	public void supprimerModule(ArrayList<Module> ml){
+		moduleList.removeAll(ml);
+	}
 	
 	/**
 	 * getter d'un element de moduleList a un index donné

@@ -30,6 +30,7 @@ import javax.swing.event.ChangeEvent;
 
 import pack.Stage;
 
+import data.ModelModules;
 import data.ModelStages;
 import data.ModelStagiaires;
 import pack.Config;
@@ -61,6 +62,8 @@ public class FenetreDonneeNew extends JFrame implements ActionListener {
 	private JButton stagesBtn;
 	private JButton addStBtn;
 	private JButton remStBtn;
+	private JButton addMoBtn;
+	private JButton remMoBtn;
 	
 	//attributs qui vont contenir les données temporaires
 	//private ArrayList<Stage> stageList;//liste des stages
@@ -70,16 +73,19 @@ public class FenetreDonneeNew extends JFrame implements ActionListener {
 	
 	private ModelStages ms;
 	private ModelStagiaires mss;
+	private ModelModules msm;
 	private JPanel stagiairesPane;
+	private JPanel modulesPane;
 	private JPanel btn1Pane;
 	private JScrollPane scrollPane_1;
 	private JTable tableStagiaires;
+	private JTable tableModules;
 	private JTabbedPane tabbedPane;
 	private JPanel infoPane;
 	private JLabel lbl_2;
-	private JLabel lblDate;
+	private JLabel lblDate,lblDate2;
 	private JLabel lbl_3;
-	private JLabel lblStage;
+	private JLabel lblStage,lblStage2;
 	
 	//-Dswing.defaultlaf=com.sun.java.swing.plaf.windows.WindowsLookAndFeel
 	/**
@@ -101,7 +107,7 @@ public class FenetreDonneeNew extends JFrame implements ActionListener {
 			@Override
 			public void windowClosing(WindowEvent e) {
 				System.out.println("Window Closing Event"); //$NON-NLS-1$
-				if (ms.isMod() || mss.isMod()) {
+				if (ms.isMod() || mss.isMod() || msm.isMod()) {
 					//fenetre de dialogue
 					int rep = JOptionPane.showConfirmDialog(null, Messages.getString("FenetreDonneeNew.saveMsg") //$NON-NLS-1$
 							,Messages.getString("FenetreDonneeNew.Mod"),JOptionPane.YES_NO_OPTION,
@@ -171,12 +177,15 @@ public class FenetreDonneeNew extends JFrame implements ActionListener {
 			    public void stateChanged(ChangeEvent evt) {
 			        JTabbedPane pane = (JTabbedPane)evt.getSource();
 			        // Get current tab
-			        if (pane.getSelectedIndex() == 1) {
+			        if (pane.getSelectedIndex() >= 1) {
 			        	Stage s = ms.getSelectedStage();
 			        	if (s != null) {
 			        		mss.setStage(s);
+			        		msm.setStage(s);
 			        		lblStage.setText(s.getCode());
 			        		lblDate.setText(ms.filterDate);
+			        		lblStage2.setText(s.getCode());
+			        		lblDate2.setText(ms.filterDate);
 			        	}
 			        }
 			    }});
@@ -281,6 +290,55 @@ public class FenetreDonneeNew extends JFrame implements ActionListener {
 		btnPane2.add(remStBtn);
 		stagiairesPane.add(btnPane2, BorderLayout.SOUTH);
 
+		
+		// Modules
+		modulesPane = new JPanel();
+		tabbedPane.addTab(Messages.getString("FenetreDonneeNew.Modules"), null, modulesPane, null); //$NON-NLS-1$
+		modulesPane.setLayout(new BorderLayout(0, 0));
+		
+		infoPane = new JPanel();
+		modulesPane.add(infoPane, BorderLayout.NORTH);
+		infoPane.setBackground(Color.WHITE);
+		infoPane.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		
+		lbl_2 = new JLabel(Messages.getString("FenetreDonneeNew.Date")); //$NON-NLS-1$
+		infoPane.add(lbl_2);
+		
+		lblDate2 = new JLabel("1/2/3");
+		infoPane.add(lblDate2);
+		
+		lbl_3 = new JLabel(Messages.getString("FenetreDonneeNew.Stage")); //$NON-NLS-1$
+		infoPane.add(lbl_3);
+
+		lblStage2 = new JLabel("SMG XXX");
+		infoPane.add(lblStage2);
+		
+		tableModules = new JTable();
+		tableModules.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		msm = new ModelModules(tableModules);
+		scrollPane_1 = new JScrollPane(tableModules);
+		modulesPane.add(scrollPane_1, BorderLayout.CENTER);
+		btn1Pane = new JPanel();
+		modulesPane.add(btn1Pane, BorderLayout.SOUTH);
+
+		btnPane2 = new JPanel();
+		btnPane2.setBackground(Color.WHITE);
+		stagesBtn = new JButton(Messages.getString("FenetreDonneeNew.ListeStages")); //$NON-NLS-1$
+		stagesBtn.setPreferredSize(new Dimension(200, 35));
+		stagesBtn.addActionListener(this);
+		btnPane2.add(stagesBtn);
+		addMoBtn = new JButton(Messages.getString("FenetreDonneeNew.Add")); //$NON-NLS-1$
+		addMoBtn.setIcon(new ImageIcon(Config.getRes("modif.png"))); //$NON-NLS-1$
+		addMoBtn.setPreferredSize(new Dimension(200, 35));
+		addMoBtn.addActionListener(this);
+		btnPane2.add(addMoBtn);
+		remMoBtn = new JButton(Messages.getString("FenetreDonneeNew.Remove")); //$NON-NLS-1$
+		remMoBtn.setIcon(new ImageIcon(Config.getRes("remove.png"))); //$NON-NLS-1$
+		remMoBtn.setPreferredSize(new Dimension(200, 35));
+		remMoBtn.addActionListener(this);
+		btnPane2.add(remMoBtn);
+		modulesPane.add(btnPane2, BorderLayout.SOUTH);
+		
 	}//fin constructionCenterPane()
 	
 	/**
@@ -300,7 +358,11 @@ public class FenetreDonneeNew extends JFrame implements ActionListener {
 		if (source.equals(addStBtn)) {
 			mss.newStagiaire();
 		}
-		
+		//si le bouton est le bouton add Module
+		if (source.equals(addMoBtn)) {
+			msm.newModule();
+		}
+
 		//si le bouton est le bouton du choix du stage
 		if (source.equals(remStBtn)) {
 			int rep = JOptionPane.NO_OPTION;
