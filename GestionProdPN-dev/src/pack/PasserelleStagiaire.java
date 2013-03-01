@@ -479,7 +479,7 @@ Next:	for (Stagiaire stagiaire : stagiairePNCList) {
 		}
 	}
 
-	@SuppressWarnings("deprecation")
+	@SuppressWarnings({ "deprecation", "unused" })
 	private static void ecritureListeTests2() {
 		ArrayList<Stage> stageList = PasserelleStage.lectureStageObj();
 		String selDate = "";
