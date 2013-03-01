@@ -31,6 +31,7 @@ public class Stage implements Serializable /*,Cloneable*/ {
 	private ArrayList<Module> moduleList;
 	private ArrayList<Stagiaire> stagiaireList;
 	private Stage coStage;
+	private ArrayList<Stage> coStageList;
 	
 	private SimpleDateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
 	
@@ -43,6 +44,8 @@ public class Stage implements Serializable /*,Cloneable*/ {
 		this.idx = 0;
 		this.idxMax = 0;
 		this.setCoStage(null);
+		coStageList = new ArrayList<Stage>();
+		
 	}
 	
 	/**
@@ -68,6 +71,7 @@ public class Stage implements Serializable /*,Cloneable*/ {
 		this.idx = 0;
 		this.idxMax = 0;
 		this.setCoStage(null);
+		coStageList = new ArrayList<Stage>();
 		affectationInfoStage();
 	}//fin Stage(Module unModule)
 	
@@ -409,6 +413,11 @@ public class Stage implements Serializable /*,Cloneable*/ {
 
 	public void setCoStage(Stage coStage) {
 		this.coStage = coStage;
+		if (coStage != null)
+			coStage.coStageList.add(this);
 	}
 	
+	public ArrayList<Stage> getCoStageList() {
+		return this.coStageList;
+	}
 }//fin class
