@@ -447,6 +447,7 @@ public class PasserellePDF {
 		Integer rowNum = Config.getI(cfg+"rownum");
 		float[] widths;
 		String code = leStage.getCode();
+		boolean eao = code.matches(Config.get(cfg+"eao.pattern"));
 		
 		ArrayList<Stagiaire> sl = new ArrayList<Stagiaire>();
 		sl.addAll(leStage.getStagiaireList());
@@ -587,6 +588,7 @@ public class PasserellePDF {
 				//isvsmp
 				center.addCell(" ");
 		}
+		if (eao) rowNum -= 3;
 		if(i<=rowNum){
 			cell.setPhrase(new Phrase(" \n ", font));
 			cell.setColspan(colNum);
@@ -595,12 +597,27 @@ public class PasserellePDF {
 			}//fin pour
 		}//fin si
 		
+		// Test EAO
+		PdfPTable footer0 = new PdfPTable(1);
+		if (eao) {
+			footer0.setWidthPercentage(95);
+			cell = new PdfPCell(new Phrase(Config.get(cfg+"eao.s2"), font9));
+			cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+			cell.setPadding(10);
+			cell.setBorder(0);
+			footer0.addCell(cell);
+			cell.setPhrase(new Phrase(""));
+			footer0.addCell(cell);
+			
+		}
+
 		// Footer
 		PdfPTable footer = getFooter(leStage);
 		
 		//ajout des composants
 		doc.add(header);
 		doc.add(center);
+		if (eao) doc.add(footer0);
 		doc.add(footer);
 			
 	}//fin
