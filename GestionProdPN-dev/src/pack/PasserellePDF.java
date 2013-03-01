@@ -276,13 +276,17 @@ public class PasserellePDF {
 		Boolean adapt = leStage.getCode().matches(Config.get(cfg+"s2.pat"));
 		String code = leStage.getCode();
 		
-		ArrayList<Stagiaire> sl = leStage.getStagiaireList();
+		ArrayList<Stagiaire> sl = new ArrayList<Stagiaire>();
+		sl.addAll(leStage.getStagiaireList());
 		if (group) {
+			code = leStage.getCodeI();
+			System.out.println("ListStagiaire " + code + " : ");
 			for (Stage s : leStage.getCoStageList()) {
+				System.out.println("   + "+s.getCode());
 				sl.addAll(s.getStagiaireList());
 			}
 			Collections.sort(sl);
-			code = leStage.getCodeI();
+			System.out.println(sl);
 		}
 
 		//construction du header
@@ -349,7 +353,7 @@ public class PasserellePDF {
 		int i;
 		for (i = 0; i < sl.size(); i++) {
 			for (int j = 0; j < colNum; j++) {
-				String info = leStage.getEltStagiaireList(i).getInfo(j);
+				String info = sl.get(i).getInfo(j);
 				cell.setPhrase(new Phrase(info,new Font(FontFamily.HELVETICA, 11)));
 				center.addCell(cell);
 			}
@@ -444,13 +448,18 @@ public class PasserellePDF {
 		float[] widths;
 		String code = leStage.getCode();
 		
-		ArrayList<Stagiaire> sl = leStage.getStagiaireList();
+		ArrayList<Stagiaire> sl = new ArrayList<Stagiaire>();
+		sl.addAll(leStage.getStagiaireList());
 		if (group) {
+			code = leStage.getCodeI();
+			System.out.println("ListeEmargement " + code + " : ");
+			System.out.println(sl);
 			for (Stage s : leStage.getCoStageList()) {
+				System.out.println("   + "+s.getCode());
 				sl.addAll(s.getStagiaireList());
 			}
 			Collections.sort(sl);
-			code = leStage.getCodeI();
+			System.out.println(sl);
 		}
 
 		Common.setStatus("Création Liste Emargement "+code);
@@ -545,9 +554,9 @@ public class PasserellePDF {
 				//str = String.format("%-20s%-20s\n%25s%10s%10s", 
 				cell.setBorder(0);
 				cell.setColspan(5);
-				cell.setPhrase(new Phrase(leStage.getEltStagiaireList(i).getInfo(0), fontB10));
+				cell.setPhrase(new Phrase(sl.get(i).getInfo(0), fontB10));
 				stgCell.addCell(cell);
-				cell.setPhrase(new Phrase(leStage.getEltStagiaireList(i).getInfo(1), font));
+				cell.setPhrase(new Phrase(sl.get(i).getInfo(1), font));
 				stgCell.addCell(cell);
 
 				cell.setColspan(1);
@@ -555,15 +564,15 @@ public class PasserellePDF {
 				stgCell.addCell(cell);
 
 				cell.setColspan(2);
-				cell.setPhrase(new Phrase(leStage.getEltStagiaireList(i).getInfo(3), font));
+				cell.setPhrase(new Phrase(sl.get(i).getInfo(3), font));
 				stgCell.addCell(cell);
 
 				cell.setColspan(5);
-				cell.setPhrase(new Phrase(leStage.getEltStagiaireList(i).getInfo(4), font));
+				cell.setPhrase(new Phrase(sl.get(i).getInfo(4), font));
 				stgCell.addCell(cell);
 
 				cell.setColspan(2);
-				cell.setPhrase(new Phrase(leStage.getEltStagiaireList(i).getInfo(2), font));
+				cell.setPhrase(new Phrase(sl.get(i).getInfo(2), font));
 				stgCell.addCell(cell);
 				
 				cell.setColspan(1);
