@@ -33,7 +33,7 @@ public class PasserelleStagiaire {
 	private static final String pathFilePnc= Config.get("imp.pnc"); //"dataImport\\OATVPNC.xls";
 	private static final String pathFilePnt= Config.get("imp.pnt"); //"dataImport\\OATVPNT.xls";
 	private static final String pathFileSMS= Config.get("exp.sms"); // "dataExport\\ListSMS.xls"
-	private static final String pathDirTests= Config.get("exp.tests"); // "dataExport\\Tests du"
+	private static final String pathDirTests= Config.get("exp.tests.dir"); // "dataExport\\Tests du"
 	
 	private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	private static Date dateDemain;
@@ -56,6 +56,7 @@ public class PasserelleStagiaire {
 		ArrayList<Stagiaire> StagiaireList = chargerTousStagiairesPNC();
 		StagiaireList = FiltreBOContact(StagiaireList);
 		ecritureListeTests(StagiaireList);
+		//ecritureListeTests2();
 		if (good) {
 			JOptionPane.showMessageDialog(null, "<html>Operation terminée !" +
 					"<br>les fichiers sont dans dataExport/Tests...</html>", "Termine", JOptionPane.INFORMATION_MESSAGE);
@@ -436,24 +437,32 @@ Next:	for (Stagiaire stagiaire : stagiairePNCList) {
 		Hashtable<String,StringBuffer> stgMap = new Hashtable<String,StringBuffer>();
 		String pathDossier = pathDirTests+dateFormat.format(dateDemain)+"/";
 		String key = "";
+		String group = Config.get("exp.tests.group.pattern");
+		SimpleDateFormat jF = new SimpleDateFormat("EEEE");
+		String jour = jF.format(dateDemain).toUpperCase();
 		
 		for (Stagiaire s : stagiaireList) {
 			String code = s.getCodeStage().replace(" ", "").trim();
 			code = code.substring(0,3)+" "+code.substring(3);
+			if (code.matches(group)) {
+				code = code.replaceAll(group, "$1");
+				code += " "+jour;
+			}
 			String matr = "M"+s.getMatricule().subSequence(0, 6);
 			if (stgMap.containsKey(code)) {
 				//System.out.println("[INFO] ajout stage:"+code+" et matr:"+matr);
 				stgMap.get(code).append("|"+matr);
 			}
 			else {
-				//System.out.println("[INFO]   +++ stage:"+code+" et matr:"+matr);
+				System.out.println("[INFO]   +++ stage:"+code+" et matr:"+matr);
 				stgMap.put(code,new StringBuffer(matr));
 			}
 		}
 
 		try {
 			new File(pathDossier).mkdir();
-	
+			
+			
 			Enumeration<String> e = stgMap.keys();
 			 while (e.hasMoreElements()) {
 				  key = e.nextElement();
@@ -470,6 +479,63 @@ Next:	for (Stagiaire stagiaire : stagiairePNCList) {
 		}
 	}
 
-
+	@SuppressWarnings("deprecation")
+	private static void ecritureListeTests2() {
+		ArrayList<Stage> stageList = PasserelleStage.lectureStageObj();
+		String selDate = "";
+		StringBuffer line;
+		String code="",pathDossier="";
+		
+		//recuperation de la date de demain
+		Calendar cl=new GregorianCalendar();
+		Date dateactuelle = new Date();
+		if(dateactuelle.getDay() == 5){
+			cl.add(Calendar.DATE, 3);
+		}else{
+			cl.add(Calendar.DATE, 1);
+		}
+		try {
+			dateDemain = new Date((cl.get(Calendar.YEAR)-1900), cl.get(Calendar.MONTH), cl.get(Calendar.DATE));		
+			selDate = JOptionPane.showInputDialog("Séléction de la date: ", dateFormat.format(dateDemain));
+			dateDemain = dateFormat.parse(selDate);
+	
+			pathDossier = pathDirTests+dateFormat.format(dateDemain)+"/";
+			
+			for (Stage stage : stageList) {
+				if(dateDemain.before(stage.getDateDt()) == false 
+						&& dateDemain.after(stage.getDateDt()) == false
+						&& stage.getCode().matches(Config.get("exp.sms.pattern")) ) {
+					code = stage.getCode().replace(" ", "").trim();
+					code = code.substring(0,3)+" "+code.substring(3);
+					line = new StringBuffer();
+					for (Stagiaire s : stage.getStagiaireList()) {
+						String matr = "M"+s.getMatricule().subSequence(0, 6);
+						if (line.length() > 0) {
+							//System.out.println("[INFO] ajout stage:"+code+" et matr:"+matr);
+							line.append("|"+matr);
+						}
+						else {
+							//System.out.println("[INFO]   +++ stage:"+code+" et matr:"+matr);
+							line.append(matr);
+						}
+					} 
+					new File(pathDossier).mkdir();
+					FileWriter fichier = new FileWriter(pathDossier+code+"_2.txt");
+					PrintWriter printer = new PrintWriter(fichier);
+					printer.println(line);
+					printer.close();
+				}
+			}
+		}
+		catch (IOException e) {
+			JOptionPane.showMessageDialog(null, "<html>probleme d'ecriture de" +
+					"<br>"+pathDossier+code+".txt", "Erreur", JOptionPane.ERROR_MESSAGE);
+		}
+		catch (ParseException e) {
+			good = false;
+			JOptionPane.showMessageDialog(null, "<html>probleme de format" +
+				"<br/>de la date " + selDate + "</html>", "Erreur", JOptionPane.ERROR_MESSAGE);;
+		}				
+	}
 
 }//fin class
