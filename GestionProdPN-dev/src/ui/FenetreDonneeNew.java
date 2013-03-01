@@ -182,9 +182,15 @@ public class FenetreDonneeNew extends JFrame implements ActionListener {
 			        	if (s != null) {
 			        		mss.setStage(s);
 			        		msm.setStage(s);
-			        		lblStage.setText(s.getCode());
+			        		if (s.hasPnStage()) {
+				        		lblStage.setText(s.getCode() + "  ("+s.getPnStage().getCode()+")");
+				        		lblStage2.setText(s.getCode() + "  ("+s.getPnStage().getCode()+")");
+			        		}
+			        		else {
+				        		lblStage.setText(s.getCode());
+				        		lblStage2.setText(s.getCode());
+			        		}
 			        		lblDate.setText(ms.filterDate);
-			        		lblStage2.setText(s.getCode());
 			        		lblDate2.setText(ms.filterDate);
 			        	}
 			        }

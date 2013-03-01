@@ -23,7 +23,7 @@ public class ModelModules extends AbstractTableModel
 	
 	private Stage stage;
 	private ArrayList<Module> modules;
-	private final String[] entetes = {"Début", "Fin", "Libellé", "Intervenant 1", "Intervenant 1",
+	private final String[] entetes = {"Début", "Fin", "Libellé", "FSS 1", "FSS 2", "Invervenant",
 			"Moyen"};
 	private TableModelSorter sorter;
 	private JTable table;
@@ -34,6 +34,7 @@ public class ModelModules extends AbstractTableModel
 			{ 50, 80, 65},
 			{ 50, 80, 65},
 			{ 80,180, 60},
+			{ 60,180, 90},
 			{ 60,180, 90},
 			{ 60,180, 90},
 			{ 60,180, 60}
@@ -128,10 +129,18 @@ public class ModelModules extends AbstractTableModel
         	case 2:
             	return modules.get(rowIndex).getLibelle();
         	case 3:
-            	return modules.get(rowIndex).getNomLeader()+modules.get(rowIndex).getNomIntervenant();
+            	return modules.get(rowIndex).getNomLeader();
         	case 4:
-            	return modules.get(rowIndex).getNomAide();
+        		if (modules.get(rowIndex).hasCoModule())
+        			return modules.get(rowIndex).getCoModule().getNomLeader();
+        		else
+            		return modules.get(rowIndex).getNomAide();
         	case 5:
+        		if (modules.get(rowIndex).hasCoModule())
+        			return modules.get(rowIndex).getNomAide();
+        		else
+        			return modules.get(rowIndex).getNomIntervenant();
+        	case 6:
             	return modules.get(rowIndex).getSalle();
         	default:
             	return null;
@@ -146,9 +155,16 @@ public class ModelModules extends AbstractTableModel
     		case 1:
 	    	case 2:
 	    	case 3:
-	    	case 4:
 	    	case 5:
+	    	case 6:
 	    		write = true;
+	    		break;
+	    	case 4:
+        		if (modules.get(rowIndex).hasCoModule())
+        			write = false;
+        		else
+        			write = true;
+        		break;
     	}
     	return write;
     }
@@ -172,9 +188,13 @@ public class ModelModules extends AbstractTableModel
                 	s.setNomLeader((String)aValue);
                     break;
                 case 4:
-					s.setNomAide((String)aValue);
-                   break;
+            		if (!modules.get(rowIndex).hasCoModule())
+            			s.setNomAide((String)aValue);
+            		break;
                 case 5:
+        			s.setNomAide((String)aValue);
+                   break;
+                case 6:
 					s.setSalle((String)aValue);
                	break;
                 default:

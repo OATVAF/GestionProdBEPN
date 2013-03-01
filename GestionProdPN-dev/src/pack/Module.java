@@ -26,6 +26,7 @@ public class Module implements Serializable, Comparable<Module> {
 	private String nomAide;
 	private String nomIntervenant;
 	private String compagnie;
+	private Module coModule;
 
 	/**
 	 * constructeur
@@ -47,6 +48,7 @@ public class Module implements Serializable, Comparable<Module> {
 		this.setNomLeader("");
 		this.setNomAide("");
 		this.setNomIntervenant("");
+		this.coModule = null;
 	}
 	
 	public long getId() {
@@ -223,6 +225,21 @@ public class Module implements Serializable, Comparable<Module> {
 
 	public String toString() {
 		return codeStage+"."+libelle+"."+heureDebut+"-"+heureFin;
+	}
+
+	public Module getCoModule() {
+		return coModule;
+	}
+	
+	public boolean hasCoModule() {
+		return (coModule!=null);
+	}
+
+	public void setCoModule(Module m) {
+		this.coModule = m;
+		m.coModule = this;
+		System.out.println("Co-Modules :" + codeStage + "_" + libelle
+				+ "<=>" + m.codeStage + "_" + m.libelle);
 	}
 }//fin class
 

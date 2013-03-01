@@ -31,7 +31,8 @@ public class PasserelleStage {
 	private static final boolean filterCancel = Config.getB("imp.delia.filter.cancel");
 	private static final String filterCancelPat = Config.get("imp.delia.filter.cancel.pat");
 	private static final String filterP123Pat = Config.get("imp.pm123.pat");
-
+	private static final String PncPntComTime = Config.get("imp.pnt.s2.group.time");
+	
 	private static SimpleDateFormat fmtDate   = new SimpleDateFormat("dd/MM/yyyy");
 
 	/**
@@ -174,6 +175,7 @@ public class PasserelleStage {
 		
 		//instanciation des listes
 		ArrayList<Stage> stageExportList = new ArrayList<Stage>();
+		ArrayList<Stage> stageS2List = new ArrayList<Stage>();
 		ArrayList<Module> moduleList = new ArrayList<Module>();
 		FileReader fichier;
 		Map<String, Integer> hsCode = new HashMap<String, Integer>();
@@ -365,6 +367,9 @@ public class PasserelleStage {
 					s.setIdx(hsId.get(s.getId()), hsCode.get(s.getCodeI()));
 					stageExportList.add(s);
 					module.setCodeStage(s.getCode());
+					if (s.getCode().matches("^(S2).*")) {
+						stageS2List.add(s);
+					}
 					if (s.getIdx() > 1 && hsStages.containsKey(s.getCodeI()+"-1")) {
 						s.setCoStage(hsStages.get(s.getCodeI()+"-1"));
 						System.out.println("* "+s.getCode()+" has coStage:"+s.getCoStage().getCode());
@@ -376,6 +381,23 @@ public class PasserelleStage {
 			}
 		}
 		
+		// Groupement des S2/SMG/OMG/SGP/OGP
+		for (Stage s : stageExportList) {
+			if (s.getCode().matches("^(SMG|OMG|SGP|OGP).*")) {
+				// Recherche du 4S associé
+				for (Stage s2 : stageS2List) {
+					Module mg = s.getModuleAtTime(PncPntComTime);
+					Module ms = s2.getModuleAtTime(PncPntComTime);
+					if (mg != null && ms != null
+							&& mg.getLibelle().equals(ms.getLibelle())) {
+						System.out.println("Groupe "+ s.getCode()+"<=>"+s2.getCode());
+						s.setPnStage(s2);
+						//s2.setPnStage(s);
+					}
+				}
+			}
+		}
+			
 		return stageExportList;
 	}//fin importExportDelia()
 	

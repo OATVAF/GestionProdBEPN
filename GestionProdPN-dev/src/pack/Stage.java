@@ -32,6 +32,7 @@ public class Stage implements Serializable /*,Cloneable*/ {
 	private ArrayList<Stagiaire> stagiaireList;
 	private Stage coStage;
 	private ArrayList<Stage> coStageList;
+	private Stage pnStage;
 	
 	private SimpleDateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
 	
@@ -210,7 +211,7 @@ public class Stage implements Serializable /*,Cloneable*/ {
 	}
 
 	/**
-	 * revoit le premier module du stage
+	 * renvoit le premier module du stage
 	 * @return module
 	 */
 	public Module getFirstModule(){
@@ -223,7 +224,7 @@ public class Stage implements Serializable /*,Cloneable*/ {
 	}
 
 	/**
-	 * revoit le dernier module du stage
+	 * renvoit le dernier module du stage
 	 * @return module
 	 */
 	public Module getLastModule(){
@@ -233,6 +234,30 @@ public class Stage implements Serializable /*,Cloneable*/ {
 		else {
 			return moduleList.get(moduleList.size()-1);
 		}
+	}
+
+	/**
+	 * renvoit le module du stage à une heure donnée
+	 * @return module
+	 */
+	public Module getModuleAtTime(String h){
+		for (Module m : moduleList) {
+			if (m.getHeureDebut().equals(h))
+				return m;
+		}
+		return null;
+	}
+	
+	/**
+	 * renvoit le module du stage à une heure donnée
+	 * @return module
+	 */
+	public Module getModuleAtTime(Module mod){
+		for (Module m : moduleList) {
+			if (m.getHeureDebut().equals(mod.getHeureDebut()))
+				return m;
+		}
+		return null;
 	}
 
 	/**
@@ -419,5 +444,23 @@ public class Stage implements Serializable /*,Cloneable*/ {
 	
 	public ArrayList<Stage> getCoStageList() {
 		return this.coStageList;
+	}
+
+	public Stage getPnStage() {
+		return pnStage;
+	}
+	
+	public boolean hasPnStage() {
+		return (pnStage != null);
+	}
+
+	public void setPnStage(Stage s) {
+		this.pnStage = s;
+		s.pnStage=this;
+		for (Module m: moduleList) {
+			Module cm = s.getModuleAtTime(m);
+			if (cm != null && m.getLibelle().equals(cm.getLibelle()))
+				m.setCoModule(s.getModuleAtTime(m));
+		}
 	}
 }//fin class

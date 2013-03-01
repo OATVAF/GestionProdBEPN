@@ -72,8 +72,9 @@ public class PasserellePDF {
 	private static Font fontB28 = new Font(FontFamily.HELVETICA, 28, Font.BOLD);
 	private static Font fontB140= new Font(FontFamily.HELVETICA,140, Font.BOLD);
 	private static Font fontB95 = new Font(FontFamily.HELVETICA, 95, Font.BOLD);
-	private static Font fontI9 =  new Font(FontFamily.HELVETICA,  9, Font.ITALIC);
-	private static Font fontBI9  = new Font(FontFamily.HELVETICA,  9, Font.BOLD | Font.ITALIC);
+	private static Font fontI9  = new Font(FontFamily.HELVETICA,  9, Font.ITALIC);
+	private static Font fontBI9 = new Font(FontFamily.HELVETICA, 9, Font.BOLD | Font.ITALIC);
+	private static Font fontBI12= new Font(FontFamily.HELVETICA, 12, Font.BOLD | Font.ITALIC);
 
 	/** 
 	 *  Liste des document éditables
@@ -996,6 +997,7 @@ public class PasserellePDF {
 		String Nom = fss.nomFSS;
 		ArrayList<Module> moduleList = fss.modules;
 		String date = moduleList.get(0).getDate();
+		Phrase phrs;
 		
 		// tri selon l'heure de début
 		Collections.sort(moduleList, new ModuleStartComparator());
@@ -1039,7 +1041,7 @@ public class PasserellePDF {
 				lead = "Aide";
 				aide = module.getNomLeader();
 			}
-			Phrase phrs = new Phrase(lead, font12);
+			phrs = new Phrase(lead, font12);
 			if (!aide.equals("")) {
 				phrs.add(new Phrase("\n"+aide, fontI9));
 			}
@@ -1075,7 +1077,13 @@ public class PasserellePDF {
 				cell.setPadding(2); cell.setBorder(0);
 				header.addCell(cell); header.addCell(cell);
 				
-				cell = new PdfPCell(new Phrase("Stage : "+stage.getCode(), fontB12));
+				phrs = new Phrase("Stage : "+stage.getCode(), fontB12);
+				//if (Config.getB(cfg+"s2-smg") 
+				//		&& stage.getCode().matches(Config.get(cfg+"s2-smg.pattern"))) {
+				if (stage.hasPnStage()) {
+					phrs.add(new Phrase(" / ("+stage.getPnStage().getCode()+")", fontBI12));
+				}
+				cell = new PdfPCell(phrs);
 				cell.setHorizontalAlignment(Element.ALIGN_LEFT);
 				cell.setPadding(2); cell.setBorder(0); header.addCell(cell);
 				
@@ -1094,8 +1102,8 @@ public class PasserellePDF {
 				center.addCell(new Phrase("Début", fontB9));
 				center.addCell(new Phrase("Fin", fontB9));
 				center.addCell(new Phrase("Activité", fontB9));
-				center.addCell(new Phrase("Leader", fontB9));
-				center.addCell(new Phrase("Aide", fontB9));
+				center.addCell(new Phrase("FSS 1", fontB9));
+				center.addCell(new Phrase("FSS 2/Aide", fontB9));
 				center.addCell(new Phrase("Moyen", fontB9));
 
 				for (Module m : stage.getModuleList()) {
@@ -1103,7 +1111,16 @@ public class PasserellePDF {
 					center.addCell(new Phrase(m.getHeureFin(), font9));
 					center.addCell(new Phrase(m.getLibelle(), font9));
 					center.addCell(new Phrase(m.getNomLeader(), m.getNomLeader().equals(Nom) ? fontB9 : font9));
-					center.addCell(new Phrase(m.getNomAide(), m.getNomAide().equals(Nom) ? fontBI9 :fontI9));
+					String a1="",a2="";
+					if (m.hasCoModule()) {
+						a1=m.getCoModule().getNomLeader();
+						a2="\n"+m.getNomAide()+m.getNomIntervenant();
+					}
+					else
+						a1=m.getNomAide()+m.getNomIntervenant();
+					phrs = new Phrase(a1, a1.equals(Nom) ? fontBI9 :fontI9);
+					phrs.add(new Phrase(a2, fontI9));
+					center.addCell(phrs);
 					center.addCell(new Phrase(m.getSalle(), font9));
 				}
 				
