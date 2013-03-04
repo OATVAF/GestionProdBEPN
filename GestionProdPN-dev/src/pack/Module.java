@@ -153,7 +153,8 @@ public class Module implements Serializable, Comparable<Module> {
 	 */
 	public void setNomLeader(String nomLeader) {
 		this.nomLeader = nomLeader;
-		if (this.stage != null) {
+		if (this.stage != null && this.stage.getLeader().equals("")) {
+			System.out.println("Module:"+getCodeStage()+":"+libelle+".setNomLeader:"+nomLeader);
 			this.stage.setLeader(nomLeader);
 		}
 	}
@@ -238,6 +239,8 @@ public class Module implements Serializable, Comparable<Module> {
 	public void setCoModule(Module m) {
 		this.coModule = m;
 		m.coModule = this;
+		if (this.salle.equals("")) this.setSalle(m.salle);
+		if (m.salle.equals("")) m.setSalle(this.salle);		
 		System.out.println("Co-Modules :" + codeStage + "_" + libelle
 				+ "<=>" + m.codeStage + "_" + m.libelle);
 	}

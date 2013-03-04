@@ -364,7 +364,8 @@ public class PasserelleStage {
 					//nothing
 				} else {
 					Stage s = new Stage(module);
-					s.setIdx(hsId.get(s.getId()), hsCode.get(s.getCodeI()));
+					s.setIdx(Config.getI("imp.delia.s2.map."+hsId.get(s.getId())),
+							hsCode.get(s.getCodeI()));
 					stageExportList.add(s);
 					module.setCodeStage(s.getCode());
 					if (s.getCode().matches("^(S2).*")) {
@@ -375,7 +376,7 @@ public class PasserelleStage {
 						System.out.println("* "+s.getCode()+" has coStage:"+s.getCoStage().getCode());
 					}
 					hsStages.put(s.getCode(), s);
-					//System.out.println("Add stage "+s.getCode()+":"+hsId.get(module.getId())+"/"+hsCode.get(module.getCodeStage()));
+					System.out.println("Add stage "+s.getCode()+":"+hsId.get(module.getId())+"/"+hsCode.get(module.getCodeStage()));
 					System.out.println("+ "+s.getCode()+"/"+s.getSCode()+":"+s.getIdx()+"/"+s.getIdxMax()+ "M:" + module.getLibelle()+" L:"+s.getLeader() + " s:"+module.getStage());
 				}
 			}
