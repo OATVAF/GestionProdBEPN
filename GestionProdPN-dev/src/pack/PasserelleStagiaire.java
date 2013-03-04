@@ -271,8 +271,9 @@ public class PasserelleStagiaire {
 	public static /*ArrayList<Stage>*/ void ajoutPnc(ArrayList<Stage> stageList,ArrayList<Stagiaire> stagiairePNCList) {
 		//ArrayList<Stage> newStageList = stageList;
 		String site = Config.get("app.site");
+		String p123Pat = Config.get("imp.pm123.pat");
 		String m123Pat = Config.get("imp.m123.pat."+site);
-
+		String p123Date = "";
 		
 Next:	for (Stagiaire stagiaire : stagiairePNCList) {
 			String strCodeStagiaire = stagiaire.getCodeStage().replace(" ", "").trim();
@@ -280,6 +281,9 @@ Next:	for (Stagiaire stagiaire : stagiairePNCList) {
 			// Find stage for code
 			for (Stage stage : stageList) {
 				String strCodeStage = stage.getCodeI().replace(" ", "");
+				if (strCodeStage.matches(p123Pat)) {
+					p123Date=stage.getDateStr();
+				}
 				if ( (strCodeStagiaire.startsWith(strCodeStage)
 					  || strCodeStage.startsWith(strCodeStagiaire))
 						&& ! stage.getDateDt().before(stagiaire.getDateDeb())
@@ -290,7 +294,8 @@ Next:	for (Stagiaire stagiaire : stagiairePNCList) {
 					continue Next;
 				}
 			}		
-			if (strCodeStagiaire.matches(m123Pat)) {
+			if (strCodeStagiaire.matches(m123Pat) 
+					&& p123Date.equals(stagiaire.getDateDebStage())) {
 				int n = Integer.parseInt(""+strCodeStagiaire.charAt(1));
 				String code = "M"+n+" "+site.toUpperCase();
 				System.out.println("+ "+code);
