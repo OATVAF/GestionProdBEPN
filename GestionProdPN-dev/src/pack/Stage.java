@@ -13,7 +13,7 @@ import java.util.Date;
  * @author BERON Jean-Sébastien
  *
  */
-public class Stage implements Serializable /*,Cloneable*/ {
+public class Stage implements Serializable, Comparable<Stage> /*,Cloneable*/ {
 
 	private static final long serialVersionUID = -3775254007031121727L;
 
@@ -463,4 +463,13 @@ public class Stage implements Serializable /*,Cloneable*/ {
 				m.setCoModule(s.getModuleAtTime(m));
 		}
 	}
+	public int compareTo(Stage other) {
+		return (this.toString().compareTo(other.toString()));
+	}
+
+	public String toString() {
+		return getCode();
+		//return compagnie + "." + code + "." + idx + "." + date;
+	}
+
 }//fin class

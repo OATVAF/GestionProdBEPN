@@ -61,8 +61,8 @@ public class ModelModules extends AbstractTableModel
 		fireTableDataChanged();
     }
 	
-	public void setStage(Stage s) {
-		stage = s;
+	public void setStage(Object s) {
+		stage = (Stage)s;
 		modules = stage.getModuleList();
 		fireTableDataChanged();
 	}

@@ -10,16 +10,25 @@ public class ModelCombo extends AbstractListModel implements ComboBoxModel
 {
 	private static final long serialVersionUID = 4011116690928828937L;
 
-	List<String> list = new ArrayList<String>();
-	String sel = null;
+	//List<String> list = new ArrayList<String>();
+	List<Object> list = new ArrayList<Object>();
+	Object sel = null;
 	
-	public void setList(List<String> l) {
+	public void setList(List<Object> l) {
 		list = l;
 	}
 	
+	/*
 	public void add(String s) {
 		if (! list.contains(s)) {
 			list.add(s);
+		}
+	}
+	*/
+	
+	public void add(Object o) {
+		if (! list.contains(o)) {
+			list.add(o);
 		}
 	}
 
@@ -36,6 +45,6 @@ public class ModelCombo extends AbstractListModel implements ComboBoxModel
 	}
 
 	public void setSelectedItem(Object anItem) {
-		sel = (String)anItem;
+		sel = anItem;
 	}
 }

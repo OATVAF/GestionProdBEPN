@@ -3,6 +3,7 @@ package data;
 import java.awt.Component;
 import java.awt.Font;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 import javax.swing.plaf.FontUIResource;
@@ -38,6 +39,8 @@ public class ModelStages extends AbstractTableModel
 	private ArrayList<Stage> stages = new ArrayList<Stage>();
 	public ModelCombo dateModel = new ModelCombo();	
 	public ModelCombo cieModel = new ModelCombo();
+	public ModelCombo stageModel = new ModelCombo();
+	
 	private TableModelSorter sorter;
 	private JTable table;
 	public String filterDate;
@@ -253,14 +256,24 @@ public class ModelStages extends AbstractTableModel
         }
     }
     
+    public Stage getStage(String c) {
+		return null;
+    }
+    
     public void selDate(String date) {
     	filterDate = date;
 		stages = new ArrayList<Stage>();
+		stageModel = new ModelCombo();
 		for (Stage s : stagesAll) {
     		if(s.getDateStr().equals(filterDate)){
     			stages.add(s);
     		}
     	}
+		Collections.sort(stages);
+		for (Stage s : stages) {
+			stageModel.add(s);
+		}
+		/*
 		//tri des stages par ordre alphabetique
 		Stage stgTmp ;
 		boolean good = false;
@@ -277,6 +290,7 @@ public class ModelStages extends AbstractTableModel
 				}
 			}
 		}
+		*/
 		fireTableDataChanged();
 		//fireTableRowsInserted(stages.size() -1, stages.size() -1);
     }

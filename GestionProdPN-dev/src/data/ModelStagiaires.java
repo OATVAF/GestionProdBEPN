@@ -64,8 +64,8 @@ public class ModelStagiaires extends AbstractTableModel {
 		fireTableDataChanged();
     }
 	
-	public void setStage(Stage s) {
-		stage = s;
+	public void setStage(Object s) {
+		stage = (Stage)s;
 		stagiaires = stage.getStagiaireList();
 		fireTableDataChanged();
 	}
