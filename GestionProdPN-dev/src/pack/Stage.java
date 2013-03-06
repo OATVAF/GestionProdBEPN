@@ -267,7 +267,7 @@ public class Stage implements Serializable, Comparable<Stage> /*,Cloneable*/ {
 	 */
 	public void ajoutModule(Module leModule){
 		moduleList.add(leModule);
-		Collections.sort(moduleList, new ModuleStartComparator());
+		Collections.sort(moduleList); //, new ModuleStartComparator());
 	}
 	
 	/**

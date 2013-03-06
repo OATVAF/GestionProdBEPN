@@ -153,8 +153,16 @@ public class Module implements Serializable, Comparable<Module> {
 	 */
 	public void setNomLeader(String nomLeader) {
 		this.nomLeader = nomLeader;
-		if (this.stage != null && this.stage.getLeader().equals("")) {
-			System.out.println("Module:"+getCodeStage()+":"+libelle+".setNomLeader:"+nomLeader);
+		if (this.stage == null) return;
+		// Leader stage vide ?
+		if (stage.getLeader().equals("")) {
+			System.out.println("  * Module:"+getCodeStage()+":"+libelle+".setNomLeader:"+nomLeader);
+			this.stage.setLeader(nomLeader);
+		}
+		// premier module du stage ?
+		else if (this == stage.getFirstModule() 
+			&& ! stage.getLeader().equals(nomLeader) ) {
+			System.out.println("  # Change Leader Module:"+getCodeStage()+":"+libelle+".setNomLeader:"+nomLeader);
 			this.stage.setLeader(nomLeader);
 		}
 	}
