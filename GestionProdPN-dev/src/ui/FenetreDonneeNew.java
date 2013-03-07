@@ -2,8 +2,10 @@ package ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -17,16 +19,22 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.event.ChangeListener;
 
 import java.awt.FlowLayout;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.ListSelectionModel;
 import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
+
+import org.jdesktop.swingworker.SwingWorker;
 
 import pack.Stage;
 
@@ -35,7 +43,6 @@ import data.ModelStages;
 import data.ModelStagiaires;
 import pack.Config;
 
-
 /**
  * Fenetre qui permet a l'utilisateur de modifier les données importées<br>
  * il pourra choisir la date et le stage afin d'en changer plusieurs données<br>
@@ -43,7 +50,7 @@ import pack.Config;
  * @author BERON Jean-Sébastien
  *
  */
-public class FenetreDonneeNew extends JFrame implements ActionListener {
+public class FenetreDonneeNew extends JFrame implements ActionListener, PropertyChangeListener {
 
 	private static final long serialVersionUID = 3417928306187912598L;
 	
@@ -53,13 +60,13 @@ public class FenetreDonneeNew extends JFrame implements ActionListener {
 	private JPanel bluePane;//conteneur servant de décor
 	private JPanel selPane;
 	private JPanel choixPane;// conteneur contenant les listes déroulantes
+	private JPanel barPane;
+
 
 	private JComboBox dateBox;
 	private JComboBox stageBox;
 	private JLabel dateLbl;
 	private JLabel stageLbl;
-
-	private JButton switchBtn;
 	private JButton addBtn;
 	private JButton removeBtn;
 	
@@ -75,14 +82,52 @@ public class FenetreDonneeNew extends JFrame implements ActionListener {
 	private JTable tableStagiaires;
 	private JTable tableModules;
 
+	
 	private ModelStages ms;
 	private ModelStagiaires mss;
 	private ModelModules msm;
+
+	private JProgressBar progressBar;
+	private JTextPane statusPane;
+	private StatusBar statusBar;
 
 	private static final int STAGES_IDX = 0;
 	private static final int STAGIAIRES_IDX = 1;
 	private static final int MODULES_IDX = 2;
 
+	private static FenetreDonneeNew FDN;
+	
+	private Task task;
+	
+	class Task extends SwingWorker<Void, Void> {
+		
+        /*
+         * Main task. Executed in background thread.
+         */
+		@Override
+        public Void doInBackground() {
+			int progress = 0;
+            setProgress(0);
+
+            while (! isCancelled() && (progress<=100)) {
+            	setProgress(progress++);
+            	try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+				}
+            }
+			return null;
+		}
+		
+        @Override
+        public void done() {
+            Toolkit.getDefaultToolkit().beep();
+            setCursor(null); //turn off the wait cursor
+            statusBar.update(Messages.getString("FenetreDonneeNew.savedMsg"), 0);
+        }
+
+	}
+	
 	//-Dswing.defaultlaf=com.sun.java.swing.plaf.windows.WindowsLookAndFeel
 	/**
 	 * constructeur de la fenetre
@@ -97,7 +142,7 @@ public class FenetreDonneeNew extends JFrame implements ActionListener {
 		this.setSize(900, 600);
 		this.setLocationRelativeTo(null);
 		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		
+		FDN=this;
 		
 		addWindowListener(new WindowAdapter() {
 			@Override
@@ -110,10 +155,15 @@ public class FenetreDonneeNew extends JFrame implements ActionListener {
 							JOptionPane.WARNING_MESSAGE, new ImageIcon(Config.getRes("save.png"))); //$NON-NLS-1$
 					//si la reponse est "oui"
 					if(rep == JOptionPane.YES_OPTION) {
+						setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+						task = new Task();
+						task.addPropertyChangeListener(FDN);
+						task.execute();
 						ms.saveStages();
-						JOptionPane.showMessageDialog(null, Messages.getString("FenetreDonneeNew.savedMsg"), Messages.getString("FenetreDonneeNew.saveTitle"), JOptionPane.INFORMATION_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+						task.cancel(true);
+						//JOptionPane.showMessageDialog(null, Messages.getString("FenetreDonneeNew.savedMsg"),
+						//		Messages.getString("FenetreDonneeNew.saveTitle"), JOptionPane.INFORMATION_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
 					}
-
 				}
 			}
 		});
@@ -194,6 +244,10 @@ public class FenetreDonneeNew extends JFrame implements ActionListener {
 		
 		dateBox = new JComboBox();
 		stageBox = new JComboBox();
+		barPane = new JPanel();
+		progressBar = new JProgressBar();
+		statusPane = new JTextPane();
+		statusBar = new StatusBar(statusPane, progressBar);
 
 		tableStages = new JTable();
 		tableStages.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -237,25 +291,27 @@ public class FenetreDonneeNew extends JFrame implements ActionListener {
 		stageBox.setModel(ms.stageModel);
 		//stageBox.setSelectedIndex(ms.stageModel.getSize()-1);
 		choixPane.add(stageBox);
-																
-		//conteneur affichant les boutons de modifications
-		JPanel btnPane = new JPanel();
-		selPane.add(btnPane, BorderLayout.SOUTH);
-		btnPane.setBackground(Color.WHITE);
-		switchBtn = new JButton(Messages.getString("FenetreDonneeNew.ToStagiaires")); //$NON-NLS-1$
-		switchBtn.setPreferredSize(new Dimension(200, 35));
-		switchBtn.addActionListener(this);
-		btnPane.add(switchBtn);
 		addBtn = new JButton(Messages.getString("FenetreDonneeNew.Add")); //$NON-NLS-1$
+		choixPane.add(addBtn);
 		addBtn.setIcon(new ImageIcon(Config.getRes("modif.png"))); //$NON-NLS-1$
 		addBtn.setPreferredSize(new Dimension(200, 35));
-		addBtn.addActionListener(this);
-		btnPane.add(addBtn);
 		removeBtn = new JButton(Messages.getString("FenetreDonneeNew.Remove")); //$NON-NLS-1$
+		choixPane.add(removeBtn);
 		removeBtn.setIcon(new ImageIcon(Config.getRes("remove.png"))); //$NON-NLS-1$
 		removeBtn.setPreferredSize(new Dimension(200, 35));
 		removeBtn.addActionListener(this);
-		btnPane.add(removeBtn);
+		addBtn.addActionListener(this);
+		
+		// Bar
+		
+		selPane.add(barPane, BorderLayout.SOUTH);
+		barPane.setBackground(Color.WHITE);
+		barPane.setLayout(new BorderLayout(5, 5));
+		barPane.add(progressBar, BorderLayout.EAST);
+		barPane.add(statusPane, BorderLayout.CENTER);		
+		statusBar.select();
+		statusBar.update(null, 0);
+
 	}//fin constructionCenterPane()
 	
 	/**
@@ -265,33 +321,21 @@ public class FenetreDonneeNew extends JFrame implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		int i = tabbedPane.getSelectedIndex();
 		
+		// Status
+		statusBar.setMax(100);
+		statusBar.update(null, 0);
+
 		//récupération de la source
 		JComponent source = (JComponent) e.getSource();
 		
 		if (source.equals(dateBox)) {
 			ms.selDate((String) dateBox.getSelectedItem());
 		}
-		
-		if (source.equals(stageBox)) {
+		else if (source.equals(stageBox)) {
 			mss.setStage(stageBox.getSelectedItem());
     		msm.setStage(stageBox.getSelectedItem());
 		}
-
-		//si le bouton est le bouton de l'affichage des stagiaires
-		if(source.equals(switchBtn)){
-			switch (i) {
-			case STAGES_IDX:
-				tabbedPane.setSelectedIndex(STAGIAIRES_IDX);
-				break;
-			case STAGIAIRES_IDX:
-			case MODULES_IDX:
-				tabbedPane.setSelectedIndex(STAGES_IDX);
-				break;
-			}
-		}
-
-		//si le bouton est le bouton add Stage
-		if (source.equals(addBtn)) {
+		else if (source.equals(addBtn)) {
 			switch (i) {
 			case STAGES_IDX:
 				ms.newStage();
@@ -305,9 +349,7 @@ public class FenetreDonneeNew extends JFrame implements ActionListener {
 			}
 		}
 
-
-		//si le bouton est le bouton de la suppression de stage
-		if(source.equals(removeBtn)){
+		else if(source.equals(removeBtn)){
 			int rep = JOptionPane.NO_OPTION;
 				        
         	String msg = tabbedPane.getTitleAt(i);
@@ -328,7 +370,13 @@ public class FenetreDonneeNew extends JFrame implements ActionListener {
 				}
 			}
 		}
-		
 	}//fin actionPerformed()
+
+	public void propertyChange(PropertyChangeEvent evt) {
+	    if ("progress" == evt.getPropertyName()) {
+            int progress = (Integer) evt.getNewValue();
+            statusBar.update(progress);
+        }
+	}
 	
 }//fin class

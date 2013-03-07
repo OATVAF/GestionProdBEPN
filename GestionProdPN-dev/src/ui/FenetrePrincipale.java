@@ -10,6 +10,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -59,6 +61,12 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 	//police des boutons
 	private Font btnFont;
 	
+	private JPanel barPane;
+	private JProgressBar progressBar;
+	private JTextPane statusPane;
+
+	private StatusBar statusBar;
+
 	//private boolean TVall = false;
 	
 	/**
@@ -153,9 +161,11 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 		
 		//construction du centerPane
 		constructionCenterPane();
-		
 		contentPane.add(centerPane,BorderLayout.CENTER);
 		
+		constructionStatusPane();
+		contentPane.add(barPane, BorderLayout.SOUTH);
+
 	}//fin constructionContentPane()
 	
 	/**
@@ -180,6 +190,8 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 		//construction du prodPane
 		constructionProdPane();
 		centerPane.add(prodPane,BorderLayout.CENTER);
+		
+		//construction statusBar
 		
 	}//fin constructionCenterPane()
 	
@@ -305,6 +317,22 @@ public class FenetrePrincipale extends JFrame implements ActionListener{
 		prodPane.add(smsPane);
 		
 	}//fin constructionProdPane()
+
+	private void constructionStatusPane() {
+		barPane = new JPanel();
+		barPane.setBackground(Color.WHITE);
+		barPane.setLayout(new BorderLayout(5, 5));
+		
+		progressBar = new JProgressBar();
+		barPane.add(progressBar, BorderLayout.EAST);
+		
+		statusPane = new JTextPane();
+		barPane.add(statusPane, BorderLayout.CENTER);
+		
+		statusBar = new StatusBar(statusPane, progressBar);
+		statusBar.select();
+		statusBar.update(null, 0);
+	}
 
 	/**
 	 * procedure de l'interface ActionListener<br/>
