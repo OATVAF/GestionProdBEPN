@@ -249,6 +249,9 @@ public class PasserellePDF {
 					break;
 				case FEUILLE_ROUTE_FSS:
 					creationFeuilRouteFSS(fssModules, doc, cfgP);
+					if (Config.getB(cfgP+"circulation")) {
+						creationDeroule(fssModules, doc, cfgP);
+					}
 					break;
 				default:
 					break;
@@ -1056,83 +1059,92 @@ public class PasserellePDF {
 		doc.add(new Phrase("  "));
 		doc.add(center);
 		
-		if (Config.getB(cfg+"circulation")) {
-			// Liste des stages
-			ArrayList<Stage> stageList = new ArrayList<Stage>();
-			for (Module module : moduleList) {
-				if (!stageList.contains(module.getStage())) {
-					stageList.add(module.getStage());
-				}
-			}
-
-			header = new PdfPTable(2);
-			header.setWidthPercentage(100);
-			cell = new PdfPCell(new Phrase("\n"));
-			cell.setPadding(2); cell.setBorder(2);
-			header.addCell(cell); header.addCell(cell);
+	}//fin
+	
+	/**
+	 * creation du tableau de chaque stage du FSS
+	 */
+	private static void creationDeroule(FSS_Modules fss, Document doc, String cfg) throws DocumentException{
+			
+		String Nom = fss.nomFSS;
+		ArrayList<Module> moduleList = fss.modules;
+		String date = moduleList.get(0).getDate();
+		Phrase phrs;
+			
+		PdfPTable header, center;
+		PdfPCell cell, defCell;
 		
-			for (Stage stage : stageList) {
-				//System.out.println(stage.getCodeI());
-				cell = new PdfPCell(new Phrase("\n"));
-				cell.setPadding(2); cell.setBorder(0);
-				header.addCell(cell); header.addCell(cell);
-				
-				phrs = new Phrase("Stage : "+stage.getCode(), fontB12);
-				//if (Config.getB(cfg+"s2-smg") 
-				//		&& stage.getCode().matches(Config.get(cfg+"s2-smg.pattern"))) {
-				if (stage.hasPnStage()) {
-					phrs.add(new Phrase(" / ("+stage.getPnStage().getCode()+")", fontBI12));
-				}
-				cell = new PdfPCell(phrs);
-				cell.setHorizontalAlignment(Element.ALIGN_LEFT);
-				cell.setPadding(2); cell.setBorder(0); header.addCell(cell);
-				
-				cell = new PdfPCell(new Phrase("Date : "+ date, fontB12));
-				cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-				cell.setPadding(2); cell.setBorder(0); header.addCell(cell);
-				
-				center = new PdfPTable(6);
-				center.setWidthPercentage(100);
-				widths = new float[] { 1f, 1f, 2.5f, 2.5f, 2.5f, 3f };
-				center.setWidths(widths);
-				defCell = center.getDefaultCell();
-				//defCell.setBorder(7);
-				defCell.setPadding(3);
-				
-				center.addCell(new Phrase("Début", fontB9));
-				center.addCell(new Phrase("Fin", fontB9));
-				center.addCell(new Phrase("Activité", fontB9));
-				center.addCell(new Phrase("FSS 1", fontB9));
-				center.addCell(new Phrase("FSS 2/Aide", fontB9));
-				center.addCell(new Phrase("Moyen", fontB9));
-
-				for (Module m : stage.getModuleList()) {
-					center.addCell(new Phrase(m.getHeureDebut(), font9));
-					center.addCell(new Phrase(m.getHeureFin(), font9));
-					center.addCell(new Phrase(m.getLibelle(), font9));
-					center.addCell(new Phrase(m.getNomLeader(), m.getNomLeader().equals(Nom) ? fontB9 : font9));
-					String a1="",a2="";
-					if (m.hasCoModule()) {
-						a1=m.getCoModule().getNomLeader();
-						a2="\n"+m.getNomAide()+m.getNomIntervenant();
-					}
-					else
-						a1=m.getNomAide()+m.getNomIntervenant();
-					phrs = new Phrase(a1, a1.equals(Nom) ? fontBI9 :fontI9);
-					phrs.add(new Phrase(a2, fontI9));
-					center.addCell(phrs);
-					center.addCell(new Phrase(m.getSalle(), font9));
-				}
-				
-				//doc.add(new Phrase(" "));
-				doc.add(header);
-				doc.add(center);
-
-				header = new PdfPTable(2);
-				header.setWidthPercentage(100);
+		// Liste des stages
+		ArrayList<Stage> stageList = new ArrayList<Stage>();
+		for (Module module : moduleList) {
+			if (!stageList.contains(module.getStage())) {
+				stageList.add(module.getStage());
 			}
 		}
-	}//fin
+
+		header = new PdfPTable(2);
+		header.setWidthPercentage(100);
+		cell = new PdfPCell(new Phrase("\n"));
+		cell.setPadding(2); cell.setBorder(2);
+		header.addCell(cell); header.addCell(cell);
+	
+		for (Stage stage : stageList) {
+			//System.out.println(stage.getCodeI());
+			cell = new PdfPCell(new Phrase("\n"));
+			cell.setPadding(2); cell.setBorder(0);
+			header.addCell(cell); header.addCell(cell);
+			
+			phrs = new Phrase("Stage : "+stage.getCode(), fontB12);
+			//if (Config.getB(cfg+"s2-smg") 
+			//		&& stage.getCode().matches(Config.get(cfg+"s2-smg.pattern"))) {
+			if (stage.hasPnStage()) {
+				phrs.add(new Phrase(" / ("+stage.getPnStage().getCode()+")", fontBI12));
+			}
+			cell = new PdfPCell(phrs);
+			cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+			cell.setPadding(2); cell.setBorder(0); header.addCell(cell);
+			
+			cell = new PdfPCell(new Phrase("Date : "+ date, fontB12));
+			cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+			cell.setPadding(2); cell.setBorder(0); header.addCell(cell);
+			
+			center = new PdfPTable(6);
+			center.setWidthPercentage(100);
+			float[] widths = new float[] { 1f, 1f, 2.5f, 2.5f, 2.5f, 3f };
+			center.setWidths(widths);
+			defCell = center.getDefaultCell();
+			//defCell.setBorder(7);
+			defCell.setPadding(3);
+			
+			center.addCell(new Phrase("Début", fontB9));
+			center.addCell(new Phrase("Fin", fontB9));
+			center.addCell(new Phrase("Activité", fontB9));
+			center.addCell(new Phrase("FSS 1", fontB9));
+			center.addCell(new Phrase("FSS 2/Aide", fontB9));
+			center.addCell(new Phrase("Moyen", fontB9));
+
+			for (Module m : stage.getModuleList()) {
+				center.addCell(new Phrase(m.getHeureDebut(), font9));
+				center.addCell(new Phrase(m.getHeureFin(), font9));
+				center.addCell(new Phrase(m.getLibelle(), font9));
+				center.addCell(new Phrase(m.getNomLeader(), m.getNomLeader().equals(Nom) ? fontB9 : font9));
+				String a1="",a2="";
+				if (m.hasCoModule()) {
+					a1=m.getCoModule().getNomLeader();
+					a2="\n"+m.getNomAide()+m.getNomIntervenant();
+				}
+				else
+					a1=m.getNomAide()+m.getNomIntervenant();
+				phrs = new Phrase(a1, a1.equals(Nom) ? fontBI9 :fontI9);
+				phrs.add(new Phrase(a2, fontI9));
+				center.addCell(phrs);
+				center.addCell(new Phrase(m.getSalle(), font9));
+			}
+			
+			doc.add(header);
+			doc.add(center);
+		}
+	}
 	
 	/**
 	 * creer le pdf pour le FREP du stage passé en parametre
