@@ -153,7 +153,7 @@ public class PasserelleStagiaire {
 				Workbook workbook;
 				workbook = Workbook.getWorkbook(fichier);
 				Sheet sheet = workbook.getSheet(0);
-				for (int i = 1; i < sheet.getRows()-1; i++) {
+				for (int i = 1; i < sheet.getRows(); i++) {
 					Cell[] cell = sheet.getRow(i);
 					StagiaireList.add(new Stagiaire(cell[4].getContents(), cell[11].getContents()
 							, cell[5].getContents(), cell[6].getContents()
@@ -182,7 +182,7 @@ public class PasserelleStagiaire {
 				Workbook workbook;
 				workbook = Workbook.getWorkbook(fichier);
 				Sheet sheet = workbook.getSheet(0);
-				for (int i = 1; i < sheet.getRows()-1; i++) {
+				for (int i = 1; i < sheet.getRows(); i++) {
 					Cell[] cell = sheet.getRow(i);
 					StagiaireList.add(new Stagiaire(cell[3].getContents(), cell[9].getContents()
 							, cell[4].getContents(), cell[5].getContents()
