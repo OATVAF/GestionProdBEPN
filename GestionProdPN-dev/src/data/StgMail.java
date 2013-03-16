@@ -1,29 +1,31 @@
 package data;
 
+import pack.Config;
 import jxl.Cell;
 
 public class StgMail {
 
-	public String Nom;
-	public String Prenom;
-	public String Matricule;
-	public String Fct;
-	public String Email;
-	public String NumStage;
-	public String Site;
+	public String prop[];
 	public int n;
+
+	private static final int nCols = Config.getI("exp.interview.cols");
+	private static final String delimiter = "\t";
 	
 	public StgMail(Cell[] c, int i) {
-		Nom       = c[0].getContents();
-		Prenom    = c[1].getContents();
-		Matricule = c[2].getContents();
-		Fct       = c[3].getContents();
-		Email     = c[4].getContents();
-		NumStage  = c[5].getContents();
-		Site      = c[6].getContents();
+		prop = new String[nCols];
+		for (int j=0; j<nCols; j++)
+			prop[j]=c[j].getContents();
 		n = i;
 	}
 	public String toString() {
-		return Nom + "\t" + Prenom + "\t" + Matricule + "\t" + Fct + "\t" + Email + "\t" + NumStage + "\t" + Site;
-	}
+		//return Nom + "\t" + Prenom + "\t" + Matricule + "\t" + Fct + "\t" + Email + "\t" + NumStage + "\t" + Site;
+	    StringBuilder arTostr = new StringBuilder();
+	    if (prop.length > 0) {
+	        arTostr.append(prop[0]);
+	        for (int i=1; i<prop.length; i++) {
+	            arTostr.append(delimiter);
+	            arTostr.append(prop[i]);
+	        }
+	    }
+	    return arTostr.toString();	}
 }
