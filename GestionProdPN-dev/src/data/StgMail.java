@@ -13,9 +13,11 @@ public class StgMail {
 	
 	public StgMail(Cell[] c, int i) {
 		prop = new String[nCols];
-		for (int j=0; j<nCols; j++)
-			prop[j]=c[j].getContents();
-		n = i;
+		if (c.length > 0) {
+			for (int j=0; j<nCols && j<c.length; j++)
+				prop[j]=c[j].getContents();
+			n = i;
+		}
 	}
 	public String toString() {
 		//return Nom + "\t" + Prenom + "\t" + Matricule + "\t" + Fct + "\t" + Email + "\t" + NumStage + "\t" + Site;
