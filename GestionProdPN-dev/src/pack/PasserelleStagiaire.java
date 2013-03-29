@@ -67,7 +67,7 @@ public class PasserelleStagiaire {
 		good = true;
 		String pnL[] = { "pnc", "pnt" };
 		String cfg, pnIn="", pnOut;
-
+		boolean header = true;
 		//String pPNCS_1 = Config.get("imp.pnc-1"); //"dataImport/PNC_S-1.xls";
 		//String pPNTS_1 = Config.get("imp.pnt-1"); //"dataImport/PNT_S-1.xls";
 		
@@ -94,8 +94,11 @@ public class PasserelleStagiaire {
 				for (int i=0; i< num; i++) {
 					qListes[i]=(Config.get(cfg+(i+1)));
 					pnOut= Config.get(cfg+"fileOut")+qListes[i]+".txt";
-					P[i] = new PrintWriter(new FileWriter(pnOut, append)); 
-					P[i].println(h.toString());
+					P[i] = new PrintWriter(new FileWriter(pnOut, append));
+					if (header) {
+						P[i].println(h.toString());
+						header = false;
+					}
 				}
 				
 				for (StgMail s : StgList) {
