@@ -382,6 +382,47 @@ public class PasserelleStage {
 			}
 		}
 		
+		// Traitement des modules S2 uniques
+		for (Stage s : stageS2List) {
+			for (Module m : s.getModuleList()) {
+				if (m.getLibelle().matches(Config.get("imp.pnt.s2.modules_communs.pattern"))){
+					if (s.hasCoStage()) {
+						if (s.isMainCoStage()) {
+							for (Stage cs : s.getCoStageList()) {
+								if (cs.getModuleAtTime(m) == null) {
+									System.out.println(" Ajout Module commun 4S:"+s.getModuleAtTime(m)+" => "+cs);
+									cs.ajoutModule(m);
+								}
+							}
+						}
+						else {
+							if (s.getCoStage().getModuleAtTime(m) == null) {
+								System.out.println(" Ajout Module commun 4S:"+m+" => "+s.getCoStage());
+								s.getCoStage().ajoutModule(m);
+							}
+							for (Stage cs : s.getCoStage().getCoStageList()) {
+								if (cs.getModuleAtTime(m) == null) {
+									System.out.println(" Ajout Module commun 4S:"+m+" => "+cs);
+									cs.ajoutModule(m);
+								}
+							}
+
+						}
+					}
+					/*
+					else {
+						for (Stage cs : s.getCoStage().getCoStageList()) {
+							if (cs.getModuleAtTime(m) == null) {
+								System.out.println(" Ajout Module commun SMG/4S: "+s.getCode()+"."+s.getLibelle()
+										+ " à " +cs.getCode());
+							}
+						}
+					}
+					*/
+				}
+			}
+		}
+		
 		// Groupement des S2/SMG/OMG/SGP/OGP
 		for (Stage s : stageExportList) {
 			if (s.getCode().matches("^(SMG|OMG|SGP|OGP).*")) {
@@ -392,6 +433,7 @@ public class PasserelleStage {
 					if (mg != null && ms != null
 							&& mg.getLibelle().equals(ms.getLibelle())) {
 						System.out.println("Groupe "+ s.getCode()+"<=>"+s2.getCode());
+						// TODO faire le ménage sur les modules EPU!
 						s.setPnStage(s2);
 						//s2.setPnStage(s);
 					}

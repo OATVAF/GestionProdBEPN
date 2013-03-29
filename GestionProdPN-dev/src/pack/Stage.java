@@ -249,7 +249,7 @@ public class Stage implements Serializable, Comparable<Stage> /*,Cloneable*/ {
 	}
 	
 	/**
-	 * renvoit le module du stage à une heure donnée
+	 * renvoit le premier module du stage à une heure donnée
 	 * @return module
 	 */
 	public Module getModuleAtTime(Module mod){
@@ -258,6 +258,45 @@ public class Stage implements Serializable, Comparable<Stage> /*,Cloneable*/ {
 				return m;
 		}
 		return null;
+	}
+	
+	/**
+	 * renvoit la liste de modules du stage à une heure donnée
+	 * @return liste des modules
+	 */
+	
+	public ArrayList<Module> getModulesAtTime(Module mod){
+		ArrayList<Module> l= new ArrayList<Module>();
+		for (Module m : moduleList) {
+			if (m.getHeureDebut().equals(mod.getHeureDebut()))
+				l.add(m); 
+		}
+		return l;
+	}
+
+	/**
+	 * renvoit le module du stage avec un libellé donné
+	 * @return module
+	 */
+	public Module getModuleWithLibelle(String str){
+		for (Module m : moduleList) {
+			if (m.getLibelle().equals(str))
+				return m;
+		}
+		return null;
+	}
+	
+	/**
+	 * renvoit la liste de modules du stage avec un libellé donné
+	 * @return liste des modules
+	 */
+	public ArrayList<Module> getModulesWithLibelle(String str){
+		ArrayList<Module> l= new ArrayList<Module>();
+		for (Module m : moduleList) {
+			if (m.getLibelle().equals(str))
+				l.add(m); 
+		}
+		return l;
 	}
 
 	/**
@@ -329,28 +368,6 @@ public class Stage implements Serializable, Comparable<Stage> /*,Cloneable*/ {
 		stagiaireList.removeAll(sl);
 	}
 
-	/**
-	 * procedure triant les stagiaire par ordre alphabetique
-	 */
-	/*
-	public void trierStagiaireList(){
-		Stagiaire stgTemps ;
-		boolean good = false;
-		//tant que le tri n'est pas bon
-		while (! good) {
-			good = true;
-			for (int i = 0; i < stagiaireList.size()-1; i++) {
-				if(stagiaireList.get(i).getNom().compareToIgnoreCase(stagiaireList.get(i+1).getNom()) > 0){
-					good = false;
-					//echange
-					stgTemps = stagiaireList.get(i);
-					stagiaireList.set(i, stagiaireList.get(i+1));
-					stagiaireList.set(i+1, stgTemps);
-				}//finsi
-			}//finpour
-		}//fin tant que
-	}//fin trierStagiaireList()
-	*/
 	/**
 	 * getter de stagiaireList
 	 * @return stagiaireList
@@ -446,6 +463,20 @@ public class Stage implements Serializable, Comparable<Stage> /*,Cloneable*/ {
 		return this.coStageList;
 	}
 
+	/**
+	 * @return true si le stage fait partie d'un goupe de co-stages 4S
+	 */
+	public boolean hasCoStage() {
+		return ((coStage != null) || (coStageList.size() != 0)) ;
+	}
+
+	/**
+	 * @return true si le stage est le n°1 des co-stages 4S
+	 */
+	public boolean isMainCoStage() {
+		return (coStageList.size() != 0) ;
+	}
+
 	public Stage getPnStage() {
 		return pnStage;
 	}
@@ -458,9 +489,11 @@ public class Stage implements Serializable, Comparable<Stage> /*,Cloneable*/ {
 		this.pnStage = s;
 		s.pnStage=this;
 		for (Module m: moduleList) {
+			ArrayList<Module> l = s.getModulesAtTime(m);
+			System.out.println("setPnStage :"+l.size());
 			Module cm = s.getModuleAtTime(m);
 			if (cm != null && m.getLibelle().equals(cm.getLibelle()))
-				m.setCoModule(s.getModuleAtTime(m));
+				m.setCoModule(cm);
 		}
 	}
 	public int compareTo(Stage other) {

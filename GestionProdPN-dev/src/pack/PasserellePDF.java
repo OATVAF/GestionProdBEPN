@@ -44,9 +44,20 @@ public class PasserellePDF {
 	public static class FSS_Modules {
 		public String nomFSS;
 		public ArrayList<Module> modules;
+		public ArrayList<Stage> stages;
+		
 		public FSS_Modules(String nomFss) {
 			this.nomFSS = nomFss;
 			this.modules = new ArrayList<Module>();
+			this.stages = new ArrayList<Stage>();
+		}
+		public ArrayList<Stage> getStages() {		
+			for (Module module : modules) {
+				if (!stages.contains(module.getStage())) {
+					stages.add(module.getStage());
+				}
+			}
+			return stages;
 		}
 	};
 
@@ -73,7 +84,8 @@ public class PasserellePDF {
 	private static Font fontB140= new Font(FontFamily.HELVETICA,140, Font.BOLD);
 	private static Font fontB95 = new Font(FontFamily.HELVETICA, 95, Font.BOLD);
 	private static Font fontI9  = new Font(FontFamily.HELVETICA,  9, Font.ITALIC);
-	private static Font fontBI9 = new Font(FontFamily.HELVETICA, 9, Font.BOLD | Font.ITALIC);
+	private static Font fontBI9 = new Font(FontFamily.HELVETICA,  9, Font.BOLD | Font.ITALIC);
+	private static Font fontBI10= new Font(FontFamily.HELVETICA, 10, Font.BOLD | Font.ITALIC);
 	private static Font fontBI12= new Font(FontFamily.HELVETICA, 12, Font.BOLD | Font.ITALIC);
 
 	/** 
@@ -210,13 +222,25 @@ public class PasserellePDF {
 				case LISTE_STAGIAIRES: 
 					creationListStagiaire(leStage, doc, cfgP, false);
 					// Cas 4S
+					if (leStage.getCode().matches(Config.get(cfgP+"s2.pattern"))) {
+						// création de la liste complète pour le stage S2-1
+						if (Config.getB(cfgP+"s2.group") 
+								&& leStage.isMainCoStage()) {
+							//System.out.println("Liste Stagiaire 4S Groupé "+leStage.getCode());
+							if (Config.getB(cfgP+"s2.saut")) 
+								doc.newPage();
+							doc.newPage();
+							creationListStagiaire(leStage, doc, cfgP, true);
+						}
+					}
+					/*
 					if (Config.getB(cfgP+"s2.group") 
 							&& leStage.getCode().matches(Config.get(cfgP+"s2.pattern"))
 							&& leStage.getCoStage() == null) {
 						System.out.println("ListStagiaire 4S Groupé "+leStage.getCode());
 						doc.newPage();
-						creationListStagiaire(leStage, doc, cfgP, true);
 					}
+					*/
 					break;
 				case LISTE_EMARGEMENTS:
 					if (leStage.getSizeStagiaireList() != 0) {
@@ -224,12 +248,17 @@ public class PasserellePDF {
 							creationListeEmargementDIF(leStage, doc, cfgP);
 						else {
 							creationListeEmargement(leStage, doc, cfgP, false);
-							if (Config.getB(cfgP+"s2.group") 
-									&& leStage.getCode().matches(Config.get(cfgP+"s2.pattern"))
-									&& leStage.getCoStage() == null) {
-								System.out.println("ListStagiaire 4S Groupé "+leStage.getCode());
-								doc.newPage();
-								creationListeEmargement(leStage, doc, cfgP, true);
+							// 4S ?
+							if (leStage.getCode().matches(Config.get(cfgP+"s2.pattern"))) {
+								// création de la liste complète pour le stage S2-1
+								if (Config.getB(cfgP+"s2.group") 
+										&& leStage.getCoStage() == null) {
+									System.out.println("Liste Emargement 4S Groupé "+leStage.getCode());
+									if (Config.getB(cfgP+"s2.saut")) 
+										doc.newPage();
+									doc.newPage();
+									creationListeEmargement(leStage, doc, cfgP, true);
+								}
 							}
 						}
 					} else 
@@ -249,9 +278,6 @@ public class PasserellePDF {
 					break;
 				case FEUILLE_ROUTE_FSS:
 					creationFeuilRouteFSS(fssModules, doc, cfgP);
-					if (Config.getB(cfgP+"circulation")) {
-						creationDeroule(fssModules, doc, cfgP);
-					}
 					break;
 				default:
 					break;
@@ -276,7 +302,7 @@ public class PasserellePDF {
 
 		Common.setStatus("Création Liste Stagiaires "+leStage.getCodeI());
 		Integer colNum = Config.getI(cfg+"colnum");
-		Integer rowNum = Config.getI(cfg+"rownum");
+		//Integer rowNum = Config.getI(cfg+"rownum");
 		Boolean adapt = leStage.getCode().matches(Config.get(cfg+"s2.pat"));
 		String code = leStage.getCode();
 		
@@ -344,7 +370,8 @@ public class PasserellePDF {
 		//construction du center
 		PdfPTable center = new PdfPTable(colNum);
 		center.setWidthPercentage(100);
-		
+		center.setTotalWidth(PageSize.A4.getWidth());
+
 		widths = new float[] { 2f, 2f, 1f, 1f, 2f };
 		for (int i=1; i<=colNum; i++) { widths[i-1]=Config.getF(cfg+"col"+i+".w"); }
 		center.setWidths(widths);
@@ -362,22 +389,12 @@ public class PasserellePDF {
 				center.addCell(cell);
 			}
 		}
-		
-		if (adapt) {
-			rowNum = rowNum - 4;
-		}
-		if(i<rowNum){
-			cell.setColspan(colNum);
-			cell.setPhrase(new Phrase(" "));
-			for (int ii = i; ii <= rowNum; ii++) {
-				center.addCell(cell);
-			}
-		}
 				
-		//construction du footer
-		PdfPTable footer = new PdfPTable(3);
-		footer.setWidthPercentage(95);
-				
+		//construction du warning
+		PdfPTable warn = new PdfPTable(3);
+		warn.setWidthPercentage(95);
+		warn.setTotalWidth(PageSize.A4.getWidth());
+
 		if (adapt) {
 			cell = new PdfPCell();
 			PdfPTable w = new PdfPTable(new float[] { 1f, 3f, 1f});
@@ -400,14 +417,25 @@ public class PasserellePDF {
 			cell.setColspan(3);
 			cell.setBorder(15);
 			cell.setBackgroundColor(new BaseColor(Config.getI(cfg+"s2.bg")));
-			footer.addCell(cell);
+			warn.addCell(cell);
 			
 			cell.setPhrase(new Phrase(" "));
 			cell.setBackgroundColor(new BaseColor(0xFFFFFF));
 			cell.setBorder(0);
-			footer.addCell(cell);
-			footer.addCell(cell);
+			warn.addCell(cell);
+			warn.addCell(cell);
 		}
+		
+		// Padding
+		PdfPTable space = new PdfPTable(1);
+		space.setWidthPercentage(100);
+		space = creationDeroule(leStage, "", doc, cfg, 
+				center.getTotalHeight()+warn.getTotalHeight());
+
+		//construction du footer
+		PdfPTable footer = new PdfPTable(3);
+		footer.setWidthPercentage(95);
+
 		cell = new PdfPCell(new Phrase(" "));
 		cell.setColspan(3);
 		cell.setBorder(0);
@@ -431,10 +459,11 @@ public class PasserellePDF {
 		cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		footer.addCell(cell);
 		
-		
 		//ajout des composants
 		doc.add(header);
 		doc.add(center);
+		doc.add(space);
+		doc.add(warn);
 		doc.add(footer);
 
 	}//fin 
@@ -448,7 +477,7 @@ public class PasserellePDF {
 	private static void creationListeEmargement(Stage leStage, Document doc, String cfg, 
 			boolean group) throws DocumentException{
 		Integer colNum = Config.getI(cfg+"colnum");
-		Integer rowNum = Config.getI(cfg+"rownum");
+		//Integer rowNum = Config.getI(cfg+"rownum");
 		float[] widths;
 		String code = leStage.getCode();
 		boolean eao = code.matches(Config.get(cfg+"eao.pattern"));
@@ -457,14 +486,14 @@ public class PasserellePDF {
 		sl.addAll(leStage.getStagiaireList());
 		if (group) {
 			code = leStage.getCodeI();
-			System.out.println("ListeEmargement " + code + " : ");
-			System.out.println(sl);
+			//System.out.println("ListeEmargement " + code + " : ");
+			//System.out.println(sl);
 			for (Stage s : leStage.getCoStageList()) {
-				System.out.println("   + "+s.getCode());
+				//System.out.println("   + "+s.getCode());
 				sl.addAll(s.getStagiaireList());
 			}
 			Collections.sort(sl);
-			System.out.println(sl);
+			//System.out.println(sl);
 		}
 
 		Common.setStatus("Création Liste Emargement "+code);
@@ -532,6 +561,7 @@ public class PasserellePDF {
 		widths = new float[] { 1f, 8f, 1.5f, 4f, 1.5f };
 		for (int i=1; i<=colNum; i++) { widths[i-1]=Config.getF(cfg+"col"+i+".w"); }
 		center.setWidths(widths);
+		center.setTotalWidth(PageSize.A4.getWidth());
 		
 		//cell = new PdfPCell(new Phrase("N",fontB10)); cell.setBorder(0);
 		cell.setHorizontalAlignment(Element.ALIGN_LEFT);
@@ -592,17 +622,10 @@ public class PasserellePDF {
 				//isvsmp
 				center.addCell(" ");
 		}
-		if (eao) rowNum -= 3;
-		if(i<=rowNum){
-			cell.setPhrase(new Phrase(" \n ", font));
-			cell.setColspan(colNum);
-			for (int j = i; j < rowNum; j++) {
-					center.addCell(cell);
-			}//fin pour
-		}//fin si
 		
 		// Test EAO
 		PdfPTable footer0 = new PdfPTable(1);
+		footer0.setTotalWidth(PageSize.A4.getWidth());
 		if (eao) {
 			footer0.setWidthPercentage(95);
 			cell = new PdfPCell(new Phrase(Config.get(cfg+"eao.s2"), font9));
@@ -612,15 +635,22 @@ public class PasserellePDF {
 			footer0.addCell(cell);
 			cell.setPhrase(new Phrase(""));
 			footer0.addCell(cell);
-			
 		}
 
+		// Padding
+		PdfPTable space = new PdfPTable(1);
+		space.setWidthPercentage(100);
+		space = creationDeroule(leStage, "", doc, cfg,
+				center.getTotalHeight()+footer0.getTotalHeight());
+				
+		
 		// Footer
 		PdfPTable footer = getFooter(leStage);
 		
 		//ajout des composants
 		doc.add(header);
 		doc.add(center);
+		doc.add(space);
 		if (eao) doc.add(footer0);
 		doc.add(footer);
 			
@@ -1029,12 +1059,13 @@ public class PasserellePDF {
 		center.setWidthPercentage(100);
 		float[] widths = new float[] { 1f, 1f, 1f, 1.3f, 1.2f };
 		center.setWidths(widths);
+		center.setTotalWidth(PageSize.A4.getWidth());
 
 		center.addCell(new Phrase("Code Stage",fontB12));
 		center.addCell(new Phrase("Leader/Aide",fontB12));
 		center.addCell(new Phrase("Horaire",fontB12));
 		center.addCell(new Phrase("Module",fontB12));
-		center.addCell(new Phrase("Salle",fontB12));
+		center.addCell(new Phrase("Salle/Moyen",fontB12));
 		
 		for (Module module : moduleList) {
 			center.addCell(new Phrase(module.getCodeStage(), font12));
@@ -1052,98 +1083,141 @@ public class PasserellePDF {
 			
 			center.addCell(new Phrase(module.getHeureDebut()+" - "+module.getHeureFin(),font12));
 			center.addCell(new Phrase(module.getLibelle(),font12));
-			center.addCell(new Phrase(module.getSalle(),font12));
+			if (module.getNomIntervenant().startsWith("BUS")) {
+				center.addCell(new Phrase(module.getNomIntervenant(), font12));
+			}
+			else
+				center.addCell(new Phrase(module.getSalle(),font12));
 		}
 		
+		PdfPTable space = new PdfPTable(1);
+		if (Config.getB(cfg+"deroule")) {
+			space = creationDeroule(fss.getStages(), Nom, doc, cfg, center.getTotalHeight());
+		}
+
 		doc.add(header);
 		doc.add(new Phrase("  "));
 		doc.add(center);
+		doc.add(space);
 		
 	}//fin
 	
 	/**
 	 * creation du tableau de chaque stage du FSS
+	 * @return 
 	 */
-	private static void creationDeroule(FSS_Modules fss, Document doc, String cfg) throws DocumentException{
-			
-		String Nom = fss.nomFSS;
-		ArrayList<Module> moduleList = fss.modules;
-		String date = moduleList.get(0).getDate();
+	@SuppressWarnings("unchecked")
+	private static PdfPTable creationDeroule(Object param, String nomFSS, Document doc, String cfg, float cHeight) throws DocumentException {
 		Phrase phrs;
-			
-		PdfPTable header, center;
+		PdfPTable ret, space, header, center;
 		PdfPCell cell, defCell;
-		
-		// Liste des stages
 		ArrayList<Stage> stageList = new ArrayList<Stage>();
-		for (Module module : moduleList) {
-			if (!stageList.contains(module.getStage())) {
-				stageList.add(module.getStage());
+		boolean deroule = false;
+		
+		if (param.getClass().toString().equals("class pack.Stage")) {
+			stageList.add((Stage)param);
+			if (Config.getB(cfg+"deroule") &&
+					((Stage)param).getCode().matches(Config.get(cfg+"deroule.pattern"))) {
+				deroule=true;
 			}
 		}
+		else if (param.getClass().toString().equals("class java.util.ArrayList")) {
+			stageList.addAll((ArrayList<Stage>)param);
+		}
+		
+		String date = stageList.get(0).getDateStr();
 
-		header = new PdfPTable(2);
-		header.setWidthPercentage(100);
-		cell = new PdfPCell(new Phrase("\n"));
-		cell.setPadding(2); cell.setBorder(2);
-		header.addCell(cell); header.addCell(cell);
-	
-		for (Stage stage : stageList) {
-			//System.out.println(stage.getCodeI());
-			cell = new PdfPCell(new Phrase("\n"));
-			cell.setPadding(2); cell.setBorder(0);
-			header.addCell(cell); header.addCell(cell);
-			
-			phrs = new Phrase("Stage : "+stage.getCode(), fontB12);
-			//if (Config.getB(cfg+"s2-smg") 
-			//		&& stage.getCode().matches(Config.get(cfg+"s2-smg.pattern"))) {
-			if (stage.hasPnStage()) {
-				phrs.add(new Phrase(" / ("+stage.getPnStage().getCode()+")", fontBI12));
-			}
-			cell = new PdfPCell(phrs);
-			cell.setHorizontalAlignment(Element.ALIGN_LEFT);
-			cell.setPadding(2); cell.setBorder(0); header.addCell(cell);
-			
-			cell = new PdfPCell(new Phrase("Date : "+ date, fontB12));
-			cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-			cell.setPadding(2); cell.setBorder(0); header.addCell(cell);
-			
-			center = new PdfPTable(6);
-			center.setWidthPercentage(100);
-			float[] widths = new float[] { 1f, 1f, 2.5f, 2.5f, 2.5f, 3f };
-			center.setWidths(widths);
-			defCell = center.getDefaultCell();
-			//defCell.setBorder(7);
-			defCell.setPadding(3);
-			
-			center.addCell(new Phrase("Début", fontB9));
-			center.addCell(new Phrase("Fin", fontB9));
-			center.addCell(new Phrase("Activité", fontB9));
-			center.addCell(new Phrase("FSS 1", fontB9));
-			center.addCell(new Phrase("FSS 2/Aide", fontB9));
-			center.addCell(new Phrase("Moyen", fontB9));
+		ret = new PdfPTable(1);
+		ret.setWidthPercentage(100);
+		
+		space = new PdfPTable(1);
+		space.setWidthPercentage(100);
+		space.setTotalWidth(PageSize.A4.getWidth());
 
-			for (Module m : stage.getModuleList()) {
-				center.addCell(new Phrase(m.getHeureDebut(), font9));
-				center.addCell(new Phrase(m.getHeureFin(), font9));
-				center.addCell(new Phrase(m.getLibelle(), font9));
-				center.addCell(new Phrase(m.getNomLeader(), m.getNomLeader().equals(Nom) ? fontB9 : font9));
-				String a1="",a2="";
-				if (m.hasCoModule()) {
-					a1=m.getCoModule().getNomLeader();
-					a2="\n"+m.getNomAide()+m.getNomIntervenant();
+		if (deroule) {
+			for (Stage stage : stageList) {
+				//System.out.println(stage.getCodeI());
+				header = new PdfPTable(2);
+				header.setWidthPercentage(100);
+				
+				phrs = new Phrase("Stage : "+stage.getCode(), fontB10);
+				if (stage.hasPnStage()) {
+					phrs.add(new Phrase(" / ("+stage.getPnStage().getCode()+")", fontBI10));
 				}
-				else
-					a1=m.getNomAide()+m.getNomIntervenant();
-				phrs = new Phrase(a1, a1.equals(Nom) ? fontBI9 :fontI9);
-				phrs.add(new Phrase(a2, fontI9));
-				center.addCell(phrs);
-				center.addCell(new Phrase(m.getSalle(), font9));
+				cell = new PdfPCell(phrs);
+				cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+				cell.setPadding(2); cell.setBorder(0); header.addCell(cell);
+				
+				cell = new PdfPCell(new Phrase("Date : "+ date, fontB10));
+				cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+				cell.setPadding(2); cell.setBorder(0); header.addCell(cell);
+				
+				center = new PdfPTable(6);
+				center.setWidthPercentage(100);
+				float[] widths = new float[] { 1f, 1f, 2.5f, 2.5f, 2.5f, 3f };
+				center.setWidths(widths);
+				defCell = center.getDefaultCell();
+				//defCell.setBorder(7);
+				defCell.setPadding(3);
+				
+				center.addCell(new Phrase("Début", fontB9));
+				center.addCell(new Phrase("Fin", fontB9));
+				center.addCell(new Phrase("Activité", fontB9));
+				center.addCell(new Phrase("FSS 1", fontB9));
+				center.addCell(new Phrase("FSS 2/Aide", fontB9));
+				center.addCell(new Phrase("Salle/Moyen", fontB9));
+	
+				for (Module m : stage.getModuleList()) {
+					center.addCell(new Phrase(m.getHeureDebut(), font9));
+					center.addCell(new Phrase(m.getHeureFin(), font9));
+					center.addCell(new Phrase(m.getLibelle(), font9));
+					center.addCell(new Phrase(m.getNomLeader(), m.getNomLeader().equals(nomFSS) ? fontB9 : font9));
+					String a1="";
+					if (m.hasCoModule()) {
+						a1=m.getCoModule().getNomLeader();
+					}
+					String a2=m.getNomAide();
+					String a3=m.getNomIntervenant();
+					phrs = new Phrase();
+					if (!a1.equals("")) phrs.add(new Chunk(a1, a1.equals(nomFSS) ? fontBI9 :fontI9));
+					if (!a2.equals("")) { if (!a1.equals("")) a2="\n"+a2; phrs.add(new Chunk(a2, a2.equals(nomFSS) ? fontBI9 :fontI9)); }
+					if (!a3.equals("") && !a3.startsWith("BUS")) { if (!a2.equals("")) a3="\n"+a3; phrs.add(new Chunk(a3, a3.equals(nomFSS) ? fontBI9 :fontI9)); }
+					center.addCell(phrs);
+					if (a3.startsWith("BUS")) {
+						center.addCell(new Phrase(a3, font9));
+					}
+					else
+						center.addCell(new Phrase(m.getSalle(), font9));
+				}
+				
+				cell = new PdfPCell(); cell.setPadding(1);	cell.setBorder(0);
+				if (Config.getB(cfg+"deroule.header")) {
+					cell.addElement(header);
+					space.addCell(cell);
+				}
+				cell = new PdfPCell(); cell.setPadding(1);	cell.setBorder(0); 
+				cell.addElement(center); space.addCell(cell);
+				
+				cell = new PdfPCell(new Phrase("\n", font9));
+				cell.setPadding(1);	cell.setBorder(0); 
+				cell.setFixedHeight(10); 
+				space.addCell(cell);
 			}
-			
-			doc.add(header);
-			doc.add(center);
 		}
+		
+		cell = new PdfPCell(new Phrase(""));
+		if (Config.getB(cfg+"deroule.header"))
+			cell.setBorder(2);
+		else
+			cell.setBorder(0);
+		cell.setPadding(1);	
+		cell.setFixedHeight(Config.getI(cfg+"space.h")-cHeight-space.getTotalHeight());
+		ret.addCell(cell);
+		
+		cell = new PdfPCell(space);
+		cell.setPadding(1);	cell.setBorder(0);
+		ret.addCell(cell);
+		return ret;
 	}
 	
 	/**
@@ -1152,7 +1226,7 @@ public class PasserellePDF {
 	 * @param cfg 
 	 * @throws DocumentException 
 	 */
-	private static void creationFREP(Stage leStage, Document doc, String cfg) throws DocumentException{
+	private static void creationFREP(Stage leStage, Document doc, String cfg) throws DocumentException {
 				
 		Common.setStatus("Création FREP "+leStage.getCode());
 		
