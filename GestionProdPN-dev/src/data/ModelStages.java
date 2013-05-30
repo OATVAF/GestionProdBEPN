@@ -353,6 +353,7 @@ public class ModelStages extends AbstractTableModel
 		s.setCompagnie("AFR");
 		stagesAll.add(s);
 		stages.add(s);
+		stageModel.add(s);
         setMod(true);
 		fireTableDataChanged();
 	}
