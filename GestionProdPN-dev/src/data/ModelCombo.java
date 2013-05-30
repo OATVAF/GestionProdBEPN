@@ -32,6 +32,14 @@ public class ModelCombo extends AbstractListModel implements ComboBoxModel
 		}
 	}
 
+	public void remove(Object o) {
+		list.remove(o);
+	}
+
+	public void removeAll(List<?> sl) {
+		list.removeAll(sl);
+	}
+	
 	public Object getElementAt(int index) {
 		return list.get(index);
 	}
