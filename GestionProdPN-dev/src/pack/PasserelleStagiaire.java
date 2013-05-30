@@ -247,46 +247,63 @@ public class PasserelleStagiaire {
 		//return newStageList;
 	}//
 	
-	public static /*ArrayList<Stage>*/ void ajoutPnc(ArrayList<Stage> stageList,ArrayList<Stagiaire> stagiairePNCList) {
+	public static /*ArrayList<Stage>*/ void ajoutPnc(ArrayList<Stage> stageList,ArrayList<Stagiaire> pncList) {
 		//ArrayList<Stage> newStageList = stageList;
 		String site = Config.get("app.site");
 		String p123Pat = Config.get("imp.pm123.pat");
 		String m123Pat = Config.get("imp.m123.pat."+site);
 		String p123Date = "";
 		
-Next:	for (Stagiaire stagiaire : stagiairePNCList) {
+		// Tri par Spe puis Nom pour répartition équitable CCP/CC/HST dans les stages dédoublés
+		if (Config.getB("imp.pnc.smg.spe_sort")) {
+			Collections.sort(pncList, new StagiaireStageSpeNameComparator());
+		}
+
+		Stage stage = null;
+		int n = 0;
+		long modulo = 0;
+
+Next:	for (Stagiaire stagiaire : pncList) {
 			String strCodeStagiaire = stagiaire.getCodeStage().replace(" ", "").trim();
 			// System.out.println("S:"+stagiaire.getNom()+"/"+strCodeStagiaire);
 			// Find stage for code
-			for (Stage stage : stageList) {
-				String strCodeStage = stage.getCodeI().replace(" ", "");
-				if (strCodeStage.matches(p123Pat)) {
-					p123Date=stage.getDateStr();
+			if (! stagiaire.isInStage(stage)) {
+				for (Stage s : stageList) {
+					String strCodeStage = s.getCodeI().replace(" ", "");
+					if (strCodeStage.matches(p123Pat)) {
+						p123Date=s.getDateStr();
+					}
+					if ( stagiaire.isInStage(s)) {
+						stage = s;
+						n = 0;
+					}
 				}
-				if ( (strCodeStagiaire.startsWith(strCodeStage)
-					  || strCodeStage.startsWith(strCodeStagiaire))
-						&& ! stage.getDateDt().before(stagiaire.getDateDeb())
-						&& ! stage.getDateDt().after(stagiaire.getDateFin())
-					) {
-					stage.ajoutStagiaire(stagiaire);
-					System.out.println("Ajout PNC "+stagiaire.getNom() +" sur "+strCodeStage);
-					continue Next;
+			}
+			if (stagiaire.isInStage(stage)) {
+				Stage stageI = stage;
+				if (stage.getIdxMax() > 0) {
+					modulo = (n % stage.getIdxMax()) +1 ;
+					stageI = stage.getCoStageI((int)modulo);
 				}
-			}		
-			if (strCodeStagiaire.matches(m123Pat) 
+				stageI.ajoutStagiaire(stagiaire);
+				System.out.println("Ajout PNC "+n+" "+stagiaire.getNom() +" sur "+stageI.getCode());
+				n++;
+			}
+			else if (strCodeStagiaire.matches(m123Pat) 
 					&& p123Date.equals(stagiaire.getDateDebStage())) {
-				int n = Integer.parseInt(""+strCodeStagiaire.charAt(1));
-				String code = "M"+n+" "+site.toUpperCase();
+				int nP = Integer.parseInt(""+strCodeStagiaire.charAt(1));
+				String code = "M"+nP+" "+site.toUpperCase();
 				System.out.println("+ "+code);
-				Module mod =  new Module(new Long(n), 
+				Module mod =  new Module(new Long(nP), 
 						code, "", stagiaire.getDateDebStage(),
-						Config.get("imp.m123.m"+n+".debut"),
-						Config.get("imp.m123.m"+n+".fin"));
+						Config.get("imp.m123.m"+nP+".debut"),
+						Config.get("imp.m123.m"+nP+".fin"));
 				mod.setCompagnie(Config.get("imp.m123.comp"));
 				mod.setSalle(Config.get("imp.m123.salle"));
-				Stage stg = new Stage(mod);
-				stg.ajoutStagiaire(stagiaire);
-				stageList.add(stg);
+				stage = new Stage(mod);
+				stage.ajoutStagiaire(stagiaire);
+				System.out.println("Ajout PNC M "+stagiaire.getNom() +" sur "+stage.getCode());
+				stageList.add(stage);
 				continue Next;
 			}
 		}

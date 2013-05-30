@@ -177,6 +177,8 @@ public class ModelModules extends AbstractTableModel
             switch(columnIndex){
             	case 0:
             		s.setHeureDebut((String)aValue);
+            		stage.sortModules();
+            		fireTableDataChanged();
             		break;
             	case 1:
                 	s.setHeureFin((String)aValue);

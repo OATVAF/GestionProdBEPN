@@ -119,7 +119,7 @@ public enum Config {
 	}
 
 	private Config() {
-		//System.out.println("[Config()] : Init "+iniConfigFile+" !");
+		System.out.println("[Config()] : Init "+iniConfigFile+" !");
 		myProp iniProp = new myProp(iniConfigFile,false);
 		Props.add(iniProp);
 		

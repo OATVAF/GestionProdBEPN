@@ -205,6 +205,17 @@ public class Stagiaire implements Serializable, Comparable<Stagiaire> {
 		comment = aValue;
 	}
 
+	public boolean isInStage(Stage stage) {
+		if (stage == null) return false;
+		String cStage = stage.getCodeI().replace(" ", "").trim();
+		String cStagiaire = this.getCodeStage().replace(" ", "").trim();
+		if ( (cStagiaire.startsWith(cStage) || cStage.startsWith(cStagiaire))
+			 && ! stage.getDateDt().before(this.getDateDeb())
+			 && ! stage.getDateDt().after(this.getDateFin()) ) {
+			return true;
+		}
+		return false;
+	}
 	public int compareTo(Stagiaire other) {
 		return (this.toString().compareTo(other.toString()));
 	}
@@ -248,3 +259,14 @@ class StagiaireSpeNameComparator implements Comparator<Stagiaire> {
 		return s1.compareTo(s2);
     }
 }
+/**
+ * Comparateur de Stagiaire selon le stage puis spécialité
+ */
+class StagiaireStageSpeNameComparator implements Comparator<Stagiaire> {
+	public int compare(Stagiaire stg1, Stagiaire stg2) {
+		String s1 = stg1.getCodeStage()+stg1.getSpe()+stg1.toString();
+		String s2 = stg2.getCodeStage()+stg2.getSpe()+stg2.toString();
+		return s1.compareTo(s2);
+    }
+}
+

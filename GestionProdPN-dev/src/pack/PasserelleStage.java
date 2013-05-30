@@ -406,20 +406,19 @@ public class PasserelleStage {
 									cs.ajoutModule(m);
 								}
 							}
-
 						}
 					}
-					/*
-					else {
-						for (Stage cs : s.getCoStage().getCoStageList()) {
-							if (cs.getModuleAtTime(m) == null) {
-								System.out.println(" Ajout Module commun SMG/4S: "+s.getCode()+"."+s.getLibelle()
-										+ " à " +cs.getCode());
-							}
-						}
-					}
-					*/
 				}
+				/*
+				else {
+					for (Stage cs : s.getCoStage().getCoStageList()) {
+						if (cs.getModuleAtTime(m) == null) {
+							System.out.println(" Ajout Module commun SMG/4S: "+s.getCode()+"."+s.getLibelle()
+									+ " à " +cs.getCode());
+						}
+					}
+				}
+				*/
 			}
 		}
 		
@@ -436,6 +435,15 @@ public class PasserelleStage {
 						// TODO faire le ménage sur les modules EPU!
 						s.setPnStage(s2);
 						//s2.setPnStage(s);
+						// TODO
+						for (Module m : s.getModuleList()) {
+							System.out.println("  ==> Check module "+m.getLibelle() + " at "+m.getHeureDebut());
+							if (m.getLibelle().matches(Config.get("imp.pnc.smg.modules_communs.pattern"))){
+								if (s2.getModuleAtTime(m) == null) {
+									System.out.println("  ==> Missing module "+m.getLibelle() + " at "+m.getHeureDebut());
+								}
+							}
+						}
 					}
 				}
 			}

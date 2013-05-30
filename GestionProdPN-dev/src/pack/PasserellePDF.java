@@ -81,6 +81,7 @@ public class PasserellePDF {
 	private static Font fontB20 = new Font(FontFamily.HELVETICA, 20, Font.BOLD);
 	private static Font fontB22 = new Font(FontFamily.HELVETICA, 22, Font.BOLD);
 	private static Font fontB28 = new Font(FontFamily.HELVETICA, 28, Font.BOLD);
+	private static Font fontB130= new Font(FontFamily.HELVETICA,130, Font.BOLD);
 	private static Font fontB140= new Font(FontFamily.HELVETICA,140, Font.BOLD);
 	private static Font fontB95 = new Font(FontFamily.HELVETICA, 95, Font.BOLD);
 	private static Font fontI9  = new Font(FontFamily.HELVETICA,  9, Font.ITALIC);
@@ -139,10 +140,13 @@ public class PasserellePDF {
 			fssModules = (FSS_Modules) param;
 			leStage = fssModules.modules.get(0).getStage();
 		}
-
 		else {
 			System.out.println("[ERR] creationDoc bad arg "+param.getClass().toString());
 			return;
+		}
+
+		if (leStage == null) {
+			System.out.println("[ERR] creationDoc BUG Stage null");
 		}
 
 		//System.out.println("creationDoc("+param.getClass()+" "+leStage.getCode()+", "+type+")");
@@ -221,7 +225,7 @@ public class PasserellePDF {
 				switch(mType) {
 				case LISTE_STAGIAIRES: 
 					creationListStagiaire(leStage, doc, cfgP, false);
-					// Cas 4S
+					// Cas 4S / OMG groupé
 					if (leStage.getCode().matches(Config.get(cfgP+"s2.pattern"))) {
 						// création de la liste complète pour le stage S2-1
 						if (Config.getB(cfgP+"s2.group") 
@@ -248,12 +252,11 @@ public class PasserellePDF {
 							creationListeEmargementDIF(leStage, doc, cfgP);
 						else {
 							creationListeEmargement(leStage, doc, cfgP, false);
-							// 4S ?
+							// 4S / OMG ?
 							if (leStage.getCode().matches(Config.get(cfgP+"s2.pattern"))) {
 								// création de la liste complète pour le stage S2-1
-								if (Config.getB(cfgP+"s2.group") 
-										&& leStage.getCoStage() == null) {
-									System.out.println("Liste Emargement 4S Groupé "+leStage.getCode());
+								if (Config.getB(cfgP+"s2.group") && leStage.isMainCoStage()) {
+									System.out.println("Liste Emargement 4S/OMG Groupé "+leStage.getCode());
 									if (Config.getB(cfgP+"s2.saut")) 
 										doc.newPage();
 									doc.newPage();
@@ -268,7 +271,16 @@ public class PasserellePDF {
 					creationFREP(leStage, doc, cfgP);
 					break;
 				case AFFICHAGE_SALLE:
-					creationAffichageSalle(leStage, doc, cfgP);
+					creationAffichageSalle(leStage, doc, cfgP, false);
+					if (leStage.getCode().matches(Config.get(cfgP+"s2.pattern"))) {
+						if (Config.getB(cfgP+"s2.group") && leStage.isMainCoStage()) {
+							System.out.println("Affichage Salle 4S/OMG Groupé "+leStage.getCode());
+							if (Config.getB(cfgP+"s2.saut")) 
+								doc.newPage();
+							doc.newPage();
+							creationAffichageSalle(leStage, doc, cfgP, true);
+						}
+					}
 					break;
 				case CHECKLIST:
 					creationCheckListAdm(listeStage, doc, cfgP);
@@ -1090,6 +1102,7 @@ public class PasserellePDF {
 				center.addCell(new Phrase(module.getSalle(),font12));
 		}
 		
+		// TODO
 		PdfPTable space = new PdfPTable(1);
 		if (Config.getB(cfg+"deroule")) {
 			space = creationDeroule(fss.getStages(), Nom, doc, cfg, center.getTotalHeight());
@@ -1123,6 +1136,7 @@ public class PasserellePDF {
 		}
 		else if (param.getClass().toString().equals("class java.util.ArrayList")) {
 			stageList.addAll((ArrayList<Stage>)param);
+			deroule=true;
 		}
 		
 		String date = stageList.get(0).getDateStr();
@@ -1136,6 +1150,10 @@ public class PasserellePDF {
 
 		if (deroule) {
 			for (Stage stage : stageList) {
+				if (stage == null) {
+					System.out.println("[ERR] creationDeroule BUG Stage null");
+					continue;
+				}
 				//System.out.println(stage.getCodeI());
 				header = new PdfPTable(2);
 				header.setWidthPercentage(100);
@@ -1666,12 +1684,16 @@ public class PasserellePDF {
 	 * @param cfg 
 	 * @throws DocumentException 
 	 */
-	private static void creationAffichageSalle(Stage leStage, Document doc, String cfg) throws DocumentException{
+	private static void creationAffichageSalle(Stage leStage, Document doc, String cfg,
+			boolean group) throws DocumentException{
 		
 		SimpleDateFormat fmt = new SimpleDateFormat("EEEE d MMMM yyyy");		
 		String code = leStage.getCode();
-
-		Common.setStatus("Création Affichage Salle "+leStage.getCodeI());
+		if (group) {
+			code = leStage.getCodeI();
+		}
+		
+		Common.setStatus("Création Affichage Salle "+code);
 
 		PdfPTable header = new PdfPTable(3);
 		float[] widths = new float[] { 3f, 4f, 3f };
@@ -1699,7 +1721,7 @@ public class PasserellePDF {
 		doc.add(header);
 		
 		PdfPTable center = new PdfPTable(1);
-		center.setWidthPercentage(95);
+		center.setWidthPercentage(100);
 		
 		Phrase phrs1 = new Phrase("", fontB20);
 		PdfPCell cell1 = new PdfPCell(phrs1);
@@ -1708,7 +1730,10 @@ public class PasserellePDF {
 		cell1.setBorder(0);
 		cell1.setMinimumHeight(120);
 
-		Phrase phrs2 = new Phrase(leStage.getCode(),fontB140);
+		Phrase phrs2 = new Phrase(code,fontB140);
+		if (code.length() == 10) {
+			phrs2 = new Phrase(code,fontB130);
+		}
 		PdfPCell cell2 = new PdfPCell(phrs2);
 		cell2.setHorizontalAlignment(Element.ALIGN_CENTER);
 		cell2.setVerticalAlignment(Element.ALIGN_MIDDLE);
@@ -1724,7 +1749,7 @@ public class PasserellePDF {
 	
 		if (code.length() > 10) {
 			cell1.setMinimumHeight(50);
-			phrs2 = new Phrase(leStage.getCode(),fontB95); cell2.setPhrase(phrs2);
+			phrs2 = new Phrase(code,fontB95); cell2.setPhrase(phrs2);
 			cell2.setMinimumHeight(300);
 			cell3.setMinimumHeight(50);
 		}

@@ -123,12 +123,16 @@ public class Stage implements Serializable, Comparable<Stage> /*,Cloneable*/ {
 		affectationInfoStage();
 	}
 	/**
-	 * getter de code
+	 * getter de code stage (sans index)
 	 * @return
 	 */
 	public String getCodeI() {
 		return code;
 	}
+	/**
+	 * getter de code stage (avec index)
+	 * @return
+	 */
 	public String getCode() {
 		String c = code;
 		if (idxMax != null && idxMax > 1) {
@@ -305,8 +309,13 @@ public class Stage implements Serializable, Comparable<Stage> /*,Cloneable*/ {
 	 * @param leModule
 	 */
 	public void ajoutModule(Module leModule){
+		leModule.setStage(this);
 		moduleList.add(leModule);
 		Collections.sort(moduleList); //, new ModuleStartComparator());
+	}
+	
+	public void sortModules() {
+		Collections.sort(moduleList);
 	}
 	
 	/**
@@ -352,6 +361,10 @@ public class Stage implements Serializable, Comparable<Stage> /*,Cloneable*/ {
 		Collections.sort(stagiaireList);
 	}
 	
+	public void sortStagiaires(){
+		Collections.sort(stagiaireList);
+	}
+
 	/**
 	 * suppression d'un stagiaire dans la liste des stagiaires
 	 * @param index
@@ -451,6 +464,22 @@ public class Stage implements Serializable, Comparable<Stage> /*,Cloneable*/ {
 
 	public Stage getCoStage() {
 		return coStage;
+	}
+
+	public Stage getCoStageI(int  idx) {
+		if (hasCoStage())
+			if (idx == 1)
+				if (isMainCoStage())
+					return this;
+				else
+					return coStage;
+			else
+				if (isMainCoStage())
+					return coStageList.get(idx-2);
+				else
+					return coStage.coStageList.get(idx-2);
+		else
+			return this;
 	}
 
 	public void setCoStage(Stage coStage) {
