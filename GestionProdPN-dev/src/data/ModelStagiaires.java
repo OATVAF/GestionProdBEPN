@@ -9,6 +9,8 @@ import javax.swing.plaf.FontUIResource;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 
+import pack.Config;
+import pack.MosWS;
 import pack.Stage;
 import pack.Stagiaire;
 
@@ -34,7 +36,7 @@ public class ModelStagiaires extends AbstractTableModel {
 			{ 80,200,150},
 			{ 60,150, 90},
 			{ 60, 60, 50},
-			{ 60,200,100}
+			{ 60,400,100}
 			};
 
 	/**
@@ -137,7 +139,9 @@ public class ModelStagiaires extends AbstractTableModel {
         	case 4:
             	return stagiaires.get(rowIndex).getSpe();
         	case 5:
-            	return stagiaires.get(rowIndex).getComment();
+        		String M6 = "M" + stagiaires.get(rowIndex).getMatricule().substring(0, 6);
+        		System.out.println(M6 + ":"+MosWS.MosAuth(M6));
+            	return stagiaires.get(rowIndex).getComment()+" "+MosWS.MosCourses(M6);
         	default:
             	return null;
 		}
