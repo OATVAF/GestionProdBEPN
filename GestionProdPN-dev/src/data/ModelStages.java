@@ -338,6 +338,7 @@ public class ModelStages extends AbstractTableModel
     public void removeStages(ArrayList<Stage> sl) {
     	stagesAll.removeAll(sl);
     	stages.removeAll(sl);
+    	stageModel.removeAll(sl);
 		setMod(true);
 		fireTableDataChanged();
     }
