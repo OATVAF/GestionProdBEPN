@@ -34,7 +34,7 @@ public class PasserelleStagiaire {
 	private static final String pathFilePnt= Config.get("imp.pnt"); //"dataImport\\OATVPNT.xls";
 	private static final String pathFileSMS= Config.get("exp.sms"); // "dataExport\\ListSMS.xls"
 	private static final String pathDirTests= Config.get("exp.tests.dir"); // "dataExport\\Tests du"
-	
+		
 	private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	private static Date dateDemain;
 	
@@ -125,7 +125,15 @@ public class PasserelleStagiaire {
 	}
 
 	public static ArrayList<Stagiaire> chargerTousStagiairesPNC(){
-		
+		final int colMat = Config.getI("imp.pnc.mat");
+		final int colCod = Config.getI("imp.pnc.codeStg");
+		final int colDeb = Config.getI("imp.pnc.dateDeb");
+		final int colFin = Config.getI("imp.pnc.dateFin");
+		final int colNom = Config.getI("imp.pnc.nom");
+		final int colPre = Config.getI("imp.pnc.prenom");
+		final int colSpe = Config.getI("imp.pnc.spe");
+		final int colSec = Config.getI("imp.pnc.secteur");
+				
 		ArrayList<Stagiaire> StagiaireList = new ArrayList<Stagiaire>();
 			try {
 				File fichier = new File(pathFilePnc);
@@ -134,10 +142,10 @@ public class PasserelleStagiaire {
 				Sheet sheet = workbook.getSheet(0);
 				for (int i = 1; i < sheet.getRows(); i++) {
 					Cell[] cell = sheet.getRow(i);
-					StagiaireList.add(new Stagiaire(cell[4].getContents(), cell[11].getContents()
-							, cell[5].getContents(), cell[6].getContents()
-							, cell[2].getContents(), cell[3].getContents()
-							, cell[0].getContents(), cell[12].getContents()));
+					StagiaireList.add(new Stagiaire(cell[colMat].getContents(), cell[colCod].getContents()
+							, cell[colDeb].getContents(), cell[colFin].getContents()
+							, cell[colNom].getContents(), cell[colPre].getContents()
+							, cell[colSpe].getContents(), cell[colSec].getContents()));
 				}
 			} catch (BiffException e) {
 				good = false;
@@ -154,7 +162,15 @@ public class PasserelleStagiaire {
 	}//fin chargerTousStagiairesPNC()
 	
 	public static ArrayList<Stagiaire> chargerTousStagiairesPNT(){
-		
+		final int colMat = Config.getI("imp.pnt.mat");
+		final int colCod = Config.getI("imp.pnt.codeStg");
+		final int colDeb = Config.getI("imp.pnt.dateDeb");
+		final int colFin = Config.getI("imp.pnt.dateFin");
+		final int colNom = Config.getI("imp.pnt.nom");
+		final int colPre = Config.getI("imp.pnt.prenom");
+		final int colSpe = Config.getI("imp.pnt.spe");
+		final int colSec = Config.getI("imp.pnt.secteur");
+
 		ArrayList<Stagiaire> StagiaireList = new ArrayList<Stagiaire>();
 			try {
 				File fichier = new File(pathFilePnt);
@@ -163,10 +179,10 @@ public class PasserelleStagiaire {
 				Sheet sheet = workbook.getSheet(0);
 				for (int i = 1; i < sheet.getRows(); i++) {
 					Cell[] cell = sheet.getRow(i);
-					StagiaireList.add(new Stagiaire(cell[3].getContents(), cell[9].getContents()
-							, cell[4].getContents(), cell[5].getContents()
-							, cell[1].getContents(), cell[2].getContents()
-							, cell[0].getContents(), cell[12].getContents()));
+					StagiaireList.add(new Stagiaire(cell[colMat].getContents(), cell[colCod].getContents()
+							, cell[colDeb].getContents(), cell[colFin].getContents()
+							, cell[colNom].getContents(), cell[colPre].getContents()
+							, cell[colSpe].getContents(), cell[colSec].getContents()));
 				}
 			} catch (BiffException e) {
 				good = false;
