@@ -5,7 +5,10 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.HeadlessException;
 import java.awt.Toolkit;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -29,6 +32,11 @@ import javax.swing.event.ChangeListener;
 import java.awt.FlowLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import javax.swing.ListSelectionModel;
 import javax.swing.JTabbedPane;
@@ -69,6 +77,7 @@ public class FenetreDonneeNew extends JFrame implements ActionListener, Property
 	private JLabel stageLbl;
 	private JButton addBtn;
 	private JButton removeBtn;
+	private JButton importBtn;
 	
 	//attributs qui vont contenir les données temporaires
 	//private ArrayList<Stage> stageList;//liste des stages
@@ -98,6 +107,7 @@ public class FenetreDonneeNew extends JFrame implements ActionListener, Property
 	private static FenetreDonneeNew FDN;
 	
 	private Task task;
+
 	
 	class Task extends SwingWorker<Void, Void> {
 		
@@ -228,8 +238,15 @@ public class FenetreDonneeNew extends JFrame implements ActionListener, Property
 			    public void stateChanged(ChangeEvent evt) {
 			        JTabbedPane pane = (JTabbedPane)evt.getSource();
 			        // Get current tab
-			        if (pane.getSelectedIndex() >= 1) {
+			        switch (pane.getSelectedIndex()) {
+			        case 0:
+			        	stageBox.setEnabled(false);
+			    		importBtn.setEnabled(false);
+			        	break;
+			        case 1:			        	
+			        case 2:
 			        	stageBox.setEnabled(true);
+			    		importBtn.setEnabled(pane.getSelectedIndex()==1);
 			        	Stage s = ms.getSelectedStage();
 			        	if (s != null) {
 			        		mss.setStage(s);
@@ -237,13 +254,11 @@ public class FenetreDonneeNew extends JFrame implements ActionListener, Property
 			        		stageBox.setSelectedItem(s);
 			        	}
 			        }
-			        else {
-			        	stageBox.setEnabled(false);	
-			        }
 			    }});
 		
 		dateBox = new JComboBox();
 		stageBox = new JComboBox();
+		importBtn = new JButton();
 		barPane = new JPanel();
 		progressBar = new JProgressBar();
 		statusPane = new JTextPane();
@@ -294,14 +309,20 @@ public class FenetreDonneeNew extends JFrame implements ActionListener, Property
 		addBtn = new JButton(Messages.getString("FenetreDonneeNew.Add")); //$NON-NLS-1$
 		choixPane.add(addBtn);
 		addBtn.setIcon(new ImageIcon(Config.getRes("modif.png"))); //$NON-NLS-1$
-		addBtn.setPreferredSize(new Dimension(200, 35));
+		addBtn.setPreferredSize(new Dimension(160, 35));
 		removeBtn = new JButton(Messages.getString("FenetreDonneeNew.Remove")); //$NON-NLS-1$
 		choixPane.add(removeBtn);
 		removeBtn.setIcon(new ImageIcon(Config.getRes("remove.png"))); //$NON-NLS-1$
-		removeBtn.setPreferredSize(new Dimension(200, 35));
+		removeBtn.setPreferredSize(new Dimension(160, 35));
+		importBtn.setText(Messages.getString("FenetreDonneeNew.Import"));
+		choixPane.add(importBtn);
+		importBtn.setPreferredSize(new Dimension(160, 35));
+		importBtn.setIcon(new ImageIcon(Config.getRes("import.png"))); //$NON-NLS-1$
+		
 		removeBtn.addActionListener(this);
 		addBtn.addActionListener(this);
-		
+		importBtn.addActionListener(this);
+	
 		// Bar
 		
 		selPane.add(barPane, BorderLayout.SOUTH);
@@ -369,6 +390,59 @@ public class FenetreDonneeNew extends JFrame implements ActionListener, Property
 					break;
 				}
 			}
+		}
+		else if(source.equals(importBtn)){
+			String split[];
+			try {
+				String data = (String) Toolkit.getDefaultToolkit()
+				        .getSystemClipboard().getData(DataFlavor.stringFlavor);
+				if (data.length() > 0) {
+					// convert \/ to \n
+					data = data.replaceAll("\\s*\\/\\s*", "\r");
+					// convert String into InputStream
+					InputStream is = new ByteArrayInputStream(data.getBytes());
+					// read it with BufferedReader
+					BufferedReader br = new BufferedReader(new InputStreamReader(is));
+
+					String line, spe, nom, pnom, prenom, sect;
+					int jn=0;
+					while ((line = br.readLine()) != null) {
+						System.out.println("Import :"+line);
+						spe=nom=pnom=prenom=sect="";
+						split = line.split("[\\t\\s]+");
+						for (int j=0; j<split.length; j++) {
+							split[j]=split[j].replaceAll(Config.get("imp.clients.rem"), "");
+							if (split[j].matches(Config.get("imp.clients.spe"))) {
+								spe=split[j];
+							}
+							else if (split[j].matches(Config.get("imp.clients.sec"))) {
+								sect=split[j];
+							}
+							else if (split[j].matches(Config.get("imp.clients.nom"))) {
+								pnom=nom; jn=j;
+								nom += (nom.length()>0 ? " ": "") + split[j];
+							}
+							else if (split[j].matches(Config.get("imp.clients.pre"))) {
+								prenom += (prenom.length()>0 ? " ": "") + split[j];
+							}
+						}
+						if (prenom == "" && jn > 1) {
+							nom=pnom;
+							prenom=split[jn];
+						}
+						mss.newStagiaire(nom, prenom, spe, sect);
+					}
+				}
+			} catch (HeadlessException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (UnsupportedFlavorException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} 
 		}
 	}//fin actionPerformed()
 

@@ -98,6 +98,13 @@ public class ModelStagiaires extends AbstractTableModel {
 		fireTableDataChanged();
 	}
 	
+	public void newStagiaire(String nom, String prenom, String spe, String sect) {
+		Stagiaire st = new Stagiaire("", stage.getCode(), stage.getDateStr(), stage.getDateStr(), nom, prenom, spe, sect);
+		stage.ajoutStagiaire(st);
+        setMod(true);
+		fireTableDataChanged();
+	}
+
 	
     public ArrayList<Stagiaire> getSelectedStagiaires() {
     	ArrayList<Stagiaire> sl = new ArrayList<Stagiaire>();
