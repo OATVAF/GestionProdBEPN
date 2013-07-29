@@ -17,7 +17,6 @@ import java.util.Map;
 
 import javax.swing.JOptionPane;
 
-import data.StgMail;
 
 /**
  * 
