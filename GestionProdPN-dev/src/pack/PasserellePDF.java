@@ -87,7 +87,7 @@ public class PasserellePDF {
 	private static Font fontI9  = new Font(FontFamily.HELVETICA,  9, Font.ITALIC);
 	private static Font fontBI9 = new Font(FontFamily.HELVETICA,  9, Font.BOLD | Font.ITALIC);
 	private static Font fontBI10= new Font(FontFamily.HELVETICA, 10, Font.BOLD | Font.ITALIC);
-	private static Font fontBI12= new Font(FontFamily.HELVETICA, 12, Font.BOLD | Font.ITALIC);
+	//private static Font fontBI12= new Font(FontFamily.HELVETICA, 12, Font.BOLD | Font.ITALIC);
 
 	/** 
 	 *  Liste des document éditables
@@ -1013,6 +1013,10 @@ public class PasserellePDF {
 			fss.modules = new ArrayList<Module>();
 			for (Stage leStage : stageList) {
 				for (Module module : leStage.getModuleList()) {
+					if (fss.modules.contains(module)) {
+						System.out.println("Déjà "+module.toString()+" pour "+nomFss);
+						continue;
+					}
 					if(module.getNomLeader().equalsIgnoreCase(nomFss)){
 						fss.modules.add(module);
 					}else{

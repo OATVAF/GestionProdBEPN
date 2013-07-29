@@ -309,7 +309,14 @@ public class Stage implements Serializable, Comparable<Stage> /*,Cloneable*/ {
 	 * @param leModule
 	 */
 	public void ajoutModule(Module leModule){
-		leModule.setStage(this);
+		if (leModule.getStage() != this) {
+			if (leModule.getStage() != null) {
+				System.out.println(leModule+" a un stage : " + leModule.getStage());
+			}
+			else {
+				leModule.setStage(this);
+			}
+		}
 		moduleList.add(leModule);
 		Collections.sort(moduleList); //, new ModuleStartComparator());
 	}
@@ -517,12 +524,28 @@ public class Stage implements Serializable, Comparable<Stage> /*,Cloneable*/ {
 	public void setPnStage(Stage s) {
 		this.pnStage = s;
 		s.pnStage=this;
-		for (Module m: moduleList) {
-			ArrayList<Module> l = s.getModulesAtTime(m);
-			System.out.println("setPnStage :"+l.size());
-			Module cm = s.getModuleAtTime(m);
-			if (cm != null && m.getLibelle().equals(cm.getLibelle()))
-				m.setCoModule(cm);
+		
+		// liste tous les modules SMG/4S
+		ArrayList <Module> mL = new ArrayList<Module>(moduleList);
+		mL.addAll(s.moduleList);
+		Collections.sort(mL);
+		
+		// groupe les co-modules et cherche les manques
+		for (int i=0; i<mL.size()-1; i++) {
+			Module m1 = mL.get(i);
+			Module m2 = mL.get(i+1);
+			if (m1.getLibelle().matches(Config.get("imp.pnc.smg_s2.modules_communs.pattern"))){
+				System.out.println("==> Check module "+m1.getLibelle() + " at "+m1.getHeureDebut());				
+				if (m1.getHeureDebut().equals(m2.getHeureDebut())
+						/*&& m1.getLibelle().equals(m2.getLibelle())*/) {
+					m1.setCoModule(m2);
+					i++;
+				}
+				else {
+					System.out.println("  ++ Ajout Module commun SMG/4S:"+m1+" => "+m1.getStage().pnStage);
+					m1.getStage().pnStage.ajoutModule(m1);
+				}
+			}
 		}
 	}
 	public int compareTo(Stage other) {

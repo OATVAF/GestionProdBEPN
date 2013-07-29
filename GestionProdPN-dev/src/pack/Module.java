@@ -249,7 +249,7 @@ public class Module implements Serializable, Comparable<Module> {
 		m.coModule = this;
 		if (this.salle.equals("")) this.setSalle(m.salle);
 		if (m.salle.equals("")) m.setSalle(this.salle);		
-		System.out.println("Co-Modules :" + codeStage + "_" + libelle
+		System.out.println("  == Co-Modules :" + codeStage + "_" + libelle
 				+ "<=>" + m.codeStage + "_" + m.libelle);
 	}
 }//fin class
