@@ -17,6 +17,8 @@ import java.util.Map;
 
 import javax.swing.JOptionPane;
 
+import data.StgMail;
+
 /**
  * 
  * @author BERON Jean-Sébastien
@@ -68,6 +70,9 @@ public class PasserelleStage {
 			//ajout des stagiaires aux stages
 			/*stageExportList =*/ PasserelleStagiaire.ajoutPnc(stageExportList, stagiairePNCList);
 			/*stageExportList =*/ PasserelleStagiaire.ajoutPnt(stageExportList, stagiairePNTList);
+			
+			// clean stages annulés
+			cleanCancelList(stageExportList);
 			
 			Date dateActuelle = new Date();
 			
@@ -166,6 +171,23 @@ public class PasserelleStage {
 		return stageListnew;
 		
 	}//fin suppresionStagenonJ()
+	
+	/**
+	 * methode qui supprime les stages annulés de la liste
+	 * @return
+	 */
+	public static void cleanCancelList(ArrayList<Stage> stageList) {
+		ArrayList<Stage> remStg = new ArrayList<Stage>();
+		if (filterCancel) {
+			for (Stage stage : stageList) {
+				if (stage.getCode().matches(filterCancelPat)) {
+					System.out.println("- "+stage.getCode());
+					remStg.add(stage);
+				}
+			}
+			stageList.removeAll(remStg);
+		}
+	}
 	
 	/**
 	 * methode qui recupere les information dans export.txt
@@ -359,8 +381,11 @@ public class PasserelleStage {
 				|| module.getCodeStage().equalsIgnoreCase("non instruction")
 				|| module.getCodeStage().equalsIgnoreCase("mts")){
 				*/
-				if ( (filterCancel && module.getCodeStage().matches(filterCancelPat))
-						|| module.getCodeStage().matches(filterPat) ) {
+				if ( 
+				/*(filterCancel && module.getCodeStage().matches(filterCancelPat)
+						&& ! module.getCodeStage().matches(filterP123Pat))
+				 		|| */
+						module.getCodeStage().matches(filterPat) ) {
 					System.out.println("- "+module.getCodeStage());
 					//nothing
 				} else {
