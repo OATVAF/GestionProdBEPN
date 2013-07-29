@@ -9,6 +9,7 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -65,9 +66,9 @@ public class FenetreTVAffichage extends JFrame implements Runnable
 	private boolean TVreload = false;
 	
 	// Date
-	private static SimpleDateFormat fmtDate   = new SimpleDateFormat("dd/MM/yyyy");
-	private static SimpleDateFormat fmtTime   = new SimpleDateFormat("HH:mm");
-	private static SimpleDateFormat fmtSec    = new SimpleDateFormat("ss");
+	private static SimpleDateFormat fmtDate   = new SimpleDateFormat("dd MMMM yyyy");
+	private static Calendar Cal = Calendar.getInstance();
+	private static Calendar pCal = Calendar.getInstance();
 	// Fonts
 	
 	private static Font font1 = new Font(Config.get("aff.font1.font"),1,Config.getI("aff.font1.size"));
@@ -93,11 +94,14 @@ public class FenetreTVAffichage extends JFrame implements Runnable
 		pptFile = Config.get("aff.ppt");
 
 		//recuperation de la date d'aujourd'hui
-		dateActuelle = new Date();
+		dateActuelle = new Date(); Cal.setTime(dateActuelle);
+		pCal.set(Calendar.YEAR, 1900);
+		pCal.set(Calendar.MONTH, 1);
+		pCal.set(Calendar.DATE, 1);	
 		
 		//chargement des stages
-		StageList = PasserelleStage.chargerStageList(TVall);
-		pDate = dateActuelle;
+		//StageList = PasserelleStage.chargerStageList(TVall);
+		//pDate = dateActuelle; pCal.setTime(pDate);
 		/*
 		if(StageList.isEmpty()){
 			//boite de dialogue
@@ -242,7 +246,7 @@ public class FenetreTVAffichage extends JFrame implements Runnable
 		titleLabel = new JLabel();
 		titleLabel.setForeground(Color.WHITE);
 		titleLabel.setFont(font3);
-		titleLabel.setText("Stages du "+fmtDate.format(dateActuelle));
+		titleLabel.setText("Stages du dd/MM/yyyy");
 		titlePane.add(titleLabel);
 		
 	}//fin constructionTitlePane()
@@ -289,26 +293,24 @@ public class FenetreTVAffichage extends JFrame implements Runnable
 	public void run() {
 		
 		//variables locales
-		String strTime = "";
-		String strnNextTime = "";
-		
+		int pMin = -1;
 		//
 		while(run){// boucle infini
 			//actualisation de la date et de l'heure
-			dateActuelle = new Date();
+			dateActuelle = new Date(); Cal.setTime(dateActuelle);
+
 			//recuperation de l'heure
-			strTime = fmtTime.format(dateActuelle);
-			if ( (Integer.parseInt(fmtSec.format(dateActuelle)) % 2 ) == 0) {
-				timeLabel.setText("   "+strTime.replace(":", " ")+"   ");
-			} else {
-				timeLabel.setText("   "+strTime+"   ");
+			String strSep = ":";
+			if ( (Cal.get(Calendar.SECOND) % 2 ) == 0) {
+				strSep=" ";
 			}
+			timeLabel.setText(String.format("   %02d%s%02d   ", Cal.get(Calendar.HOUR_OF_DAY), strSep, Cal.get(Calendar.MINUTE)));
 		
 			//actualisation des stages toutes les minutes
-			if(! strnNextTime.equalsIgnoreCase(strTime)){
+			if ( Cal.get(Calendar.MINUTE) != pMin) {
 				afficherStages();
-				strnNextTime = strTime;
-			}//finsi
+				pMin = Cal.get(Calendar.MINUTE);
+			}
 			try {
 				//System.out.println("Sleep");
 				Thread.sleep(1000);
@@ -325,10 +327,8 @@ public class FenetreTVAffichage extends JFrame implements Runnable
 	 * procedure qui affiche les stages
 	 */
 	private void afficherStages(){
-
-		String strTime = fmtTime.format(dateActuelle);
-		int nbmin = Integer.parseInt(strTime.substring(0, 2))*60 + Integer.parseInt(strTime.substring(3, 5));
-
+		int nbmin = Cal.get(Calendar.HOUR_OF_DAY)*60+Cal.get(Calendar.MINUTE);
+		
 		System.out.println("nbmin :" + nbmin);
 
 		centerPane.remove(stagePane);
@@ -336,11 +336,15 @@ public class FenetreTVAffichage extends JFrame implements Runnable
 		centerPane.add(stagePane,BorderLayout.CENTER);
 		stageLabels = new JLabel[NBAFF][5];
 		
-		if (TVreload && PasserelleStage.ObjModDate().after(pDate)) {
-			//re-chargement des stages
-			System.out.println("Reload Liste at " + PasserelleStage.ObjModDate().toString());	
+		if (TVreload && (Cal.get(Calendar.DAY_OF_YEAR)!=pCal.get(Calendar.DAY_OF_YEAR)) ) {
+			//re-chargement des stages au changement de jour
+			System.out.println("Reload Liste at " + Cal.getTime());	
 			StageList = PasserelleStage.chargerStageList(TVall);
-			pDate = dateActuelle;
+			pDate = dateActuelle; pCal.setTime(pDate);
+			titleLabel.setText("Stages du "+fmtDate.format(dateActuelle));
+		}
+		else {
+			System.out.println("Pas reload Liste");				
 		}
 		
 		if (TVall == false) {
