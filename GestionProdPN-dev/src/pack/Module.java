@@ -1,5 +1,7 @@
 package pack;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 
 
@@ -45,9 +47,9 @@ public class Module implements Serializable, Comparable<Module> {
 		this.heureDebut = Hdebut;
 		this.heureFin = Hfin;
 		this.setSalle("");
-		this.setNomLeader("");
-		this.setNomAide("");
-		this.setNomIntervenant("");
+		this.nomLeader = "";
+		this.nomAide ="" ;
+		this.nomIntervenant = "";
 		this.coModule = null;
 	}
 	
@@ -181,16 +183,41 @@ public class Module implements Serializable, Comparable<Module> {
 	 */
 	public void setNomAide(String nomAide) {
 		this.nomAide = nomAide;
+		/*
+		if (this.nomAide.equals(""))
+			this.nomAide = nomAide;
+		else
+			//setNomIntervenant(nomAide);
+			if (! this.nomAide.contains(nomAide))
+				this.nomAide += ";"+nomAide;
+		*/
 	}
 
 	/**
 	 * getter de nomAide
 	 * @return nomaide
 	 */
+	// TODO
 	public String getNomAide() {
+		//if (getNomsAides().length == 1)
+		//	return this.nomAide;
+		//else {
+		//TODO	return getNomsAides()[0];
+		//}
 		return nomAide;
 	}
 	
+	public String[] getNomsAides() {
+		//ArrayList<String> ret = new ArrayList<String>();
+		//ret.addAll(Arrays.asList(this.nomAide.split(";")));
+		return this.nomAide.split(";");
+	}
+	
+	public String getNomsAidesStr() {
+		return this.nomAide;
+	}
+	
+
 	/**
 	 * setter de nomIntervenant
 	 * @param nomIntervenant

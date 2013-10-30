@@ -2,6 +2,7 @@ package data;
 
 import java.awt.Font;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import javax.swing.JTable;
 import javax.swing.UIManager;
@@ -134,10 +135,10 @@ public class ModelModules extends AbstractTableModel
         		if (modules.get(rowIndex).hasCoModule())
         			return modules.get(rowIndex).getCoModule().getNomLeader();
         		else
-            		return modules.get(rowIndex).getNomAide();
+            		return modules.get(rowIndex).getNomsAidesStr();
         	case 5:
         		if (modules.get(rowIndex).hasCoModule())
-        			return modules.get(rowIndex).getNomAide();
+        			return modules.get(rowIndex).getNomsAidesStr();
         		else
         			return modules.get(rowIndex).getNomIntervenant();
         	case 6:
