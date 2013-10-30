@@ -147,6 +147,8 @@ public class PasserelleStagiaire {
 							, cell[colNom].getContents(), cell[colPre].getContents()
 							, cell[colSpe].getContents(), cell[colSec].getContents()));
 				}
+			} catch (ArrayIndexOutOfBoundsException e) {
+				System.out.println("=> fin tableau Import PNC");
 			} catch (BiffException e) {
 				good = false;
 				JOptionPane.showMessageDialog(null, "<html>probleme de lecture de" +
@@ -184,6 +186,8 @@ public class PasserelleStagiaire {
 							, cell[colNom].getContents(), cell[colPre].getContents()
 							, cell[colSpe].getContents(), cell[colSec].getContents()));
 				}
+			} catch (ArrayIndexOutOfBoundsException e) {
+				System.out.println("=> fin tableau Import PNT");
 			} catch (BiffException e) {
 				good = false;
 				JOptionPane.showMessageDialog(null, "<html>probleme de lecture de" +
