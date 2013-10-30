@@ -31,6 +31,7 @@ public class PasserelleStage {
 	private static final String filterPat = Config.get("imp.delia.filter.stage");
 	private static final boolean filterCancel = Config.getB("imp.delia.filter.cancel");
 	private static final String filterCancelPat = Config.get("imp.delia.filter.cancel.pat");
+	private static final String filterCancelExpt = Config.get("imp.delia.filter.cancel.expt");
 	private static final String filterP123Pat = Config.get("imp.pm123.pat");
 	private static final String PncPntComTime = Config.get("imp.pnt.s2.group.time");
 	
@@ -299,12 +300,14 @@ public class PasserelleStage {
 						}
 						if(infoLigne.get(2).equalsIgnoreCase("instructeur")){
 							String n = infoLigne.get(1);
-							for (int i=1; i<10; i++) {
+							for (int i=1; i<=Config.getI("imp.fss.num"); i++) {
 								String fssFilter = Config.get("imp.fss.pat."+i);
 								if (fssFilter != null ) {
 									n = n.replaceFirst(fssFilter, Config.get("imp.fss.rep."+i));
 								}
-								if(infoLigne.get(31).equalsIgnoreCase("oui")){
+								if(infoLigne.get(31).equalsIgnoreCase("oui") 
+										/*&& ! infoLigne.get(22).matches(Config.get("imp.pnc.smg.noleader.pattern"))*/
+										) {
 									newmodule.setNomLeader(n);
 								}else{
 									newmodule.setNomAide(n);
@@ -381,10 +384,9 @@ public class PasserelleStage {
 				|| module.getCodeStage().equalsIgnoreCase("mts")){
 				*/
 				if ( 
-				/*(filterCancel && module.getCodeStage().matches(filterCancelPat)
-						&& ! module.getCodeStage().matches(filterP123Pat))
-				 		|| */
-						module.getCodeStage().matches(filterPat) ) {
+				(filterCancel && module.getCodeStage().matches(filterCancelPat)
+						&& ! module.getCodeStage().matches(filterCancelExpt))
+				 		|| module.getCodeStage().matches(filterPat) ) {
 					System.out.println("- "+module.getCodeStage());
 					//nothing
 				} else {
