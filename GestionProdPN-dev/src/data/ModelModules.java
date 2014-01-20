@@ -2,7 +2,9 @@ package data;
 
 import java.awt.Font;
 import java.util.ArrayList;
+import java.util.Collections;
 
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
@@ -10,8 +12,10 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 
 import pack.Module;
+import pack.PasserelleStagiaire;
 import pack.Stage;
 
+import ui.Messages;
 import ui.TableModelSorter;
 
 public class ModelModules extends AbstractTableModel
@@ -176,12 +180,24 @@ public class ModelModules extends AbstractTableModel
             
             switch(columnIndex){
             	case 0:
-            		s.setHeureDebut((String)aValue);
-            		stage.sortModules();
-            		fireTableDataChanged();
+            		if (((String)aValue).matches("[0-9][0-9]:[0-9][0-9]")) {
+            			s.setHeureDebut((String)aValue);
+            			stage.sortModules();
+            			fireTableDataChanged();
+            		}
+                	else {
+        				JOptionPane.showMessageDialog(null, "<html>Erreur de format d'heure :" +
+        						"<br/>respectez le format <b>hh:mm</b></html>", "Erreur", JOptionPane.ERROR_MESSAGE);
+                	}
             		break;
             	case 1:
-                	s.setHeureFin((String)aValue);
+            		if (((String)aValue).matches("[0-9][0-9]:[0-9][0-9]")) {
+            			s.setHeureFin((String)aValue);
+            		}
+                	else {
+        				JOptionPane.showMessageDialog(null, "<html>Erreur de format d'heure :" +
+        						"<br/>respectez le format <b>hh:mm</b></html>", "Erreur", JOptionPane.ERROR_MESSAGE);
+                	}
                     break;
                 case 2:
                 	s.setLibelle((String)aValue);

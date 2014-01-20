@@ -17,6 +17,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.ListCellRenderer;
 import javax.swing.SwingConstants;
@@ -237,7 +238,13 @@ public class ModelStages extends AbstractTableModel
                 	stage.getFirstModule().setSalle((String)aValue);
                 	break;
                 case 5:
-                	stage.getFirstModule().setHeureDebut(((String)aValue).replace(" ", ""));
+            		if (((String)aValue).matches("[0-9][0-9]:[0-9][0-9]")) {
+            			stage.getFirstModule().setHeureDebut(((String)aValue).replace(" ", ""));
+		    		}
+		        	else {
+						JOptionPane.showMessageDialog(null, "<html>Erreur de format d'heure :" +
+								"<br/>respectez le format <b>hh:mm</b></html>", "Erreur", JOptionPane.ERROR_MESSAGE);
+		        	}
                 	break;
                 default:
                     System.out.println("[ERR] ModelStages.setValueAt("+columnIndex+")");
