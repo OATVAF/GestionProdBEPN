@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 
 import javax.swing.JOptionPane;
@@ -385,7 +386,10 @@ public class PasserellePDF {
 		center.setTotalWidth(PageSize.A4.getWidth());
 
 		widths = new float[] { 2f, 2f, 1f, 1f, 2f };
-		for (int i=1; i<=colNum; i++) { widths[i-1]=Config.getF(cfg+"col"+i+".w"); }
+		for (int i=1; i<=colNum; i++) {
+			if (i > widths.length) { widths = Arrays.copyOf(widths, widths.length+1); }
+			widths[i-1]=Config.getF(cfg+"col"+i+".w");
+		}
 		center.setWidths(widths);
 
 		cell.setColspan(0);
@@ -571,7 +575,10 @@ public class PasserellePDF {
 		//center.setWidthPercentage(95);
 
 		widths = new float[] { 1f, 8f, 1.5f, 4f, 1.5f };
-		for (int i=1; i<=colNum; i++) { widths[i-1]=Config.getF(cfg+"col"+i+".w"); }
+		for (int i=1; i<=colNum; i++) {
+			if (i > widths.length) { widths = Arrays.copyOf(widths, widths.length+1); }
+			widths[i-1]=Config.getF(cfg+"col"+i+".w");
+		}
 		center.setWidths(widths);
 		center.setTotalWidth(PageSize.A4.getWidth());
 		
@@ -583,14 +590,15 @@ public class PasserellePDF {
 			center.addCell(cell);
 		}
 
-		int i;
+		int i; int j;
 		// TODO SG font constante
 		for (i = 0; i < sl.size(); i++) {
+				j=0;
 				cell.setPhrase(new Phrase(""+(i+1), font));
 				cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 				cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
 				cell.setBorder(Rectangle.TOP | Rectangle.BOTTOM | Rectangle.LEFT | Rectangle.RIGHT);
-				center.addCell(cell);
+				center.addCell(cell); j++;
 				cell.setPadding(1.5f);
 				// String str = "";
 				// TODO  SG liste statique
@@ -625,14 +633,15 @@ public class PasserellePDF {
 				cell.setColspan(1);
 				PdfPCell c = new PdfPCell(stgCell);
 				c.setPadding(1.5f);
-				center.addCell(c);
+				center.addCell(c); j++;
 
-				//presence
-				center.addCell(" ");
-				//emargement
-				center.addCell(" ");
-				//isvsmp
-				center.addCell(" ");
+				for (;j<colNum; j++) {
+					//presence
+					//emargement
+					//isvsmp
+					//
+					center.addCell(" ");
+				}
 		}
 		
 		// Test EAO
@@ -787,7 +796,10 @@ public class PasserellePDF {
 		center.setWidthPercentage(98);
 
 		float[] widths = new float[] { 0.8f, 8f, 1.5f, 4f, 4f, 1f, 1.5f };
-		for (int i=1; i<=colNum; i++) { widths[i-1]=Config.getF(cfg+"col"+i+".w"); }
+		for (int i=1; i<=colNum; i++) {
+			if (i > widths.length) { widths = Arrays.copyOf(widths, widths.length+1); }
+			widths[i-1]=Config.getF(cfg+"col"+i+".w");
+		}
 		center.setWidths(widths);
 		
 		//cell.setPaddingTop(0);
@@ -800,13 +812,14 @@ public class PasserellePDF {
 		}
 
 		cell.setPadding(1.5f);
-		int i;
+		int i; int j;
 		for (i = 0; i < leStage.getSizeStagiaireList(); i++) {
+				j=0;
 				cell.setPhrase(new Phrase(""+(i+1), font));
 				cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 				cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
 				cell.setBorder(7);
-				center.addCell(cell);
+				center.addCell(cell); j++;
 				cell.setHorizontalAlignment(Element.ALIGN_LEFT);
 				PdfPTable stgCell = new PdfPTable(10);
 				stgCell.setWidthPercentage(100);
@@ -840,24 +853,22 @@ public class PasserellePDF {
 				cell.setColspan(1);
 				PdfPCell c = new PdfPCell(stgCell);
 				c.setPadding(1.5f);
-				center.addCell(c);
+				center.addCell(c); j++;
 				
-				//presence
-				center.addCell(" ");
-				//emargement M
-				center.addCell(" ");
-				//emargement A-M
-				center.addCell(" ");
-				//DIF
-				center.addCell(" ");
-				//isvsmp
-				center.addCell(" ");
+				for (;j<colNum;j++) {
+					//presence
+					//emargement M
+					//emargement A-M
+					//DIF
+					//isvsmp
+					center.addCell(" ");
+				}
 		}
 		if(i<rowNum){
 			cell.setBorder(0);
 			cell.setPhrase(new Phrase(" \n ", font));
 			cell.setColspan(colNum);
-			for (int j = i; j < rowNum; j++) {
+			for (j = i; j < rowNum; j++) {
 				center.addCell(cell);
 			}//fin pour
 		}//fin si
