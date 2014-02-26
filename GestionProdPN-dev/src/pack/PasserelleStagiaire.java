@@ -1,6 +1,5 @@
 package pack;
 import java.io.*;
-import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -10,17 +9,26 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.regex.PatternSyntaxException;
 
 import javax.swing.*;
 
 import data.StgMail;
 
+/*
 import jxl.*;
 import jxl.read.biff.*;
 
 import jxl.write.*;
 import jxl.write.biff.RowsExceededException;
+*/
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 
 /**
  * 
@@ -35,6 +43,7 @@ public class PasserelleStagiaire {
 	private static final String pathFileSMS= Config.get("exp.sms"); // "dataExport\\ListSMS.xls"
 	private static final String pathDirTests= Config.get("exp.tests.dir"); // "dataExport\\Tests du"
 	
+	private static SimpleDateFormat dfBO = new SimpleDateFormat("dd/MM/yyyy");
 	private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	private static Date dateDemain;
 	
@@ -82,14 +91,16 @@ public class PasserelleStagiaire {
 				boolean append = Config.getB(cfg+"append");
 				
 				File f = new File(pnIn);
-				Workbook wb = Workbook.getWorkbook(f);
-				Sheet sh = wb.getSheet(0);
-				StgMail h = new StgMail(sh.getRow(0),0);
-				for (int i=1; i< sh.getRows(); i++) {
-					Cell[] c = sh.getRow(i);
-					StgList.add(new StgMail(c,i-1));
+				Workbook wb = WorkbookFactory.create(f);
+				Sheet sh = wb.getSheetAt(0);
+				Iterator<Row> rows = sh.rowIterator();
+				StgMail h = new StgMail(rows.next(),0);
+				for (int i=1; rows.hasNext(); i++) {
+					Row row = rows.next();
+					if (row.getLastCellNum() > 0)
+						StgList.add(new StgMail(row,i-1));
 				}
-				wb.close();
+				//wb.close();
 	
 				for (int i=0; i< num; i++) {
 					qListes[i]=(Config.get(cfg+(i+1)));
@@ -108,7 +119,7 @@ public class PasserelleStagiaire {
 					P[i].close();
 				}
 			}
-		} catch (BiffException e) {
+		} catch (InvalidFormatException  e) {
 			good = false;
 			JOptionPane.showMessageDialog(null, "<html>probleme de lecture de" +
 					"<br>"+pnIn+"</html>", "Erreur", JOptionPane.ERROR_MESSAGE);
@@ -129,19 +140,22 @@ public class PasserelleStagiaire {
 		ArrayList<Stagiaire> StagiaireList = new ArrayList<Stagiaire>();
 			try {
 				File fichier = new File(pathFilePnc);
-				Workbook workbook;
-				workbook = Workbook.getWorkbook(fichier);
-				Sheet sheet = workbook.getSheet(0);
-				for (int i = 1; i < sheet.getRows(); i++) {
-					Cell[] cell = sheet.getRow(i);
-					StagiaireList.add(new Stagiaire(cell[4].getContents(), cell[11].getContents()
-							, cell[5].getContents(), cell[6].getContents()
-							, cell[2].getContents(), cell[3].getContents()
-							, cell[0].getContents(), cell[12].getContents()));
+				Workbook workbook = WorkbookFactory.create(fichier);			
+				Sheet sheet = workbook.getSheetAt(0);
+				Iterator<Row> rows = sheet.rowIterator();
+				rows.next();	// Skip header
+				while (rows.hasNext()) {
+					Row row = rows.next();
+					if (row.getLastCellNum() > 0)
+						StagiaireList.add(new Stagiaire(
+							  row.getCell(4).getStringCellValue(), row.getCell(11).getStringCellValue()
+							, dfBO.format(row.getCell(5).getDateCellValue()), dfBO.format(row.getCell(6).getDateCellValue())
+							, row.getCell(2).getStringCellValue(), row.getCell(3).getStringCellValue()
+							, row.getCell(0).getStringCellValue(), row.getCell(12).getStringCellValue()));
 				}
 			} catch (ArrayIndexOutOfBoundsException e) {
 				System.out.println("=> fin tableau Import PNC");
-			} catch (BiffException e) {
+			} catch (InvalidFormatException e) {
 				good = false;
 				JOptionPane.showMessageDialog(null, "<html>probleme de lecture de" +
 						"<br/>"+pathFilePnc+"</html>", "Erreur", JOptionPane.ERROR_MESSAGE);
@@ -160,19 +174,22 @@ public class PasserelleStagiaire {
 		ArrayList<Stagiaire> StagiaireList = new ArrayList<Stagiaire>();
 			try {
 				File fichier = new File(pathFilePnt);
-				Workbook workbook;
-				workbook = Workbook.getWorkbook(fichier);
-				Sheet sheet = workbook.getSheet(0);
-				for (int i = 1; i < sheet.getRows(); i++) {
-					Cell[] cell = sheet.getRow(i);
-					StagiaireList.add(new Stagiaire(cell[3].getContents(), cell[9].getContents()
-							, cell[4].getContents(), cell[5].getContents()
-							, cell[1].getContents(), cell[2].getContents()
-							, cell[0].getContents(), cell[12].getContents()));
+				Workbook workbook = WorkbookFactory.create(fichier);			
+				Sheet sheet = workbook.getSheetAt(0);
+				Iterator<Row> rows = sheet.rowIterator();
+				rows.next();	// Skip header
+				while (rows.hasNext()) {
+					Row row = rows.next();
+					if (row.getLastCellNum() > 0)
+						StagiaireList.add(new Stagiaire(
+							  row.getCell(3).getStringCellValue(), row.getCell(9).getStringCellValue()
+							, dfBO.format(row.getCell(4).getDateCellValue()), dfBO.format(row.getCell(5).getDateCellValue())
+							, row.getCell(1).getStringCellValue(), row.getCell(2).getStringCellValue()
+							, row.getCell(0).getStringCellValue(), row.getCell(12).getStringCellValue()));
 				}
 			} catch (ArrayIndexOutOfBoundsException e) {
 				System.out.println("=> fin tableau Import PNT");
-			} catch (BiffException e) {
+			} catch (InvalidFormatException e) {
 				good = false;
 				JOptionPane.showMessageDialog(null, "<html>probleme de lecture de" +
 						"<br/>"+pathFilePnt+"</html>", "Erreur", JOptionPane.ERROR_MESSAGE);
@@ -412,25 +429,22 @@ Next:	for (Stagiaire stagiaire : pncList) {
 		
 			try {
 				File file = new File(pathFileSMS);
-				WritableWorkbook workbook;
-				workbook = Workbook.createWorkbook(file);
-				WritableSheet sheet = workbook.createSheet("ListeMAT", 0);
+				Workbook workbook = new HSSFWorkbook();
+				Sheet sheet = workbook.createSheet("ListeMAT");
 				for (int i = 0; i < StagiaireList.size(); i++) {
-					sheet.addCell(new Label(0, i, StagiaireList.get(i).getMatricule()));
-					sheet.addCell(new Label(1, i, StagiaireList.get(i).getCodeStage()));
-					sheet.addCell(new Label(2, i, StagiaireList.get(i).getDateDebStage()));
+					Row row = sheet.createRow(i);
+					row.createCell(0).setCellValue(StagiaireList.get(i).getMatricule());
+					row.createCell(1).setCellValue(StagiaireList.get(i).getCodeStage());
+					row.createCell(2).setCellValue(StagiaireList.get(i).getDateDebStage());
 				}
-				workbook.write();
-				workbook.close();
+				FileOutputStream fileOut = new FileOutputStream(file);
+				workbook.write(fileOut);
+				fileOut.close();
 			} catch (IOException e) {
 				good = false;
 				JOptionPane.showMessageDialog(null, "<html>probleme d'ecriture de<br>"+pathFileSMS,
 						"Erreur", JOptionPane.ERROR_MESSAGE);
-			} catch (RowsExceededException e) {
-				good = false;
-				JOptionPane.showMessageDialog(null, "<html>probleme d'ecriture de<br>"+pathFileSMS,
-						"Erreur", JOptionPane.ERROR_MESSAGE);
-			} catch (WriteException e) {
+			} catch (IllegalArgumentException  e) {
 				good = false;
 				JOptionPane.showMessageDialog(null, "<html>probleme d'ecriture de<br>"+pathFileSMS,
 						"Erreur", JOptionPane.ERROR_MESSAGE);
