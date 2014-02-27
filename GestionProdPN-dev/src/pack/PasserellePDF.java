@@ -497,6 +497,10 @@ public class PasserellePDF {
 		float[] widths;
 		String code = leStage.getCode();
 		boolean eao = code.matches(Config.get(cfg+"eao.pattern"));
+		boolean sur = code.matches(Config.get(cfg+"eao_sur.pattern"));
+		if (sur) {
+			colNum = Config.getI(cfg+"colnum.sur");
+		}
 		
 		ArrayList<Stagiaire> sl = new ArrayList<Stagiaire>();
 		sl.addAll(leStage.getStagiaireList());
@@ -647,16 +651,22 @@ public class PasserellePDF {
 		// Test EAO
 		PdfPTable footer0 = new PdfPTable(1);
 		footer0.setTotalWidth(PageSize.A4.getWidth());
-		if (eao) {
-			footer0.setWidthPercentage(95);
+
+		footer0.setWidthPercentage(95);
+		if (sur) {
+			cell = new PdfPCell(new Phrase(Config.get(cfg+"eao_sur.s2"), font9));
+		} else if (eao) {
 			cell = new PdfPCell(new Phrase(Config.get(cfg+"eao.s2"), font9));
-			cell.setHorizontalAlignment(Element.ALIGN_LEFT);
-			cell.setPadding(10);
-			cell.setBorder(0);
-			footer0.addCell(cell);
-			cell.setPhrase(new Phrase(""));
-			footer0.addCell(cell);
 		}
+		else {
+			cell = new PdfPCell(new Phrase(Config.get(cfg+"doc.s2"), font9));
+		}
+		cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+		cell.setPadding(10);
+		cell.setBorder(0);
+		footer0.addCell(cell);
+		cell.setPhrase(new Phrase(""));
+		footer0.addCell(cell);
 
 		// Padding
 		PdfPTable space = new PdfPTable(1);
@@ -672,7 +682,8 @@ public class PasserellePDF {
 		doc.add(header);
 		doc.add(center);
 		doc.add(space);
-		if (eao) doc.add(footer0);
+		/*if (eao) */
+		doc.add(footer0);
 		doc.add(footer);
 			
 	}//fin
