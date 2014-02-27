@@ -1,7 +1,11 @@
 package data;
 
+import java.util.Iterator;
+
 import pack.Config;
-import jxl.Cell;
+//import jxl.Cell;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
 
 public class StgMail {
 
@@ -15,9 +19,18 @@ public class StgMail {
 		prop = new String[nCols];
 		if (c.length > 0) {
 			for (int j=0; j<nCols && j<c.length; j++)
-				prop[j]=c[j].getContents();
+				prop[j]=c[j].getStringCellValue();
 			n = i;
 		}
+	}
+	public StgMail(Row r, int i) {
+		prop = new String[nCols];
+		Iterator<Cell> cells = r.cellIterator();
+		for (int j=0; j<nCols && cells.hasNext(); j++) {
+			Cell c = cells.next();
+			prop[j]=c.getStringCellValue();
+		}
+		n = i;			
 	}
 	public String toString() {
 		//return Nom + "\t" + Prenom + "\t" + Matricule + "\t" + Fct + "\t" + Email + "\t" + NumStage + "\t" + Site;
