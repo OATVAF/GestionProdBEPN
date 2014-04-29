@@ -218,11 +218,12 @@ public class PasserelleStagiaire {
 				int n = 0;
 				long modulo = 0;
 				for (Stagiaire stagiaire : pntList) {
-					if (stagiaire.getCodeStage().trim().matches(s2pat)) {
+					if (stagiaire.getCodeStage().trim().matches(s2pat) 
+							&& stagiaire.isInStageS2(stage)) {
 						// modulo pour les S2
 						modulo = (n % stage.getIdxMax()) +1 ;
 						if (modulo == stage.getIdx()) {
-							System.out.println("Ajout PNT "+n+ " " + stagiaire.getNom() + " au stage " +stage.getCode());
+							System.out.println("Ajout PNT "+n+ " " + stagiaire.getNom() + " au stage " +stage.getCode() + stagiaire.getCodeStage());
 							stage.ajoutStagiaire(stagiaire);
 						}
 						n++;

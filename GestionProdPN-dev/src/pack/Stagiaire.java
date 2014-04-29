@@ -216,6 +216,17 @@ public class Stagiaire implements Serializable, Comparable<Stagiaire> {
 		}
 		return false;
 	}
+	public boolean isInStageS2(Stage stage) {
+		if (stage == null) return false;
+		String secteur = stage.getCode().replace("S2 ", "");
+		if ( this.comment.contains(secteur) 
+			 &&! stage.getDateDt().before(this.getDateDeb())
+			 && ! stage.getDateDt().after(this.getDateFin()) ) {
+			return true;
+		}
+		return false;
+	}
+
 	public int compareTo(Stagiaire other) {
 		return (this.toString().compareTo(other.toString()));
 	}
